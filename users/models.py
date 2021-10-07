@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.contrib.auth.base_user import BaseUserManager
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from .managers import UserManager
 
@@ -24,10 +24,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         ),
     )
 
+    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+
     objects = UserManager()
 
     USERNAME_FIELD = 'mobile'
-    REQUIRED_FIELDS = ['user_id']
+    REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = _('user')
