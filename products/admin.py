@@ -4,16 +4,20 @@ from .models import Product, ProductType, ProductTypeSelector, ProductTypeSelect
 from .forms import ProductVariantAdminForm
 
 
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('title', 'dkp', 'is_active', 'type', 'pk')
+
+
 class ProductVariantAdmin(admin.ModelAdmin):
     form = ProductVariantAdminForm
     list_display = ('dkpc', 'product', 'get_selectors', 'price_min', 'is_active', 'no_competition')
     list_editable = ('price_min', 'is_active')
-    search_fields = ('dkpc', 'product__name', 'selector_values__value')
+    search_fields = ('dkpc', 'product__title', 'selector_values__value')
     list_filter = ('is_active',)
 
     @admin.display(description='selectors')
     def get_selectors(self, obj):
-        return ' | '.join([s.value for s in obj.selector_values.all()])
+        return ' | '.join([f'{s.value} - {s.digikala_id}' for s in obj.selector_values.all()])
 
     def no_competition(self, obj):
         return not obj.has_competition
@@ -27,10 +31,11 @@ class ProductVariantAdmin(admin.ModelAdmin):
 
 
 class ProductTypeSelectorValueAdmin(admin.ModelAdmin):
-    list_display = ('digikala_id', 'value', 'selector' , 'pk')
+    list_display = ('digikala_id', 'value', 'selector', 'pk')
+    readonly_fields = ('digikala_id', 'value', 'selector')
 
 
-admin.site.register(Product)
+admin.site.register(Product, ProductAdmin)
 admin.site.register(ProductType)
 admin.site.register(ProductTypeSelector)
 admin.site.register(ProductTypeSelectorValue, ProductTypeSelectorValueAdmin)
