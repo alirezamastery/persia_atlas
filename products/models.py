@@ -40,7 +40,7 @@ class ProductVariant(models.Model):
     dkpc = models.CharField(max_length=256, unique=True, blank=False, null=False)
     price_min = models.IntegerField(blank=False, null=False)
     is_active = models.BooleanField(default=True, blank=False, null=False)
-    has_competition = models.BooleanField(default=True, blank=False, null=False)
+    has_competition = models.BooleanField(default=True, blank=False, null=False, editable=False)
     selector_values = models.ManyToManyField(ProductTypeSelectorValue, related_name='variants')
 
     def __str__(self):

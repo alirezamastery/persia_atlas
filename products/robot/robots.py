@@ -46,8 +46,8 @@ class TrailingPriceRobot(RobotBase):
             page_data = page.get_page_data()
             self.out_of_stock += page_data['out_of_stock']
             variants_data = page_data['variants_data']
-            # if variants_data:
-            #     self.process_variants_data(variants_data)
+            if variants_data:
+                self.process_variants_data(variants_data)
             time.sleep(round(random.uniform(1, 2), 2))
 
     def process_variants_data(self, variants_data: dict):

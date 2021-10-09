@@ -13,7 +13,7 @@ class PageBase:
 
     def __init__(self, product_obj: Product):
         self.product_obj = product_obj
-        self.my_variants = list(self.product_obj.variants.all())
+        self.my_variants = list(self.product_obj.variants.filter(is_active=True))
 
         # so far we have only seen one variant selector in each product page
         # so we don't add more than more than one selector to ProductType objects
