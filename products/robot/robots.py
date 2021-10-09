@@ -17,22 +17,24 @@ class TrailingPriceRobot(RobotBase):
 
     help = 'maintains price of our variants below competition price'
 
+    def __init__(self, *args, **kwargs):
+        self.tail = kwargs.pop('tail')
+        super().__init__(*args, **kwargs)
+
     def run(self):
-        while True:
-            logger('CYCLE START'.center(LOG_W), color='green')
-            try:
-                self.login()
-                self.check_products()
-                logger('CYCLE END'.center(LOG_W), color='green')
-                self.report()
-            except Exception as e:
-                logger('ERROR:', e, color='red')
-                self.exception_wait()
-            else:
-                break
+        logger('CYCLE START'.center(LOG_W), color='green')
+        self.login()
+        self.check_products()
+        logger('CYCLE END'.center(LOG_W), color='green')
+        self.report()
 
     def check_products(self):
-        active_products = Product.objects.filter(is_active=True)
+        if self.tail and self.tail.isdigit():
+            active_products = Product.objects \
+                                  .filter(is_active=True) \
+                                  .order_by('-id')[:int(self.tail):-1]
+        else:
+            active_products = Product.objects.filter(is_active=True)
         self.out_of_stock = []
         self.min_reached = []
         self.no_competition = []
@@ -52,17 +54,17 @@ class TrailingPriceRobot(RobotBase):
 
     def process_variants_data(self, variants_data: dict):
         for dkpc, var_data in variants_data.items():
-            while True:
-                try:
-                    if var_data['has_competition']:
-                        self.handle_competition(dkpc, var_data)
-                    else:
-                        self.no_competition.append(dkpc)
-                        self.set_no_competition_price(dkpc, var_data)
-                    break
-                except Exception as e:
-                    logger('ERROR:', e, color='red')
-                    self.exception_wait()
+            # while True:
+            #     try:
+            if var_data['has_competition']:
+                self.handle_competition(dkpc, var_data)
+            else:
+                self.no_competition.append(dkpc)
+                self.set_no_competition_price(dkpc, var_data)
+                # break
+                # except Exception as e:
+                #     logger('ERROR:', e, color='red')
+                #     self.exception_wait()
 
     def handle_competition(self, dkpc: int, var_data: dict):
         my_price = var_data['my_price']

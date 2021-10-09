@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from unidecode import unidecode
 
-from products.models import Product , ProductVariant
+from products.models import Product, ProductVariant
 from utils.logging import logger, plogger, LOG_VALUE_WIDTH, plogger_flat
 
 
@@ -39,8 +39,6 @@ class PageBase:
 
         my_variants_selectors = [v.selector_values.first().digikala_id for v in self.my_variants]
         my_variants_dkpcs = [v.dkpc for v in self.my_variants]
-        logger(f'{my_variants_selectors = }')
-        logger(f'{my_variants_dkpcs = }')
 
         ecpd2 = self.extract_javascript_object('ecpd2')
         variants_js = ecpd2.get('variants')
@@ -48,14 +46,12 @@ class PageBase:
             return None
 
         other_variants = {selector: [] for selector in my_variants_selectors}
-
         for var_data in variants_js:
             # right now variants in page only have either color or size and we have only
             # 'size' and 'color' in our database for ProductTypeSelector table
             if var_data[self.selector.title] in my_variants_selectors and \
                     str(var_data['id']) not in my_variants_dkpcs:
-                other_variants[var_data['color']].append(var_data['id'])
-
+                other_variants[var_data[self.selector.title]].append(var_data['id'])
         return other_variants
 
     def extract_javascript_object(self, obj_name: str):
@@ -66,14 +62,18 @@ class PageBase:
         return json.loads(var)
 
     def get_all_variants(self):
-        try:
-            self.other_variants = self.find_other_sellers_variants()
-            if self.other_variants is None:
-                return None
-        except Exception as e:
-            logger('ERROR:', e, color='red')
+        self.other_variants = self.find_other_sellers_variants()
+        if self.other_variants is None:
             return None
-        return self.soup.find('ul', class_='js-product-variants')
+        return self.get_product_selectors()
+
+    def get_product_selectors(self):
+        selector = self.selector.title
+        if selector == 'color':
+            return self.soup.find('ul', class_='js-product-variants')
+        elif selector == 'size':
+            return self.soup.find('div', class_='c-product__product-size-wrapper')
+        return None
 
 
 class CheckPricePage(PageBase):

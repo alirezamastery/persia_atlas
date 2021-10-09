@@ -1,5 +1,6 @@
 import inspect
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from pprint import pformat
 from textwrap import indent
 
@@ -33,7 +34,7 @@ def get_call_stack_info():
 
 
 def logger(*args, color: str = 'light_gray', bg_color: str = None):
-    date = datetime.now().strftime('%Y-%m-%d  %H:%M:%S')
+    date = datetime.now(ZoneInfo('Asia/Tehran')).strftime('%Y-%m-%d  %H:%M:%S')
     style = ''
     if color:
         style += fg(color)
@@ -54,7 +55,7 @@ def logger(*args, color: str = 'light_gray', bg_color: str = None):
 
 
 def plogger(data_obj, color: str = '', bg_color: str = ''):
-    date = datetime.now().strftime('%Y-%m-%d  %H:%M:%S')
+    date = datetime.now(ZoneInfo('Asia/Tehran')).strftime('%Y-%m-%d  %H:%M:%S')
     style = ''
     if color:
         style += fg(color)

@@ -6,6 +6,8 @@ from .forms import ProductVariantAdminForm
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('title', 'dkp', 'is_active', 'type', 'pk')
+    list_filter = ('is_active',)
+    search_fields = ('title', 'dkp')
 
     def has_delete_permission(self, request, obj=None):
         if request.user.mobile == '09358578419':
