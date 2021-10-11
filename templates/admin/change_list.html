@@ -1,0 +1,13 @@
+{% extends 'admin/change_list.html' %}
+
+{% block content %}
+{{ block.super }}
+<script type="text/javascript" defer>
+    const changListForm = document.getElementById('changelist-form')
+    const resultDiv = changListForm.getElementsByClassName('results')[0]
+    const paginatorClone = changListForm.getElementsByClassName('paginator')[0].cloneNode(true)
+    const actionsBtn = changListForm.getElementsByClassName('actions')[0]
+    paginatorClone.style.marginTop = '10px'
+    actionsBtn.append(paginatorClone)
+</script>
+{% endblock %}

@@ -1,4 +1,5 @@
 import json
+import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -14,6 +15,8 @@ class PageBase:
     def __init__(self, product_obj: Product):
         self.product_obj = product_obj
         self.my_variants = list(self.product_obj.variants.filter(is_active=True))
+        if len(self.my_variants) == 0:
+            logger(f'no active variants for {self.product_obj}', color='yellow')
 
         # so far we have only seen one variant selector in each product page
         # so we don't add more than more than one selector to ProductType objects
@@ -28,8 +31,15 @@ class PageBase:
     def get_product_page(dkp):
         url = f'https://www.digikala.com/product/dkp-{dkp}'
         logger(url, color='cyan')
-        response = requests.get(url, timeout=5, headers={'user-agent': 'Mozilla/5.0'})
-        return response.content
+        while True:
+            try:
+                response = requests.get(url,
+                                        timeout=5,
+                                        headers={'user-agent': 'Mozilla/5.0'})
+                return response.content
+            except requests.exceptions.ReadTimeout as e:
+                logger(e, color='yellow')
+                time.sleep(5)
 
     def find_other_sellers_variants(self):
         """

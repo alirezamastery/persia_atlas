@@ -11,8 +11,13 @@ class Command(BaseCommand):
             '--tail',
             action='store',
         )
+        parser.add_argument(
+            '--dkp',
+            action='store',
+        )
 
     def handle(self, *args, **options):
         tail = options.get('tail')
-        robot = TrailingPriceRobot(tail=tail)
+        dkp = options.get('dkp')
+        robot = TrailingPriceRobot(dkp=dkp, tail=tail)
         robot.run()
