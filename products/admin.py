@@ -28,6 +28,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
     search_fields = ('dkpc', 'product__title', 'selector_values__value')
     list_filter = ('is_active',)
     save_on_top = True
+    filter_horizontal = ['selector_values']
 
     @admin.display(description='selectors')
     def get_selectors(self, obj):

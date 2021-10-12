@@ -14,6 +14,9 @@ class ProductVariantAdminForm(ModelForm):
         selector_values = self.cleaned_data.get('selector_values')
         already_exists = []
         variants = product.variants.all()
+        if len(selector_values) > 1:
+            msg = f'you can not select more than one selector value'
+            raise ValidationError(msg)
         for var in variants:
             for value in selector_values:
                 if value in var.selector_values.all():

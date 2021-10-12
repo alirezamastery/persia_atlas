@@ -32,7 +32,7 @@ class ProductTypeSelectorValue(models.Model):
     value = models.CharField(max_length=256, unique=True, blank=False, null=False)
 
     def __str__(self):
-        return f'{self.selector} - {self.value}'
+        return f'{self.selector} - {self.value} - {self.digikala_id}'
 
 
 class ProductVariant(models.Model):
