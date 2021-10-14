@@ -42,6 +42,15 @@ class ProductVariant(models.Model):
     is_active = models.BooleanField(default=True, blank=False, null=False)
     has_competition = models.BooleanField(default=True, blank=False, null=False, editable=False)
     selector_values = models.ManyToManyField(ProductTypeSelectorValue, related_name='variants')
+    actual_product = models.ForeignKey('ActualProduct', null=True, on_delete=models.SET_NULL,
+                                       related_name='variants')
 
     def __str__(self):
         return f'{self.dkpc}'
+
+
+class ActualProduct(models.Model):
+    title = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.title}'

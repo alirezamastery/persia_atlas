@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import Product, ProductType, ProductTypeSelector, ProductTypeSelectorValue, ProductVariant
-from .forms import ProductVariantAdminForm
+from .models import Product, ProductType, ProductTypeSelector, ProductTypeSelectorValue, ProductVariant, ActualProduct
+from .forms import ProductVariantAdminForm, ActualProductAdminForm
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -19,6 +19,15 @@ class ProductAdmin(admin.ModelAdmin):
             return []
         else:
             return ['title', 'dkp', 'type']
+
+
+class ProductVariantInline(admin.TabularInline):
+    model = ProductVariant
+
+
+class ActualProductAdmin(admin.ModelAdmin):
+    # inlines = [ProductVariantInline]
+    pass
 
 
 class ProductVariantAdmin(admin.ModelAdmin):
@@ -84,3 +93,4 @@ admin.site.register(ProductType, ProductTypeAdmin)
 admin.site.register(ProductTypeSelector)
 admin.site.register(ProductTypeSelectorValue, ProductTypeSelectorValueAdmin)
 admin.site.register(ProductVariant, ProductVariantAdmin)
+admin.site.register(ActualProduct, ActualProductAdmin)

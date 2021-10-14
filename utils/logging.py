@@ -98,4 +98,3 @@ def plogger_flat(data_obj: dict, color: str = 'light_gray', bg_color: str = ''):
                 print(f'{indent_str} {style}{key_format(key)} {value}{RESET}')
         log_file.write(LINE_SEPARATOR + '\n')
         print(LINE_SEPARATOR)
-'https://seller.digikala.com/ajax/variants/search/?sortColumn=&sortOrder=desc&page=1&items=200&search[type]=all&search[value]=jmt&'

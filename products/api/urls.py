@@ -1,11 +1,13 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
 
-from .views import ProductVariantsViewSet, ProductVariantsListView
+from .views import (ProductVariantsViewSet, ProductVariantsListView, ActualProductListView, ActualProductDetailView)
 
 
 urlpatterns = [
-    path('vv/', ProductVariantsListView.as_view())
+    path('variants/', ProductVariantsListView.as_view()),
+    path('actual-products/', ActualProductListView.as_view()),
+    path('actual-products/<int:pk>/', ActualProductDetailView.as_view()),
 ]
 
 router = SimpleRouter()

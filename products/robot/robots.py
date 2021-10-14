@@ -100,12 +100,13 @@ class TrailingPriceRobot(RobotBase):
                 variant.save()
 
     def update_variant_price_toman(self, dkpc: Union[str, int], price: int, increasing: bool = False):
+        digi_data = self.get_digi_variant_data(dkpc)
         payload = {
             'id':                        str(dkpc),
-            'lead_time':                 '1',
+            'lead_time':                 digi_data['lead_time_latin'],
             'price_sale':                price * 10,
-            'marketplace_seller_stock':  '5',
-            'maximum_per_order':         '2',
+            'marketplace_seller_stock':  digi_data['marketplace_seller_stock_latin'],
+            'maximum_per_order':         digi_data['maximum_per_order_latin'],
             'oldSellerStock':            '5',
             'selling_chanel':            '',
             'is_buy_box_suggestion':     '0',
@@ -119,6 +120,20 @@ class TrailingPriceRobot(RobotBase):
         data = json.loads(decoded)
         plogger(data)
         self.check_server_response_for_update(data, dkpc, price, increasing)
+
+    def get_digi_variant_data(self, dkpc: int) -> dict:
+        url = f'https://seller.digikala.com/ajax/variants/search/?sortColumn=&sortOrder=desc&page=1&' \
+              f'items=10&search[type]=product_variant_id&search[value]={dkpc}&'
+        response = self.session.get(url)
+        response = response.json()
+        while True:
+            if response['status']:
+                digi_item = response['data']['items'][0]
+                if not digi_item['product_variant_id'] == dkpc:
+                    raise Exception('digikala search result dkpc is different from our variant dkpc!')
+                return digi_item
+            else:
+                pass
 
     def check_server_response_for_update(self, response, dkpc, price, increasing):
         if not increasing:

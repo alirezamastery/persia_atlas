@@ -1,6 +1,6 @@
 from pprint import pprint
 from django.forms import ModelForm, ValidationError
-from .models import ProductVariant, Product
+from .models import ProductVariant, Product, ActualProduct
 
 
 class ProductVariantAdminForm(ModelForm):
@@ -11,9 +11,10 @@ class ProductVariantAdminForm(ModelForm):
     def clean(self):
         super().clean()
         product = self.cleaned_data.get('product')
+        dkpc = self.cleaned_data.get('dkpc')
+        variants = product.variants.exclude(dkpc=dkpc).all()
         selector_values = self.cleaned_data.get('selector_values')
         already_exists = []
-        variants = product.variants.all()
         if len(selector_values) > 1:
             msg = f'you can not select more than one selector value'
             raise ValidationError(msg)
@@ -29,4 +30,16 @@ class ProductVariantAdminForm(ModelForm):
             values = ' | '.join([s.value for s in already_exists])
             msg = f'Variant for " {product.title} " with selectors: {values} already exists'
             raise ValidationError(msg)
+        return self.cleaned_data
+
+
+class ActualProductAdminForm(ModelForm):
+    class Meta:
+        model = ActualProduct
+        fields = '__all__'
+
+    def clean(self):
+        super().clean()
+        variants = self.cleaned_data.get('variants')
+        print(variants)
         return self.cleaned_data

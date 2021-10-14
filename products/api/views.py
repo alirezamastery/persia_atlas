@@ -9,10 +9,11 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from utils.logging import logger, plogger
-from ..models import Product, ProductVariant, ProductType, ProductTypeSelector, ProductTypeSelectorValue
+from ..models import (Product, ProductVariant, ActualProduct, ProductType, ProductTypeSelector,
+                      ProductTypeSelectorValue)
 from ..serializers import (ProductSerializer, ProductVariantSerializer, ProductTypeSerializer,
                            ProductTypeSelectorSerializer, ProductTypeSelectorValueSerializer,
-                           VariantSerializerDigikalaContext)
+                           VariantSerializerDigikalaContext, ActualProductSerializer)
 
 
 class ProductVariantsViewSet(RetrieveModelMixin,
@@ -71,3 +72,21 @@ class ProductVariantsListView(APIView):
                     break
         plogger(serialized)
         return Response(serialized, status=status.HTTP_200_OK)
+
+
+class ActualProductListView(APIView):
+
+    def get(self, request):
+        actual_products = ActualProduct.objects.all()
+        return Response(ActualProductSerializer(actual_products, many=True).data,
+                        status.HTTP_200_OK)
+
+
+class ActualProductDetailView(APIView):
+
+    def get(self, request, pk):
+        actual_product = ActualProduct.objects.get(pk=pk)
+
+        return Response(ActualProductSerializer(actual_product).data , status.HTTP_200_OK)
+
+
