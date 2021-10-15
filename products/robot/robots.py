@@ -106,7 +106,7 @@ class TrailingPriceRobot(RobotBase):
             'lead_time':                 digi_data['lead_time_latin'],
             'price_sale':                price * 10,
             'marketplace_seller_stock':  digi_data['marketplace_seller_stock_latin'],
-            'maximum_per_order':         digi_data['maximum_per_order_latin'],
+            'maximum_per_order':         '5',
             'oldSellerStock':            '5',
             'selling_chanel':            '',
             'is_buy_box_suggestion':     '0',
@@ -129,7 +129,13 @@ class TrailingPriceRobot(RobotBase):
         while True:
             if response['status']:
                 digi_item = response['data']['items'][0]
-                if not digi_item['product_variant_id'] == dkpc:
+                if not str(digi_item['product_variant_id']) == dkpc:
+                    plogger({
+                        'error':                            'different variant id from digikala search',
+                        'our dkpc':                         dkpc,
+                        'digikala item product_variant_id': digi_item['product_variant_id'],
+                        'digikala item id':                 digi_item['id'],
+                    }, color='red')
                     raise Exception('digikala search result dkpc is different from our variant dkpc!')
                 return digi_item
             else:

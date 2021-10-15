@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import (Product, ProductVariant, ProductType, ProductTypeSelector, ProductTypeSelectorValue, ActualProduct)
+from .models import (Product, ProductVariant, ProductType, ProductTypeSelector,
+                     ProductTypeSelectorValue, ActualProduct)
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -56,3 +57,30 @@ class ActualProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActualProduct
         fields = '__all__'
+
+
+class DKPCListSerializer(serializers.Serializer):
+    dkpc_list = serializers.ListField(child=serializers.CharField(), allow_empty=False)
+
+    def validate(self, data):
+        dkpc_list = data.get('dkpc_list')
+        for dkpc in dkpc_list:
+            if not ProductVariant.objects.filter(dkpc=dkpc).exists():
+                raise serializers.ValidationError(f'no variant whit dkpc {dkpc} found id database')
+        return data
+
+
+class UpdateVariantDigiDataSerializer(serializers.Serializer):
+    dkpc = serializers.CharField()
+    price = serializers.IntegerField()
+    our_stock = serializers.IntegerField()
+
+
+class UpdateVariantStatusSerializer(serializers.Serializer):
+    dkpc = serializers.CharField()
+    is_active = serializers.BooleanField()
+
+
+class UpdateVariantPriceMinSerializer(serializers.Serializer):
+    dkpc = serializers.CharField()
+    price_min = serializers.IntegerField()

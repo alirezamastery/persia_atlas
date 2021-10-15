@@ -32,8 +32,9 @@ class ActualProductAdmin(admin.ModelAdmin):
 
 class ProductVariantAdmin(admin.ModelAdmin):
     form = ProductVariantAdminForm
-    list_display = ('dkpc', 'product', 'get_selectors', 'price_min', 'is_active', 'get_status')
-    list_editable = ('price_min', 'is_active')
+    list_display = ('dkpc', 'product', 'get_selectors', 'price_min', 'is_active', 'no_competition')
+    list_editable = ('price_min',)
+    readonly_fields = ('is_active',)
     search_fields = ('dkpc', 'product__title', 'selector_values__value')
     list_filter = ('is_active',)
     save_on_top = True
@@ -47,12 +48,6 @@ class ProductVariantAdmin(admin.ModelAdmin):
         return not obj.has_competition
 
     no_competition.boolean = True
-
-    @admin.display(description='robot')
-    def get_status(self, obj):
-        return obj.is_active
-
-    get_status.boolean = True
 
     def has_delete_permission(self, request, obj=None):
         if request.user.mobile == '09358578419':
