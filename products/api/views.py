@@ -33,70 +33,9 @@ def get_variant_search_url(dkpc):
            f'sortOrder=desc&page=1&items=10&search[type]=product_variant_id&search[value]={dkpc}&'
 
 
-class ProductVariantsListView(APIView):
-
-    def get(self, request):
-        session = digikala_login_session()
-
-        digi_items = []
-        while True:
-            counter = 1
-            url = f'https://seller.digikala.com/ajax/variants/search/?sortColumn=&sortOrder=desc&page={counter}&items=200&'
-            digikala_res = session.get(url, timeout=30)
-            res = digikala_res.json()
-            if not res['status']:
-                return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_404_NOT_FOUND)
-            digi_items += (res['data']['items'])
-            if counter <= res['data']['pager']['totalPage']:
-                break
-            counter += 1
-
-        variants = ProductVariant.objects.all()
-        serialized = []
-        for variant in variants:
-            for item in digi_items:
-                if variant.dkpc == str(item['product_variant_id']):
-                    serialized.append(
-                        VariantSerializerDigikalaContext(variant, context={'digi_data': item}).data
-                    )
-                    break
-        plogger(serialized)
-        return Response(serialized, status=status.HTTP_200_OK)
-
-
 class ActualProductViewSet(ReadOnlyModelViewSet):
     queryset = ActualProduct.objects.all()
     serializer_class = ActualProductSerializer
-
-
-class ProductVariantDigikalaDataView(APIView):
-
-    def post(self, request):
-        dkpc_list = request.data.get('dkpc_list')
-        print(request.data)
-        serializer = DKPCListSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
-        print(serializer.data)
-        session = digikala_login_session()
-        digi_items = {}
-        for dkpc in dkpc_list:
-            url = f'https://seller.digikala.com/ajax/variants/search/?sortColumn=&' \
-                  f'sortOrder=desc&page=1&items=10&search[type]=product_variant_id&search[value]={dkpc}&'
-            digikala_res = session.get(url, timeout=30)
-            res = digikala_res.json()
-            if not res['status']:
-                return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_404_NOT_FOUND)
-            digi_items[dkpc] = res['data']['items'][0]
-
-        serialized = []
-        for dkpc, data in digi_items.items():
-            variant = ProductVariant.objects.get(dkpc=dkpc)
-            serialized.append(
-                VariantSerializerDigikalaContext(variant, context={'digi_data': data}).data
-            )
-
-        return Response(serialized, status=status.HTTP_200_OK)
 
 
 class ActualProductDigikalaDataView(APIView):
@@ -104,6 +43,7 @@ class ActualProductDigikalaDataView(APIView):
     def get(self, request, pk):
         product = ActualProduct.objects.get(pk=pk)
         dkpc_list = product.variants.all().values_list('dkpc', flat=True)
+        logger(f'{dkpc_list = }')
 
         session = digikala_login_session()
         digi_items = {}
@@ -113,6 +53,11 @@ class ActualProductDigikalaDataView(APIView):
             res = digikala_res.json()
             if not res['status']:
                 return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_404_NOT_FOUND)
+            logger(f'{dkpc:*^50}')
+            plogger(res)
+            if len(res['data']['items']) == 0:
+                return Response({'error': f'no variant with dkpc: {dkpc} in digikala site'},
+                                status.HTTP_404_NOT_FOUND)
             digi_items[dkpc] = res['data']['items'][0]
         serialized = []
         for dkpc, data in digi_items.items():
