@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (Product, ProductVariant, ProductType, ProductTypeSelector,
-                     ProductTypeSelectorValue, ActualProduct)
+                     ProductTypeSelectorValue, ActualProduct, Brand)
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -14,6 +14,22 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         model = ProductVariant
         fields = '__all__'
         depth = 2
+
+
+class ActualProductSerializer(serializers.ModelSerializer):
+    variants = ProductVariantSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ActualProduct
+        fields = '__all__'
+
+
+class BrandSerializer(serializers.ModelSerializer):
+    actual_products = ActualProductSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Brand
+        fields = '__all__'
 
 
 class VariantSerializerDigikalaContext(serializers.ModelSerializer):
@@ -49,14 +65,6 @@ class ProductTypeSelectorValueSerializer(serializers.ModelSerializer):
         model = ProductTypeSelectorValue
         fields = '__all__'
         depth = 1
-
-
-class ActualProductSerializer(serializers.ModelSerializer):
-    variants = ProductVariantSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = ActualProduct
-        fields = '__all__'
 
 
 class DKPCListSerializer(serializers.Serializer):

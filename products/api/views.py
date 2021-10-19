@@ -1,4 +1,5 @@
 import json
+import time
 from pprint import pprint
 
 import requests
@@ -9,10 +10,10 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from utils.logging import logger, plogger
-from ..models import (ProductVariant, ActualProduct)
+from ..models import (ProductVariant, ActualProduct, Brand)
 from ..serializers import (UpdateVariantPriceMinSerializer, UpdateVariantDigiDataSerializer,
                            UpdateVariantStatusSerializer, VariantSerializerDigikalaContext,
-                           ActualProductSerializer, DKPCListSerializer)
+                           ActualProductSerializer, DKPCListSerializer, BrandSerializer)
 
 
 def digikala_login_session():
@@ -20,7 +21,8 @@ def digikala_login_session():
     while True:
         response = session.post(settings.DIGIKALA_LOGIN_URL,
                                 data=settings.DIGIKALA_LOGIN_CREDENTIALS,
-                                timeout=30)
+                                timeout=10,
+                                headers={'user-agent': 'Mozilla/5.0'})
         logger(response, color='yellow')
         logger(f'{response.url = }', color='yellow')
         if response.url == settings.DIGIKALA_LOGIN_URL:
@@ -31,6 +33,11 @@ def digikala_login_session():
 def get_variant_search_url(dkpc):
     return f'https://seller.digikala.com/ajax/variants/search/?sortColumn=&' \
            f'sortOrder=desc&page=1&items=10&search[type]=product_variant_id&search[value]={dkpc}&'
+
+
+class BrandViewSet(ReadOnlyModelViewSet):
+    queryset = Brand.objects.all()
+    serializer_class = BrandSerializer
 
 
 class ActualProductViewSet(ReadOnlyModelViewSet):
@@ -49,7 +56,7 @@ class ActualProductDigikalaDataView(APIView):
         digi_items = {}
         for dkpc in dkpc_list:
             url = get_variant_search_url(dkpc)
-            digikala_res = session.get(url, timeout=30)
+            digikala_res = session.get(url, timeout=10, headers={'user-agent': 'Mozilla/5.0'})
             res = digikala_res.json()
             if not res['status']:
                 return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_404_NOT_FOUND)
@@ -59,6 +66,8 @@ class ActualProductDigikalaDataView(APIView):
                 return Response({'error': f'no variant with dkpc: {dkpc} in digikala site'},
                                 status.HTTP_404_NOT_FOUND)
             digi_items[dkpc] = res['data']['items'][0]
+            time.sleep(0.5)
+
         serialized = []
         for dkpc, data in digi_items.items():
             variant = ProductVariant.objects.get(dkpc=dkpc)
@@ -96,7 +105,8 @@ class UpdateVariantDigiDataView(APIView):
             'seller_shipping_lead_time': '2',
         }
         digikala_res = session.post(settings.DIGIKALA_URLS['update_variant_data'],
-                                    data=payload)
+                                    data=payload,
+                                    headers={'user-agent': 'Mozilla/5.0'})
         digikala_res = digikala_res.json()
         plogger(digikala_res)
         if digikala_res['status']:
@@ -118,7 +128,8 @@ class UpdateVariantStatusView(APIView):
             'active': data['is_active']
         }
         digikala_res = session.post(settings.DIGIKALA_URLS['update_variant_status'],
-                                    data=payload)
+                                    data=payload,
+                                    headers={'user-agent': 'Mozilla/5.0'})
         digikala_res = digikala_res.json()
         plogger(digikala_res)
         if digikala_res['status']:

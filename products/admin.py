@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from .models import Product, ProductType, ProductTypeSelector, ProductTypeSelectorValue, ProductVariant, ActualProduct
+from .models import (Product, ProductType, ProductTypeSelector,
+                     ProductTypeSelectorValue, ProductVariant, ActualProduct,
+                     Brand)
 from .forms import ProductVariantAdminForm, ActualProductAdminForm
 
 
@@ -84,6 +86,7 @@ class ProductTypeSelectorValueAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Brand)
 admin.site.register(ProductType, ProductTypeAdmin)
 admin.site.register(ProductTypeSelector)
 admin.site.register(ProductTypeSelectorValue, ProductTypeSelectorValueAdmin)

@@ -1,8 +1,8 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
 
-from .views import (UpdateVariantDigiDataView, UpdatePriceMinView,
-                    ActualProductViewSet, ActualProductDigikalaDataView,
+from .views import (UpdateVariantDigiDataView, UpdatePriceMinView, ActualProductViewSet,
+                    BrandViewSet, ActualProductDigikalaDataView,
                     UpdateVariantStatusView)
 
 
@@ -11,12 +11,11 @@ urlpatterns = [
     path('update-variant-data/', UpdateVariantDigiDataView.as_view()),
     path('update-variant-status/', UpdateVariantStatusView.as_view()),
     path('update-variant-price-min/', UpdatePriceMinView.as_view()),
-
 ]
 
 router = SimpleRouter()
 
-# router.register('variants', ProductVariantsViewSet)
+router.register('brands', BrandViewSet)
 router.register('actual-products', ActualProductViewSet)
 
 urlpatterns += router.urls

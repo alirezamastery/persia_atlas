@@ -1,6 +1,21 @@
 from django.db import models
 
 
+class Brand(models.Model):
+    title = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f'{self.title}'
+
+
+class ActualProduct(models.Model):
+    title = models.CharField(max_length=255, unique=True)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name='actual_products')
+
+    def __str__(self):
+        return f'{self.title}'
+
+
 class Product(models.Model):
     dkp = models.CharField(max_length=256, unique=True, blank=False, null=False)
     title = models.CharField(max_length=256)
@@ -47,10 +62,3 @@ class ProductVariant(models.Model):
 
     def __str__(self):
         return f'{self.dkpc}'
-
-
-class ActualProduct(models.Model):
-    title = models.CharField(max_length=255, unique=True)
-
-    def __str__(self):
-        return f'{self.title}'
