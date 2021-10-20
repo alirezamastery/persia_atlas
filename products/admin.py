@@ -35,7 +35,7 @@ class ActualProductAdmin(admin.ModelAdmin):
 class ProductVariantAdmin(admin.ModelAdmin):
     form = ProductVariantAdminForm
     list_display = ('dkpc', 'product', 'get_selectors', 'price_min', 'is_active', 'no_competition')
-    list_editable = ('price_min',)
+    list_editable = ('price_min', 'is_active')
     readonly_fields = ('is_active',)
     search_fields = ('dkpc', 'product__title', 'selector_values__value')
     list_filter = ('is_active',)

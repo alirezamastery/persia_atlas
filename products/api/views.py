@@ -1,5 +1,7 @@
 import json
 import time
+import pickle
+from pathlib import Path
 from pprint import pprint
 
 import requests
@@ -10,29 +12,58 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from utils.logging import logger, plogger
+from utils.digi import get_variant_search_url
 from ..models import (ProductVariant, ActualProduct, Brand)
 from ..serializers import (UpdateVariantPriceMinSerializer, UpdateVariantDigiDataSerializer,
                            UpdateVariantStatusSerializer, VariantSerializerDigikalaContext,
                            ActualProductSerializer, DKPCListSerializer, BrandSerializer)
 
 
-def digikala_login_session():
-    session = requests.Session()
-    while True:
-        response = session.post(settings.DIGIKALA_LOGIN_URL,
-                                data=settings.DIGIKALA_LOGIN_CREDENTIALS,
-                                timeout=10,
-                                headers={'user-agent': 'Mozilla/5.0'})
-        logger(response, color='yellow')
-        logger(f'{response.url = }', color='yellow')
-        if response.url == settings.DIGIKALA_LOGIN_URL:
-            continue
-        return session
+class DigikalaSession:
+    COOKIE_FILE = 'session_cookies'
+    TIMEOUT = 10
+    HEADERS = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/93.0'}
+
+    def __init__(self):
+        self.session = requests.Session()
+        cookie_file = Path(f'./{self.COOKIE_FILE}')
+        if cookie_file.is_file():
+            with open('session_cookies', 'rb') as f:
+                self.session.cookies.update(pickle.load(f))
+        else:
+            self.login()
+
+    def login(self):
+        response = self.session.post(settings.DIGIKALA_LOGIN_URL,
+                                     data=settings.DIGIKALA_LOGIN_CREDENTIALS,
+                                     timeout=10,
+                                     headers=self.HEADERS)
+        if response.url == settings.DIGIKALA_URLS['login']:
+            raise Exception('could not login to digikala')
+        with open(f'./{self.COOKIE_FILE}', 'wb') as f:
+            pickle.dump(self.session.cookies, f)
+
+    def post(self, url, payload):
+        response = self.session.post(url,
+                                     data=payload,
+                                     timeout=self.TIMEOUT,
+                                     headers=self.HEADERS)
+        if response.url == settings.DIGIKALA_URLS['login']:
+            self.login()
+            return self.post(url, payload)
+        return response.json()
+
+    def get(self, url):
+        response = self.session.get(url,
+                                    timeout=self.TIMEOUT,
+                                    headers=self.HEADERS)
+        if response.url == settings.DIGIKALA_URLS['login']:
+            self.login()
+            return self.get(url)
+        return response.json()
 
 
-def get_variant_search_url(dkpc):
-    return f'https://seller.digikala.com/ajax/variants/search/?sortColumn=&' \
-           f'sortOrder=desc&page=1&items=10&search[type]=product_variant_id&search[value]={dkpc}&'
+digi_session = DigikalaSession()
 
 
 class BrandViewSet(ReadOnlyModelViewSet):
@@ -52,12 +83,10 @@ class ActualProductDigikalaDataView(APIView):
         dkpc_list = product.variants.all().values_list('dkpc', flat=True)
         logger(f'{dkpc_list = }')
 
-        session = digikala_login_session()
         digi_items = {}
         for dkpc in dkpc_list:
             url = get_variant_search_url(dkpc)
-            digikala_res = session.get(url, timeout=10, headers={'user-agent': 'Mozilla/5.0'})
-            res = digikala_res.json()
+            res = digi_session.get(url)
             if not res['status']:
                 return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_404_NOT_FOUND)
             logger(f'{dkpc:*^50}')
@@ -87,11 +116,9 @@ class UpdateVariantDigiDataView(APIView):
 
     def post(self, request):
         serializer = UpdateVariantDigiDataSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         data = serializer.data
 
-        session = digikala_login_session()
         payload = {
             'id':                        data['dkpc'],
             'lead_time':                 '1',
@@ -104,10 +131,7 @@ class UpdateVariantDigiDataView(APIView):
             'shipping_type':             'digikala',
             'seller_shipping_lead_time': '2',
         }
-        digikala_res = session.post(settings.DIGIKALA_URLS['update_variant_data'],
-                                    data=payload,
-                                    headers={'user-agent': 'Mozilla/5.0'})
-        digikala_res = digikala_res.json()
+        digikala_res = digi_session.post(settings.DIGIKALA_URLS['update_variant_data'], payload)
         plogger(digikala_res)
         if digikala_res['status']:
             return Response(digikala_res['data'], status.HTTP_200_OK)
@@ -118,19 +142,14 @@ class UpdateVariantStatusView(APIView):
 
     def post(self, request):
         serializer = UpdateVariantStatusSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         data = serializer.data
 
-        session = digikala_login_session()
         payload = {
             'id':     data['dkpc'],
             'active': data['is_active']
         }
-        digikala_res = session.post(settings.DIGIKALA_URLS['update_variant_status'],
-                                    data=payload,
-                                    headers={'user-agent': 'Mozilla/5.0'})
-        digikala_res = digikala_res.json()
+        digikala_res = digi_session.post(settings.DIGIKALA_URLS['update_variant_status'], payload)
         plogger(digikala_res)
         if digikala_res['status']:
             variant = ProductVariant.objects.get(dkpc=data['dkpc'])
@@ -144,8 +163,7 @@ class UpdatePriceMinView(APIView):
 
     def post(self, request):
         serializer = UpdateVariantPriceMinSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
         data = serializer.data
 
         variant = ProductVariant.objects.get(dkpc=data['dkpc'])
