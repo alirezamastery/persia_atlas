@@ -1,5 +1,6 @@
 import inspect
 from datetime import datetime
+import pytz
 from zoneinfo import ZoneInfo
 from pprint import pformat
 from textwrap import indent
@@ -33,10 +34,15 @@ def get_call_stack_info():
     return caller, _username
 
 
+def get_tehran_datetime():
+    now = datetime.now()
+    tehran_zone = pytz.timezone('Asia/Tehran')
+    tehran_dt = now.astimezone(tehran_zone)
+    return tehran_dt.strftime('%Y-%m-%d  %H:%M:%S')
+
+
 def logger(*args, color: str = 'light_gray', bg_color: str = None):
-    tz = datetime.now().astimezone().tzinfo
-    date = datetime.now().astimezone(tz).replace(tzinfo=None).strftime('%Y-%m-%d  %H:%M:%S')
-    # date = datetime.now(ZoneInfo('Asia/Tehran')).strftime('%Y-%m-%d  %H:%M:%S')
+    date = get_tehran_datetime()
     style = ''
     if color:
         style += fg(color)
@@ -57,9 +63,7 @@ def logger(*args, color: str = 'light_gray', bg_color: str = None):
 
 
 def plogger(data_obj, color: str = '', bg_color: str = ''):
-    tz = datetime.now().astimezone().tzinfo
-    date = datetime.now().astimezone(tz).replace(tzinfo=None).strftime('%Y-%m-%d  %H:%M:%S')
-    # date = datetime.now(ZoneInfo('Asia/Tehran')).strftime('%Y-%m-%d  %H:%M:%S')
+    date = get_tehran_datetime()
     style = ''
     if color:
         style += fg(color)
@@ -79,7 +83,7 @@ def plogger(data_obj, color: str = '', bg_color: str = ''):
 
 
 def plogger_flat(data_obj: dict, color: str = 'light_gray', bg_color: str = ''):
-    date = datetime.now().strftime('%Y-%m-%d  %H:%M:%S')
+    date = get_tehran_datetime()
     style = ''
     if color:
         style += fg(color)
