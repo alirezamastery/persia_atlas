@@ -16,12 +16,19 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         depth = 2
 
 
+class ProductVariantUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = ['dkpc', 'price_min', 'is_active']
+
+
 class ActualProductSerializer(serializers.ModelSerializer):
     variants = ProductVariantSerializer(many=True, read_only=True)
 
     class Meta:
         model = ActualProduct
         fields = '__all__'
+        depth = 1
 
 
 class BrandSerializer(serializers.ModelSerializer):

@@ -3,7 +3,7 @@ from rest_framework.routers import SimpleRouter
 
 from .views import (UpdateVariantDigiDataView, UpdatePriceMinView, ActualProductViewSet,
                     BrandViewSet, ActualProductDigikalaDataView,
-                    UpdateVariantStatusView)
+                    UpdateVariantStatusView, ProductVariantViewSet)
 
 
 urlpatterns = [
@@ -17,5 +17,6 @@ router = SimpleRouter()
 
 router.register('brands', BrandViewSet)
 router.register('actual-products', ActualProductViewSet)
+router.register('variants', ProductVariantViewSet)
 
 urlpatterns += router.urls

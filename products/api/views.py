@@ -6,17 +6,20 @@ from pprint import pprint
 
 import requests
 from django.conf import settings
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
+from rest_framework import mixins
 from rest_framework.response import Response
 from rest_framework import status
+from django_filters import rest_framework as filters
 
 from utils.logging import logger, plogger
 from utils.digi import get_variant_search_url
 from ..models import (ProductVariant, ActualProduct, Brand)
 from ..serializers import (UpdateVariantPriceMinSerializer, UpdateVariantDigiDataSerializer,
                            UpdateVariantStatusSerializer, VariantSerializerDigikalaContext,
-                           ActualProductSerializer, DKPCListSerializer, BrandSerializer)
+                           ActualProductSerializer, DKPCListSerializer, BrandSerializer,
+                           ProductVariantSerializer, ProductVariantUpdateSerializer)
 
 
 class DigikalaSession:
@@ -75,9 +78,18 @@ class BrandViewSet(ReadOnlyModelViewSet):
     serializer_class = BrandSerializer
 
 
+class ActualProductFilter(filters.FilterSet):
+    title = filters.CharFilter(field_name='title', lookup_expr='contains')
+
+    class Meta:
+        model = ActualProduct
+        fields = ['title']
+
+
 class ActualProductViewSet(ReadOnlyModelViewSet):
     queryset = ActualProduct.objects.all()
     serializer_class = ActualProductSerializer
+    filterset_class = ActualProductFilter
 
 
 class ActualProductDigikalaDataView(APIView):
@@ -174,3 +186,16 @@ class UpdatePriceMinView(APIView):
         variant.price_min = data['price_min']
         variant.save()
         return Response(serializer.data, status.HTTP_202_ACCEPTED)
+
+
+class ProductVariantViewSet(mixins.RetrieveModelMixin,
+                            mixins.UpdateModelMixin,
+                            mixins.ListModelMixin,
+                            GenericViewSet):
+    queryset = ProductVariant.objects.all()
+    # http_method_names = ['PUT', 'PATCH']
+
+    def get_serializer_class(self):
+        if self.request.method in ['PATCH', 'PUT']:
+            return ProductVariantUpdateSerializer
+        return ProductVariantSerializer
