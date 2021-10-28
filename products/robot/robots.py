@@ -148,8 +148,12 @@ class TrailingPriceRobot(RobotBase):
         if response['status'] is False:
             if response['data']['price'] == price_range_error:
                 new_price = price - 1000
-                logger(f'new price: {new_price}')
-                self.update_variant_price_toman(dkpc, new_price, increasing=True)
+                variant = ProductVariant.objects.get(dkpc=dkpc)
+                if new_price > variant.price_min:
+                    logger(f'new price: {new_price}')
+                    self.update_variant_price_toman(dkpc, new_price, increasing=True)
+                else:
+                    logger(f'can not increase price for: {dkpc} - price is already outside digi price span')
             else:
                 raise Exception(f'could not update price of: {dkpc}')
 

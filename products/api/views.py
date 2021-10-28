@@ -172,7 +172,7 @@ class UpdateVariantStatusView(APIView):
             variant.is_active = data['is_active']
             variant.save()
             return Response(digikala_res['data'], status.HTTP_202_ACCEPTED)
-        return Response(digikala_res['data'], status.HTTP_400_BAD_REQUEST)
+        return Response(digikala_res['data'], status.HTTP_408_REQUEST_TIMEOUT)
 
 
 class UpdatePriceMinView(APIView):
@@ -193,7 +193,6 @@ class ProductVariantViewSet(mixins.RetrieveModelMixin,
                             mixins.ListModelMixin,
                             GenericViewSet):
     queryset = ProductVariant.objects.all()
-    # http_method_names = ['PUT', 'PATCH']
 
     def get_serializer_class(self):
         if self.request.method in ['PATCH', 'PUT']:
