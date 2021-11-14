@@ -107,7 +107,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class InvoiceItemListSerializer(serializers.ModelSerializer):
+class InvoiceItemListSerializer(serializers.ListSerializer):
 
     def create(self, validated_data):
         invoice_items = [InvoiceItem(**item) for item in validated_data]
