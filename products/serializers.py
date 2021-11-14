@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (Product, ProductVariant, ProductType, ProductTypeSelector,
-                     ProductTypeSelectorValue, ActualProduct, Brand)
+                     ProductTypeSelectorValue, ActualProduct, Brand, Invoice, InvoiceItem)
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -99,3 +99,15 @@ class UpdateVariantStatusSerializer(serializers.Serializer):
 class UpdateVariantPriceMinSerializer(serializers.Serializer):
     dkpc = serializers.CharField()
     price_min = serializers.IntegerField()
+
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invoice
+        fields = '__all__'
+
+
+class InvoiceItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceItem
+        fields = '__all__'
