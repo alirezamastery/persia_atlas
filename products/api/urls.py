@@ -1,9 +1,7 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
 
-from .views import (UpdateVariantDigiDataView, UpdatePriceMinView, ActualProductViewSet,
-                    BrandViewSet, ActualProductDigikalaDataView,
-                    UpdateVariantStatusView, ProductVariantViewSet)
+from .views import *
 
 
 urlpatterns = [
@@ -18,5 +16,7 @@ router = SimpleRouter()
 router.register('brands', BrandViewSet)
 router.register('actual-products', ActualProductViewSet)
 router.register('variants', ProductVariantViewSet)
+router.register('invoices', InvoiceViewSet)
+router.register('invoice-items', InvoiceItemViewSet)
 
 urlpatterns += router.urls

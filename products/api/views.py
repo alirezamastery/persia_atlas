@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from rest_framework import mixins
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
 from django_filters import rest_framework as filters
 
 from utils.logging import logger, plogger
@@ -203,7 +204,10 @@ class ProductVariantViewSet(mixins.RetrieveModelMixin,
         return ProductVariantSerializer
 
 
-class InvoiceViewSet(ReadOnlyModelViewSet):
+class InvoiceViewSet(mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.ListModelMixin,
+                     GenericViewSet):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
 
@@ -213,3 +217,14 @@ class InvoiceItemViewSet(mixins.CreateModelMixin,
                          GenericViewSet):
     queryset = InvoiceItem.objects.all()
     serializer_class = InvoiceItemSerializer
+
+    @action(detail=False, methods=['post'])
+    def bulk_insert(self, request):
+        serializer = InvoiceItemSerializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+
+        for item in serializer.data:
+            invoice = Invoice.objects.get(pk=item.pop('invoice'))
+            InvoiceItem.objects.create(**item, invoice=invoice)
+
+        return Response(serializer.data, status.HTTP_201_CREATED)

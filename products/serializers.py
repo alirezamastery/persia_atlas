@@ -107,7 +107,22 @@ class InvoiceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class InvoiceItemListSerializer(serializers.ModelSerializer):
+
+    def create(self, validated_data):
+        invoice_items = [InvoiceItem(**item) for item in validated_data]
+        return InvoiceItem.objects.bulk_create(invoice_items)
+
+
 class InvoiceItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceItem
         fields = '__all__'
+        # list_serializer_class = InvoiceItemListSerializer
+
+        # @staticmethod
+    # def validate_invoice(value):
+    #     try:
+    #         return Invoice.objects.get(pk=value)
+    #     except Invoice.DoesNotExist:
+    #         raise serializers.ValidationError(f'no invoice with id {value}')
