@@ -17,7 +17,6 @@ class Command(BaseCommand):
             dfs.append(df)
         overview = pd.concat(dfs)
         overview.set_index(['date', 'name'], inplace=True)
-        print(overview)
         overview.to_excel('quantity.xlsx', sheet_name='products')
 
     @staticmethod
@@ -48,5 +47,4 @@ class Command(BaseCommand):
             quantities.append(q['count'])
         df = pd.DataFrame({'name': names, 'quantity': quantities})
         df['date'] = f'{invoice_obj.start_date} - {invoice_obj.end_date}'
-        print(df)
         return df

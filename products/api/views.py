@@ -4,14 +4,17 @@ import pickle
 from pathlib import Path
 from pprint import pprint
 
+import pandas as pd
 import requests
 from django.conf import settings
+from django.http import FileResponse
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
 from rest_framework import mixins
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.renderers import BaseRenderer
 from django_filters import rest_framework as filters
 
 from utils.logging import logger, plogger
@@ -228,3 +231,67 @@ class InvoiceItemViewSet(mixins.CreateModelMixin,
             InvoiceItem.objects.create(**item, invoice=invoice)
 
         return Response(serializer.data, status.HTTP_201_CREATED)
+
+
+class PassthroughRenderer(BaseRenderer):
+    """
+    Return data as-is. View should supply a Response.
+    """
+    media_type = ''
+    format = ''
+
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        return data
+
+
+class FileDownload(APIView):
+    renderer_classes = [PassthroughRenderer]
+    file_name = 'quantity.xlsx'
+
+    def get(self, request):
+        invoices = Invoice.objects.all()
+        dfs = []
+        for invoice in invoices:
+            print(invoice.pk)
+            df = self.calculate_quantities(invoice)
+            dfs.append(df)
+        overview = pd.concat(dfs)
+        overview.set_index(['date', 'name'], inplace=True)
+        overview.to_excel(self.file_name, sheet_name='products')
+
+        file = open(self.file_name, 'r', encoding='ISO-8859-1')
+        response = FileResponse(file.read(), content_type='application/octet-stream')
+        response['Content-Length'] = file.__sizeof__()
+        response['Content-Disposition'] = f'attachment; filename="{self.file_name}"'
+
+        return response
+
+    @staticmethod
+    def calculate_quantities(invoice_obj: Invoice):
+        items = InvoiceItem.objects.filter(invoice=invoice_obj)
+        dkp_data = {}
+        serials = []
+
+        for item in items:
+            if item.serial in serials:
+                continue
+            variant = ProductVariant.objects.select_related('product').get(dkpc=item.dkpc)
+            dkp = variant.product.dkp
+            if dkp in dkp_data:
+                dkp_data[dkp]['count'] += 1
+            else:
+                dkp_data[dkp] = {
+                    'count': 1,
+                    'name':  variant.product.title
+                }
+
+            serials.append(item.serial)
+        pprint(dkp_data)
+        names = []
+        quantities = []
+        for q in dkp_data.values():
+            names.append(q['name'])
+            quantities.append(q['count'])
+        df = pd.DataFrame({'name': names, 'quantity': quantities})
+        df['date'] = f'{invoice_obj.start_date} - {invoice_obj.end_date}'
+        return df
