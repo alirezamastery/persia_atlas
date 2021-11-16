@@ -8,6 +8,7 @@ import pandas as pd
 import requests
 from django.conf import settings
 from django.http import FileResponse
+from django.core.files.storage import default_storage
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
 from rest_framework import mixins
@@ -244,27 +245,23 @@ class PassthroughRenderer(BaseRenderer):
         return data
 
 
-class FileDownload(APIView):
-    renderer_classes = [PassthroughRenderer]
+class InvoiceExcelView(APIView):
     file_name = 'quantity.xlsx'
 
     def get(self, request):
         invoices = Invoice.objects.all()
         dfs = []
         for invoice in invoices:
-            print(invoice.pk)
             df = self.calculate_quantities(invoice)
             dfs.append(df)
         overview = pd.concat(dfs)
         overview.set_index(['date', 'name'], inplace=True)
-        overview.to_excel(self.file_name, sheet_name='products')
 
-        file = open(self.file_name, 'r', encoding='ISO-8859-1')
-        response = FileResponse(file.read(), content_type='application/octet-stream')
-        response['Content-Length'] = file.__sizeof__()
-        response['Content-Disposition'] = f'attachment; filename="{self.file_name}"'
+        file_path = f'{settings.MEDIA_DIR_NAME}/invoice/{self.file_name}'
+        with open(file_path, 'wb+') as file:
+            overview.to_excel(file, sheet_name='products')
 
-        return response
+        return Response({'path': file_path}, status.HTTP_200_OK)
 
     @staticmethod
     def calculate_quantities(invoice_obj: Invoice):
@@ -294,4 +291,36 @@ class FileDownload(APIView):
             quantities.append(q['count'])
         df = pd.DataFrame({'name': names, 'quantity': quantities})
         df['date'] = f'{invoice_obj.start_date} - {invoice_obj.end_date}'
+        return df
+
+
+class FileDownloadTest(APIView):
+    file_name = 'quantity.xlsx'
+
+    def get(self, request):
+        dfs = []
+        for _ in range(2):
+            df = self.calculate_quantities()
+            dfs.append(df)
+
+        overview = pd.concat(dfs)
+        overview.set_index(['date', 'name'], inplace=True)
+
+        # with open(self.file_name, 'wb+') as file:
+        #     overview.to_excel(file, sheet_name='products')
+        #     file_path = f'invoice/{self.file_name}'
+        #     saved_file = default_storage.save(file_path, file)
+        #     file_url = default_storage.url(saved_file)
+        file_path = f'{settings.MEDIA_DIR_NAME}/invoice/{self.file_name}'
+        with open(file_path, 'wb+') as file:
+            overview.to_excel(file, sheet_name='products')
+            file_url = file_path
+        return Response({'path': file_url}, status.HTTP_200_OK)
+
+    @staticmethod
+    def calculate_quantities():
+        names = [x for x in range(10)]
+        quantities = [x for x in range(10)]
+        df = pd.DataFrame({'name': names, 'quantity': quantities})
+        df['date'] = 'test date'
         return df

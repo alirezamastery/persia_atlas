@@ -9,7 +9,8 @@ urlpatterns = [
     path('update-variant-data/', UpdateVariantDigiDataView.as_view()),
     path('update-variant-status/', UpdateVariantStatusView.as_view()),
     path('update-variant-price-min/', UpdatePriceMinView.as_view()),
-    path('invoice-excel/', FileDownload.as_view()),
+    path('invoice-excel/', InvoiceExcelView.as_view()),
+    path('file-test/', FileDownloadTest.as_view()),
 ]
 
 router = SimpleRouter()
