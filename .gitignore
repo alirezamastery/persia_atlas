@@ -6,7 +6,6 @@ __pycache__/
 *.pyc
 
 migrations/
-settings.py
 
 /media/
 .env
