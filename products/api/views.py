@@ -75,6 +75,7 @@ class DigikalaSession:
             self.login()
             return self.get(url)
         logger(response.url)
+        plogger(response.content)
         return response.json()
 
 
@@ -119,7 +120,7 @@ class ActualProductDigikalaDataView(APIView):
                 return Response({'error': f'no variant with dkpc: {dkpc} in digikala site'},
                                 status.HTTP_404_NOT_FOUND)
             digi_items[dkpc] = res['data']['items'][0]
-            time.sleep(0.5)
+            time.sleep(2)
 
         serialized = []
         for dkpc, data in digi_items.items():
