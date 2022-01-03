@@ -284,7 +284,7 @@ class InvoiceExcelView(APIView):
                 }
 
             serials.append(item.serial)
-        pprint(dkp_data)
+        plogger(dkp_data)
         names = []
         quantities = []
         for q in dkp_data.values():

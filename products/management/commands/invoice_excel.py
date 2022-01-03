@@ -15,6 +15,7 @@ class Command(BaseCommand):
             print(invoice.pk)
             df = self.calculate_quantities(invoice)
             dfs.append(df)
+            print(df)
         overview = pd.concat(dfs)
         overview.set_index(['date', 'name'], inplace=True)
         overview.to_excel('quantity.xlsx', sheet_name='products')
