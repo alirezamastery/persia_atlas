@@ -20,14 +20,14 @@ from django_filters import rest_framework as filters
 
 from utils.logging import logger, plogger
 from utils.digi import get_variant_search_url
-from ..models import (ProductVariant, ActualProduct, Brand, Invoice, InvoiceItem)
+from ..models import (Product, ProductVariant, ActualProduct, Brand, Invoice, InvoiceItem)
 from ..serializers import (
     UpdateVariantPriceMinSerializer, UpdateVariantDigiDataSerializer,
     UpdateVariantStatusSerializer, VariantSerializerDigikalaContext,
     ActualProductSerializer, DKPCListSerializer, BrandSerializer,
     ProductVariantSerializer, ProductVariantUpdateSerializer,
-    InvoiceSerializer, InvoiceItemSerializer
-)
+    InvoiceSerializer, InvoiceItemSerializer, ProductSerializer)
+from .filters import ProductFilter
 
 
 class DigikalaSession:
@@ -85,6 +85,11 @@ digi_session = DigikalaSession()
 class BrandViewSet(ReadOnlyModelViewSet):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
+
+
+class ProductsViewSet(ReadOnlyModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 
 class ActualProductFilter(filters.FilterSet):
@@ -197,10 +202,7 @@ class UpdatePriceMinView(APIView):
         return Response(serializer.data, status.HTTP_202_ACCEPTED)
 
 
-class ProductVariantViewSet(mixins.RetrieveModelMixin,
-                            mixins.UpdateModelMixin,
-                            mixins.ListModelMixin,
-                            GenericViewSet):
+class ProductVariantViewSet(ModelViewSet):
     queryset = ProductVariant.objects.all()
 
     def get_serializer_class(self):

@@ -18,7 +18,7 @@ def get_pick_pack_value(ps: int):
 
 def main():
     digi_percent = 0.1
-    p_factory = 585000
+    p_factory = 119000
     # lower_range = 600000
     # upper_range = 800000
     lower_range = int(p_factory * 1.1)
@@ -30,7 +30,7 @@ def main():
     pick_packs = []
     for p_sell in range(lower_range, upper_range, 500):
         pp = get_pick_pack_value(p_sell)
-        print(round(pp, -2))
+        # print(round(pp, -2))
         pick_packs.append(pp)
         profit = p_sell - (digi_percent * p_sell) - pp - p_factory
         profit_percent = profit / p_sell * 100
