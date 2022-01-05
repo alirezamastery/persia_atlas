@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (Product, ProductVariant, ProductType, ProductTypeSelector,
                      ProductTypeSelectorValue, ActualProduct, Brand, Invoice, InvoiceItem)
-
+from utils.logging import plogger, logger
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,6 +20,16 @@ class ProductVariantUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
         fields = ['dkpc', 'price_min', 'is_active']
+
+
+class ProductVariantWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = ['product', 'dkpc', 'price_min', 'is_active', 'selector_values', 'actual_product']
+
+    def validate(self, attrs):
+        plogger(attrs)
+        return attrs
 
 
 class ActualProductSerializer(serializers.ModelSerializer):

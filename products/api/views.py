@@ -20,14 +20,15 @@ from django_filters import rest_framework as filters
 
 from utils.logging import logger, plogger
 from utils.digi import get_variant_search_url
-from ..models import (Product, ProductVariant, ActualProduct, Brand, Invoice, InvoiceItem)
+from ..models import (Product, ProductVariant, ActualProduct, Brand, Invoice, InvoiceItem, ProductTypeSelectorValue)
 from ..serializers import (
     UpdateVariantPriceMinSerializer, UpdateVariantDigiDataSerializer,
     UpdateVariantStatusSerializer, VariantSerializerDigikalaContext,
     ActualProductSerializer, DKPCListSerializer, BrandSerializer,
     ProductVariantSerializer, ProductVariantUpdateSerializer,
-    InvoiceSerializer, InvoiceItemSerializer, ProductSerializer)
-from .filters import ProductFilter
+    InvoiceSerializer, InvoiceItemSerializer, ProductSerializer, ProductVariantWriteSerializer,
+    ProductTypeSelectorValueSerializer)
+from .filters import ProductFilter, ActualProductFilter
 
 
 class DigikalaSession:
@@ -92,18 +93,50 @@ class ProductsViewSet(ReadOnlyModelViewSet):
     serializer_class = ProductSerializer
 
 
-class ActualProductFilter(filters.FilterSet):
-    title = filters.CharFilter(field_name='title', lookup_expr='contains')
+class ProductVariantViewSet(ModelViewSet):
+    queryset = ProductVariant.objects.all()
 
-    class Meta:
-        model = ActualProduct
-        fields = ['title']
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ProductVariantSerializer
+        return ProductVariantWriteSerializer
+
+
+class ProductTypeSelectorValueViewSet(ModelViewSet):
+    queryset = ProductTypeSelectorValue.objects.all()
+    serializer_class = ProductTypeSelectorValueSerializer
 
 
 class ActualProductViewSet(ReadOnlyModelViewSet):
     queryset = ActualProduct.objects.all()
     serializer_class = ActualProductSerializer
     filterset_class = ActualProductFilter
+
+
+class InvoiceViewSet(mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.ListModelMixin,
+                     GenericViewSet):
+    queryset = Invoice.objects.all()
+    serializer_class = InvoiceSerializer
+
+
+class InvoiceItemViewSet(mixins.CreateModelMixin,
+                         mixins.ListModelMixin,
+                         GenericViewSet):
+    queryset = InvoiceItem.objects.all()
+    serializer_class = InvoiceItemSerializer
+
+    @action(detail=False, methods=['post'])
+    def bulk_insert(self, request):
+        serializer = InvoiceItemSerializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+
+        for item in serializer.data:
+            invoice = Invoice.objects.get(pk=item.pop('invoice'))
+            InvoiceItem.objects.create(**item, invoice=invoice)
+
+        return Response(serializer.data, status.HTTP_201_CREATED)
 
 
 class ActualProductDigikalaDataView(APIView):
@@ -200,41 +233,6 @@ class UpdatePriceMinView(APIView):
         variant.price_min = data['price_min']
         variant.save()
         return Response(serializer.data, status.HTTP_202_ACCEPTED)
-
-
-class ProductVariantViewSet(ModelViewSet):
-    queryset = ProductVariant.objects.all()
-
-    def get_serializer_class(self):
-        if self.request.method in ['PATCH', 'PUT']:
-            return ProductVariantUpdateSerializer
-        return ProductVariantSerializer
-
-
-class InvoiceViewSet(mixins.CreateModelMixin,
-                     mixins.RetrieveModelMixin,
-                     mixins.ListModelMixin,
-                     GenericViewSet):
-    queryset = Invoice.objects.all()
-    serializer_class = InvoiceSerializer
-
-
-class InvoiceItemViewSet(mixins.CreateModelMixin,
-                         mixins.ListModelMixin,
-                         GenericViewSet):
-    queryset = InvoiceItem.objects.all()
-    serializer_class = InvoiceItemSerializer
-
-    @action(detail=False, methods=['post'])
-    def bulk_insert(self, request):
-        serializer = InvoiceItemSerializer(data=request.data, many=True)
-        serializer.is_valid(raise_exception=True)
-
-        for item in serializer.data:
-            invoice = Invoice.objects.get(pk=item.pop('invoice'))
-            InvoiceItem.objects.create(**item, invoice=invoice)
-
-        return Response(serializer.data, status.HTTP_201_CREATED)
 
 
 class PassthroughRenderer(BaseRenderer):

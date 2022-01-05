@@ -19,6 +19,7 @@ router.register('brands', BrandViewSet)
 router.register('products', ProductsViewSet)
 router.register('actual-products', ActualProductViewSet)
 router.register('variants', ProductVariantViewSet)
+router.register('product-selector-values', ProductTypeSelectorValueViewSet)
 router.register('invoices', InvoiceViewSet)
 router.register('invoice-items', InvoiceItemViewSet)
 
