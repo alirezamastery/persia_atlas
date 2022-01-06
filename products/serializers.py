@@ -4,6 +4,14 @@ from .models import (Product, ProductVariant, ProductType, ProductTypeSelector,
 from utils.logging import plogger, logger
 
 
+__all__ = [
+    'UpdateVariantPriceMinSerializer', 'UpdateVariantDigiDataSerializer', 'UpdateVariantStatusSerializer',
+    'VariantSerializerDigikalaContext', 'ActualProductSerializer', 'BrandSerializer', 'ProductVariantSerializer',
+    'InvoiceSerializer', 'InvoiceItemSerializer', 'ProductSerializer', 'ProductVariantWriteSerializer',
+    'ProductTypeSelectorValueSerializer', 'ProductTypeSelectorSerializer', 'ProductTypeSerializer'
+]
+
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -17,20 +25,10 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         depth = 2
 
 
-class ProductVariantUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductVariant
-        fields = ['dkpc', 'price_min', 'is_active']
-
-
 class ProductVariantWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
         fields = ['product', 'dkpc', 'price_min', 'is_active', 'selector_values', 'actual_product']
-
-    def validate(self, attrs):
-        plogger(attrs)
-        return attrs
 
 
 class ActualProductSerializer(serializers.ModelSerializer):
@@ -50,22 +48,6 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class VariantSerializerDigikalaContext(serializers.ModelSerializer):
-    class Meta:
-        model = ProductVariant
-        fields = '__all__'
-        depth = 2
-
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        response['our_stock'] = self.context['digi_data']['marketplace_seller_stock_latin']
-        response['reserved'] = self.context['digi_data']['reservation_latin']
-        response['warehouse_stock'] = self.context['digi_data']['warehouse_stock_latin']
-        response['price'] = self.context['digi_data']['price_sale_latin']
-        response['maximum_per_order'] = self.context['digi_data']['maximum_per_order_latin']
-        return response
-
-
 class ProductTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductType
@@ -83,6 +65,34 @@ class ProductTypeSelectorValueSerializer(serializers.ModelSerializer):
         model = ProductTypeSelectorValue
         fields = '__all__'
         depth = 1
+
+
+class InvoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invoice
+        fields = '__all__'
+
+
+class InvoiceItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InvoiceItem
+        fields = '__all__'
+
+
+class VariantSerializerDigikalaContext(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = '__all__'
+        depth = 2
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['our_stock'] = self.context['digi_data']['marketplace_seller_stock_latin']
+        response['reserved'] = self.context['digi_data']['reservation_latin']
+        response['warehouse_stock'] = self.context['digi_data']['warehouse_stock_latin']
+        response['price'] = self.context['digi_data']['price_sale_latin']
+        response['maximum_per_order'] = self.context['digi_data']['maximum_per_order_latin']
+        return response
 
 
 class DKPCListSerializer(serializers.Serializer):
@@ -110,30 +120,3 @@ class UpdateVariantStatusSerializer(serializers.Serializer):
 class UpdateVariantPriceMinSerializer(serializers.Serializer):
     dkpc = serializers.CharField()
     price_min = serializers.IntegerField()
-
-
-class InvoiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Invoice
-        fields = '__all__'
-
-
-class InvoiceItemListSerializer(serializers.ListSerializer):
-
-    def create(self, validated_data):
-        invoice_items = [InvoiceItem(**item) for item in validated_data]
-        return InvoiceItem.objects.bulk_create(invoice_items)
-
-
-class InvoiceItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = InvoiceItem
-        fields = '__all__'
-        # list_serializer_class = InvoiceItemListSerializer
-
-        # @staticmethod
-    # def validate_invoice(value):
-    #     try:
-    #         return Invoice.objects.get(pk=value)
-    #     except Invoice.DoesNotExist:
-    #         raise serializers.ValidationError(f'no invoice with id {value}')

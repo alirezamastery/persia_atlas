@@ -1,14 +1,10 @@
-import json
 import time
 import pickle
 from pathlib import Path
-from pprint import pprint
 
 import pandas as pd
 import requests
 from django.conf import settings
-from django.http import FileResponse
-from django.core.files.storage import default_storage
 from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
 from rest_framework import mixins
@@ -16,81 +12,43 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.renderers import BaseRenderer
-from django_filters import rest_framework as filters
 
 from utils.logging import logger, plogger
 from utils.digi import get_variant_search_url
-from ..models import (Product, ProductVariant, ActualProduct, Brand, Invoice, InvoiceItem, ProductTypeSelectorValue)
-from ..serializers import (
-    UpdateVariantPriceMinSerializer, UpdateVariantDigiDataSerializer,
-    UpdateVariantStatusSerializer, VariantSerializerDigikalaContext,
-    ActualProductSerializer, DKPCListSerializer, BrandSerializer,
-    ProductVariantSerializer, ProductVariantUpdateSerializer,
-    InvoiceSerializer, InvoiceItemSerializer, ProductSerializer, ProductVariantWriteSerializer,
-    ProductTypeSelectorValueSerializer)
+from ..models import *
+from ..serializers import *
 from .filters import ProductFilter, ActualProductFilter, VariantFilter
 
 
-class DigikalaSession:
-    COOKIE_FILE = 'session_cookies'
-    TIMEOUT = 10
-    HEADERS = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/93.0'}
-
-    def __init__(self):
-        self.session = requests.Session()
-        cookie_file = Path(f'./{self.COOKIE_FILE}')
-        if cookie_file.is_file():
-            logger('loading cookies', color='yellow')
-            with open('session_cookies', 'rb') as f:
-                self.session.cookies.update(pickle.load(f))
-        else:
-            self.login()
-
-    def login(self):
-        logger('logging in', color='yellow')
-        response = self.session.post(settings.DIGIKALA_LOGIN_URL,
-                                     data=settings.DIGIKALA_LOGIN_CREDENTIALS,
-                                     timeout=10,
-                                     headers=self.HEADERS)
-        if response.url == settings.DIGIKALA_URLS['login']:
-            raise Exception('could not login to digikala')
-        logger('logged in', color='green')
-        with open(f'./{self.COOKIE_FILE}', 'wb') as f:
-            pickle.dump(self.session.cookies, f)
-
-    def post(self, url, payload):
-        response = self.session.post(url,
-                                     data=payload,
-                                     timeout=self.TIMEOUT,
-                                     headers=self.HEADERS)
-        if 'account/login' in response.url:
-            self.login()
-            return self.post(url, payload)
-        return response.json()
-
-    def get(self, url):
-        response = self.session.get(url,
-                                    timeout=self.TIMEOUT,
-                                    headers=self.HEADERS)
-        if 'account/login' in response.url:
-            self.login()
-            return self.get(url)
-        logger(response.url)
-        plogger(response.content)
-        return response.json()
-
-
-digi_session = DigikalaSession()
-
-
-class BrandViewSet(ReadOnlyModelViewSet):
+class BrandViewSet(ModelViewSet):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
 
 
-class ProductsViewSet(ReadOnlyModelViewSet):
-    queryset = Product.objects.all()
+class ActualProductViewSet(ModelViewSet):
+    queryset = ActualProduct.objects.all().order_by('-id')
+    serializer_class = ActualProductSerializer
+    filterset_class = ActualProductFilter
+
+
+class ProductViewSet(ModelViewSet):
+    queryset = Product.objects.all().order_by('-id')
     serializer_class = ProductSerializer
+
+
+class ProductTypeViewSet(ModelViewSet):
+    queryset = ProductType.objects.all().order_by('-id')
+    serializer_class = ProductTypeSerializer
+
+
+class ProductTypeSelectorViewSet(ModelViewSet):
+    queryset = ProductTypeSelector.objects.all().order_by('-id')
+    serializer_class = ProductTypeSelectorSerializer
+
+
+class ProductTypeSelectorValueViewSet(ModelViewSet):
+    queryset = ProductTypeSelectorValue.objects.all().order_by('-id')
+    serializer_class = ProductTypeSelectorValueSerializer
 
 
 class ProductVariantViewSet(ModelViewSet):
@@ -101,17 +59,6 @@ class ProductVariantViewSet(ModelViewSet):
         if self.request.method == 'GET':
             return ProductVariantSerializer
         return ProductVariantWriteSerializer
-
-
-class ProductTypeSelectorValueViewSet(ModelViewSet):
-    queryset = ProductTypeSelectorValue.objects.all()
-    serializer_class = ProductTypeSelectorValueSerializer
-
-
-class ActualProductViewSet(ReadOnlyModelViewSet):
-    queryset = ActualProduct.objects.all()
-    serializer_class = ActualProductSerializer
-    filterset_class = ActualProductFilter
 
 
 class InvoiceViewSet(mixins.CreateModelMixin,
@@ -199,6 +146,7 @@ class UpdateVariantDigiDataView(APIView):
         plogger(digikala_res)
         if digikala_res['status']:
             return Response(digikala_res['data'], status.HTTP_200_OK)
+
         return Response(digikala_res['data'], status.HTTP_400_BAD_REQUEST)
 
 
@@ -220,6 +168,7 @@ class UpdateVariantStatusView(APIView):
             variant.is_active = data['is_active']
             variant.save()
             return Response(digikala_res['data'], status.HTTP_202_ACCEPTED)
+
         return Response(digikala_res['data'], status.HTTP_408_REQUEST_TIMEOUT)
 
 
@@ -234,17 +183,6 @@ class UpdatePriceMinView(APIView):
         variant.price_min = data['price_min']
         variant.save()
         return Response(serializer.data, status.HTTP_202_ACCEPTED)
-
-
-class PassthroughRenderer(BaseRenderer):
-    """
-    Return data as-is. View should supply a Response.
-    """
-    media_type = ''
-    format = ''
-
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        return data
 
 
 class InvoiceExcelView(APIView):
@@ -326,3 +264,55 @@ class FileDownloadTest(APIView):
         df = pd.DataFrame({'name': names, 'quantity': quantities})
         df['date'] = 'test date'
         return df
+
+
+class DigikalaSession:
+    COOKIE_FILE = 'session_cookies'
+    TIMEOUT = 10
+    HEADERS = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/93.0'}
+
+    def __init__(self):
+        self.session = requests.Session()
+        cookie_file = Path(f'./{self.COOKIE_FILE}')
+        if cookie_file.is_file():
+            logger('loading cookies', color='yellow')
+            with open('session_cookies', 'rb') as f:
+                self.session.cookies.update(pickle.load(f))
+        else:
+            self.login()
+
+    def login(self):
+        logger('logging in', color='yellow')
+        response = self.session.post(settings.DIGIKALA_LOGIN_URL,
+                                     data=settings.DIGIKALA_LOGIN_CREDENTIALS,
+                                     timeout=10,
+                                     headers=self.HEADERS)
+        if response.url == settings.DIGIKALA_URLS['login']:
+            raise Exception('could not login to digikala')
+        logger('logged in', color='green')
+        with open(f'./{self.COOKIE_FILE}', 'wb') as f:
+            pickle.dump(self.session.cookies, f)
+
+    def post(self, url, payload):
+        response = self.session.post(url,
+                                     data=payload,
+                                     timeout=self.TIMEOUT,
+                                     headers=self.HEADERS)
+        if 'account/login' in response.url:
+            self.login()
+            return self.post(url, payload)
+        return response.json()
+
+    def get(self, url):
+        response = self.session.get(url,
+                                    timeout=self.TIMEOUT,
+                                    headers=self.HEADERS)
+        if 'account/login' in response.url:
+            self.login()
+            return self.get(url)
+        logger(response.url)
+        plogger(response.content)
+        return response.json()
+
+
+digi_session = DigikalaSession()
