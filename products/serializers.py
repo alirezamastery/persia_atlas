@@ -3,6 +3,7 @@ from .models import (Product, ProductVariant, ProductType, ProductTypeSelector,
                      ProductTypeSelectorValue, ActualProduct, Brand, Invoice, InvoiceItem)
 from utils.logging import plogger, logger
 
+
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product

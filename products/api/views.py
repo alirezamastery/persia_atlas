@@ -28,7 +28,7 @@ from ..serializers import (
     ProductVariantSerializer, ProductVariantUpdateSerializer,
     InvoiceSerializer, InvoiceItemSerializer, ProductSerializer, ProductVariantWriteSerializer,
     ProductTypeSelectorValueSerializer)
-from .filters import ProductFilter, ActualProductFilter
+from .filters import ProductFilter, ActualProductFilter, VariantFilter
 
 
 class DigikalaSession:
@@ -94,7 +94,8 @@ class ProductsViewSet(ReadOnlyModelViewSet):
 
 
 class ProductVariantViewSet(ModelViewSet):
-    queryset = ProductVariant.objects.all()
+    queryset = ProductVariant.objects.all().order_by('-id')
+    filterset_class = VariantFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
