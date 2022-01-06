@@ -5,13 +5,12 @@ from pathlib import Path
 import pandas as pd
 import requests
 from django.conf import settings
-from rest_framework.viewsets import ReadOnlyModelViewSet, ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
 from rest_framework import mixins
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.renderers import BaseRenderer
 
 from utils.logging import logger, plogger
 from utils.digi import get_variant_search_url
