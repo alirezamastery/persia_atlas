@@ -16,10 +16,13 @@ urlpatterns = [
 router = SimpleRouter()
 
 router.register('brands', BrandViewSet)
-router.register('products', ProductViewSet)
 router.register('actual-products', ActualProductViewSet)
+router.register('products', ProductViewSet)
+router.register('products-types', ProductTypeViewSet)
+router.register('product-type-selectors', ProductTypeSelectorViewSet)
+router.register('product-type-selector-values', ProductTypeSelectorValueViewSet)
 router.register('variants', ProductVariantViewSet)
-router.register('product-selector-values', ProductTypeSelectorValueViewSet)
+
 router.register('invoices', InvoiceViewSet)
 router.register('invoice-items', InvoiceItemViewSet)
 
