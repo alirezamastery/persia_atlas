@@ -102,6 +102,7 @@ class VariantSerializerDigikalaContext(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
+        response['is_digi_active'] = self.context['digi_data']['isActive']
         response['our_stock'] = self.context['digi_data']['marketplace_seller_stock_latin']
         response['reserved'] = self.context['digi_data']['reservation_latin']
         response['warehouse_stock'] = self.context['digi_data']['warehouse_stock_latin']
