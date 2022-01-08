@@ -1,10 +1,13 @@
 from django.db.models import Q
 from django_filters import rest_framework as filters
 
-from ..models import Product, ActualProduct, ProductVariant, ProductTypeSelectorValue
+from ..models import *
 
 
-__all__ = ['ActualProductFilter', 'ProductFilter', 'ProductTypeSelectorValueFilter', 'VariantFilter', ]
+__all__ = [
+    'ActualProductFilter', 'ProductFilter', 'ProductTypeSelectorValueFilter', 'VariantFilter',
+    'ProductTypeFilter', 'ProductTypeSelectorFilter'
+]
 
 
 class ActualProductFilter(filters.FilterSet):
@@ -33,6 +36,22 @@ class ProductFilter(filters.FilterSet):
         )
 
 
+class ProductTypeFilter(filters.FilterSet):
+    title = filters.CharFilter(field_name='title', lookup_expr='contains')
+
+    class Meta:
+        model = ProductType
+        fields = ['title']
+
+
+class ProductTypeSelectorFilter(filters.FilterSet):
+    title = filters.CharFilter(field_name='title', lookup_expr='contains')
+
+    class Meta:
+        model = ProductTypeSelector
+        fields = ['title']
+
+
 class ProductTypeSelectorValueFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_in_fields')
 
@@ -42,7 +61,7 @@ class ProductTypeSelectorValueFilter(filters.FilterSet):
 
     def search_in_fields(self, qs, name, value):
         return qs.filter(
-            Q(value__contains=value) | Q(digikala_id=value)
+            value__contains=value
         )
 
 

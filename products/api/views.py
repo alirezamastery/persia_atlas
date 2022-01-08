@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 from django.conf import settings
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ModelViewSet, GenericViewSet , ReadOnlyModelViewSet
 from rest_framework.views import APIView
 from rest_framework import mixins
 from rest_framework.response import Response
@@ -16,7 +16,7 @@ from utils.logging import logger, plogger
 from utils.digi import get_variant_search_url
 from ..models import *
 from ..serializers import *
-from .filters import ProductFilter, ActualProductFilter, VariantFilter
+from .filters import *
 
 
 class BrandViewSet(ModelViewSet):
@@ -29,25 +29,39 @@ class ActualProductViewSet(ModelViewSet):
     serializer_class = ActualProductSerializer
     filterset_class = ActualProductFilter
 
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ActualProductSerializer
+        return ActualProductWriteSerializer
+
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all().order_by('-id')
-    serializer_class = ProductSerializer
+    serializer_class = ProductReadSerializer
+    filterset_class = ProductFilter
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ProductReadSerializer
+        return ProductWriteSerializer
 
 
 class ProductTypeViewSet(ModelViewSet):
     queryset = ProductType.objects.all().order_by('-id')
     serializer_class = ProductTypeSerializer
+    filterset_class = ProductTypeFilter
 
 
 class ProductTypeSelectorViewSet(ModelViewSet):
     queryset = ProductTypeSelector.objects.all().order_by('-id')
     serializer_class = ProductTypeSelectorSerializer
+    filterset_class = ProductTypeSelectorFilter
 
 
-class ProductTypeSelectorValueViewSet(ModelViewSet):
-    queryset = ProductTypeSelectorValue.objects.all().order_by('-id')
+class ProductTypeSelectorValueViewSet(ReadOnlyModelViewSet):
+    queryset = ProductTypeSelectorValue.objects.all().order_by('digikala_id')
     serializer_class = ProductTypeSelectorValueSerializer
+    filterset_class = ProductTypeSelectorValueFilter
 
 
 class ProductVariantViewSet(ModelViewSet):

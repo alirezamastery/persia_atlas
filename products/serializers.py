@@ -7,12 +7,21 @@ from utils.logging import plogger, logger
 __all__ = [
     'UpdateVariantPriceMinSerializer', 'UpdateVariantDigiDataSerializer', 'UpdateVariantStatusSerializer',
     'VariantSerializerDigikalaContext', 'ActualProductSerializer', 'BrandSerializer', 'ProductVariantSerializer',
-    'InvoiceSerializer', 'InvoiceItemSerializer', 'ProductSerializer', 'ProductVariantWriteSerializer',
-    'ProductTypeSelectorValueSerializer', 'ProductTypeSelectorSerializer', 'ProductTypeSerializer'
+    'InvoiceSerializer', 'InvoiceItemSerializer', 'ProductReadSerializer', 'ProductWriteSerializer',
+    'ProductVariantWriteSerializer',
+    'ProductTypeSelectorValueSerializer', 'ProductTypeSelectorSerializer', 'ProductTypeSerializer',
+    'ActualProductWriteSerializer',
 ]
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = '__all__'
+        depth = 1
+
+
+class ProductWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
@@ -38,6 +47,12 @@ class ActualProductSerializer(serializers.ModelSerializer):
         model = ActualProduct
         fields = '__all__'
         depth = 1
+
+
+class ActualProductWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActualProduct
+        fields = '__all__'
 
 
 class BrandSerializer(serializers.ModelSerializer):
