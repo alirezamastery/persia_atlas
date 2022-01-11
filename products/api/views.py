@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 
+from persia_atlas.drf import CustomPageNumberPagination
 from utils.logging import logger, plogger
 from utils.digi import get_variant_search_url
 from ..models import *

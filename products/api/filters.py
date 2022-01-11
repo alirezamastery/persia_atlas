@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django_filters import rest_framework as filters
+from django_filters import OrderingFilter
 
 from ..models import *
 
@@ -37,7 +38,7 @@ class ProductFilter(filters.FilterSet):
 
 
 class ProductTypeFilter(filters.FilterSet):
-    title = filters.CharFilter(field_name='title', lookup_expr='contains')
+    search = filters.CharFilter(field_name='title', lookup_expr='contains')
 
     class Meta:
         model = ProductType
@@ -45,7 +46,7 @@ class ProductTypeFilter(filters.FilterSet):
 
 
 class ProductTypeSelectorFilter(filters.FilterSet):
-    title = filters.CharFilter(field_name='title', lookup_expr='contains')
+    search = filters.CharFilter(field_name='title', lookup_expr='contains')
 
     class Meta:
         model = ProductTypeSelector
@@ -54,6 +55,10 @@ class ProductTypeSelectorFilter(filters.FilterSet):
 
 class ProductTypeSelectorValueFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_in_fields')
+
+    o = OrderingFilter(
+        fields=['digikala_id', 'value']
+    )
 
     class Meta:
         model = ProductTypeSelectorValue
@@ -68,6 +73,10 @@ class ProductTypeSelectorValueFilter(filters.FilterSet):
 class VariantFilter(filters.FilterSet):
     product_title = filters.CharFilter(field_name='product', lookup_expr='title__contains')
     search = filters.CharFilter(method='search_in_fields')
+
+    o = OrderingFilter(
+        fields=['dkpc', 'price_min', 'is_active', 'has_competition', ]
+    )
 
     class Meta:
         model = ProductVariant

@@ -18,7 +18,7 @@ def get_pick_pack_value(ps: int):
 
 def main():
     digi_percent = 0.1
-    p_factory = 149000
+    p_factory = 183000
     # lower_range = 600000
     # upper_range = 800000
     lower_range = int(p_factory * 1.1)
