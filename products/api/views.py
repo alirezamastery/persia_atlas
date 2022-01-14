@@ -289,7 +289,7 @@ class DigikalaSession:
         self.session = requests.Session()
         cookie_file = Path(f'./{self.COOKIE_FILE}')
         if cookie_file.is_file():
-            logger('loading cookies', color='yellow')
+            # logger('loading cookies', color='yellow')
             with open('session_cookies', 'rb') as f:
                 self.session.cookies.update(pickle.load(f))
         else:

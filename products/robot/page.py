@@ -19,7 +19,7 @@ class PageBase:
             logger(f'no active variants for {self.product_obj}', color='yellow')
 
         # so far we have only seen one variant selector in each product page
-        # so we don't add more than more than one selector to ProductType objects
+        # so we don't add more than one selector to ProductType objects
         # hence the .first()
         self.selector = self.product_obj.type.selectors.first()
 
