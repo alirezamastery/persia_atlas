@@ -15,6 +15,8 @@ class TrailingPriceRobot(RobotBase):
     PRICE_GAP_THRESHOLD = 1000
     NO_COMPETITION_JUMP = 0.05
 
+    page_scraper_class = CheckPricePage
+
     help = 'maintains price of our variants below competition price'
 
     def __init__(self, *args, **kwargs):
@@ -47,7 +49,7 @@ class TrailingPriceRobot(RobotBase):
         for product in active_products:
             logger(product.title, color='cyan')
             try:
-                page = CheckPricePage(product)
+                page = self.page_scraper_class(product)
             except json.decoder.JSONDecodeError:
                 logger(f'ERROR: failed to load: {product.dkp}', color='red')
                 continue
@@ -77,8 +79,8 @@ class TrailingPriceRobot(RobotBase):
             self.adjust_price(dkpc, min_price)
 
     def adjust_price(self, dkpc: int, competition_price: int):
-        new_price = competition_price - self.PRICE_LOWERING_STEP
-        variant = ProductVariant.objects.get(dkpc=dkpc)
+        variant = ProductVariant.objects.select_related('product').get(dkpc=dkpc)
+        new_price = competition_price - variant.product.price_step
         if new_price < variant.price_min:
             logger(f'{dkpc}: minimum price reached'.center(LOG_W), color='red')
             self.min_reached.append(dkpc)

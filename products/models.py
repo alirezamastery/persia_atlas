@@ -21,6 +21,7 @@ class Product(models.Model):
     title = models.CharField(max_length=256)
     is_active = models.BooleanField(default=True, null=False, blank=False)
     type = models.ForeignKey('ProductType', on_delete=models.PROTECT, related_name='products')
+    price_step = models.IntegerField(default=500)
 
     def __str__(self):
         return f'{self.title}'
