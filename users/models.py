@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from PIL import Image
 
 from .managers import UserManager
 
@@ -41,11 +42,22 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=256, blank=True, null=True)
-    last_name = models.CharField(max_length=256, blank=True, null=True)
+    first_name = models.CharField(max_length=256, default='', blank=True)
+    last_name = models.CharField(max_length=256, default='', blank=True)
     avatar = models.ImageField(upload_to='users/avatars/', null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.user} - {self.first_name} - {self.last_name}'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.avatar:
+            img = Image.open(self.avatar.path)
+            w = 500
+            h = 500
+            if img.height > h or img.width > w:
+                output_size = (w, h)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
