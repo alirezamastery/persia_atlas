@@ -1,7 +1,8 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
 
-from .views import *
+from .views.ours import *
+from .views.digi import *
 
 
 urlpatterns = [
@@ -10,7 +11,7 @@ urlpatterns = [
     path('update-variant-status/', UpdateVariantStatusView.as_view()),
     path('update-variant-price-min/', UpdatePriceMinView.as_view()),
     path('invoice-excel/', InvoiceExcelView.as_view()),
-    path('file-test/', FileDownloadTest.as_view()),
+    # path('file-test/', FileDownloadTest.as_view()),
 ]
 
 router = SimpleRouter()
