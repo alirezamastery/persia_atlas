@@ -9,7 +9,15 @@ class CostTypeSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CostSerializer(serializers.ModelSerializer):
+class CostReadSerializer(serializers.ModelSerializer):
+    type = CostTypeSerializer(read_only=True)
+
+    class Meta:
+        model = Cost
+        fields = '__all__'
+
+
+class CostWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cost
         fields = '__all__'

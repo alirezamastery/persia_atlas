@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from ..models import Cost, CostType
-from .serializers import CostSerializer, CostTypeSerializer
+from .serializers import CostReadSerializer, CostWriteSerializer, CostTypeSerializer
+from .filters import *
 
 
 class CostTypeViewSet(ModelViewSet):
@@ -17,7 +18,11 @@ class CostTypeViewSet(ModelViewSet):
 
 class CostViewSet(ModelViewSet):
     queryset = Cost.objects.all().order_by('-id')
-    serializer_class = CostSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CostReadSerializer
+        return CostWriteSerializer
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
