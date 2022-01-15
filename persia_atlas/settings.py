@@ -36,6 +36,7 @@ ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'persia-atlas.com', 'www.persia-atlas
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'products.apps.ProductsConfig',
+    'accounting.apps.AccountingConfig',
 
     'rest_framework',
     'rest_framework_simplejwt',
@@ -231,3 +232,5 @@ DIGIKALA_LOGIN_CREDENTIALS = {
     'login[password]': 'Sd$123456#',
     'remember':        True
 }
+
+MAX_DAYS_DELETE_COST = 3
