@@ -12,6 +12,7 @@ from .serializers import CostSerializer, CostTypeSerializer
 class CostTypeViewSet(ModelViewSet):
     queryset = CostType.objects.all().order_by('-id')
     serializer_class = CostTypeSerializer
+    filterset_class = CostTypeFilter
 
 
 class CostViewSet(ModelViewSet):
