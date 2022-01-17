@@ -1,7 +1,8 @@
 import datetime as dt
 
 from django.conf import settings
-from rest_framework.viewsets import ModelViewSet
+from django.db.models import Sum
+from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -18,11 +19,24 @@ class CostTypeViewSet(ModelViewSet):
 
 class CostViewSet(ModelViewSet):
     queryset = Cost.objects.all().order_by('-id')
+    filterset_class = CostFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return CostReadSerializer
         return CostWriteSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            extra_data = queryset.aggregate(sum=Sum('amount'))
+            # Access paginator directly to pass kwargs:
+            return self.paginator.get_paginated_response(serializer.data, extra_data=extra_data)
+
+        raise Exception('no paginator is set')
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
