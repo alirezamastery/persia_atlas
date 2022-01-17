@@ -26,6 +26,8 @@ class ActualProductFilter(filters.FilterSet):
 
 class ProductFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_in_fields')
+    is_active = filters.BooleanFilter(field_name='is_active')
+    price_step = filters.NumberFilter(field_name='price_step')
 
     class Meta:
         model = Product
@@ -73,6 +75,8 @@ class ProductTypeSelectorValueFilter(filters.FilterSet):
 class VariantFilter(filters.FilterSet):
     product_title = filters.CharFilter(field_name='product', lookup_expr='title__contains')
     search = filters.CharFilter(method='search_in_fields')
+    is_active = filters.BooleanFilter(field_name='is_active')
+    has_competition = filters.BooleanFilter(field_name='has_competition')
 
     o = OrderingFilter(
         fields=['dkpc', 'price_min', 'is_active', 'has_competition', ]
