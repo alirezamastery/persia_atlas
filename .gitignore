@@ -9,3 +9,7 @@ migrations/
 
 /media/
 .env
+*.json
+*.sql
+*.xlsx
+*.txt
