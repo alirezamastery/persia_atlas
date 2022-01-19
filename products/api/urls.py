@@ -11,6 +11,7 @@ urlpatterns = [
     path('update-variant-status/', UpdateVariantStatusView.as_view()),
     path('update-variant-price-min/', UpdatePriceMinView.as_view()),
     path('invoice-excel/', InvoiceExcelView.as_view()),
+    path('digi-creds/', DigiLoginCredentialsView.as_view()),
     # path('file-test/', FileDownloadTest.as_view()),
 ]
 

@@ -1,4 +1,5 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet, ReadOnlyModelViewSet
+from rest_framework.views import APIView
 from rest_framework import mixins
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,11 +8,13 @@ from rest_framework.decorators import action
 from products.models import *
 from products.serializers import *
 from products.api.filters import *
+from scripts.json_db import JsonDB
 
 
 __all__ = [
     'BrandViewSet', 'ActualProductViewSet', 'ProductViewSet', 'ProductTypeViewSet', 'ProductTypeSelectorViewSet',
-    'ProductTypeSelectorValueViewSet', 'ProductVariantViewSet', 'InvoiceViewSet', 'InvoiceItemViewSet'
+    'ProductTypeSelectorValueViewSet', 'ProductVariantViewSet', 'InvoiceViewSet', 'InvoiceItemViewSet',
+    'DigiLoginCredentialsView'
 ]
 
 
@@ -102,3 +105,28 @@ class InvoiceItemViewSet(mixins.CreateModelMixin,
             InvoiceItem.objects.create(**item, invoice=invoice)
 
         return Response(serializer.data, status.HTTP_201_CREATED)
+
+
+class DigiLoginCredentialsView(APIView):
+    KEY_PASSWORD = 'digi_password'
+    KEY_USERNAME = 'digi_username'
+
+    def get(self, request):
+        db = JsonDB()
+        response = {
+            self.KEY_USERNAME: db.get(self.KEY_USERNAME),
+            self.KEY_PASSWORD: db.get(self.KEY_PASSWORD),
+        }
+        return Response(response)
+
+    def post(self, request):
+        db = JsonDB()
+        username = request.data.get(self.KEY_USERNAME, db.get(self.KEY_USERNAME))
+        password = request.data.get(self.KEY_PASSWORD, db.get(self.KEY_PASSWORD))
+        db.set(self.KEY_USERNAME, username)
+        db.set(self.KEY_PASSWORD, password)
+        response = {
+            self.KEY_USERNAME: username,
+            self.KEY_PASSWORD: password,
+        }
+        return Response(response, status=status.HTTP_201_CREATED)
