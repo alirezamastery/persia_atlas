@@ -29,6 +29,7 @@ class NoDeleteModelViewSet(mixins.CreateModelMixin,
 class BrandViewSet(NoDeleteModelViewSet):
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
+    filterset_class = BrandFilter
 
 
 class ActualProductViewSet(NoDeleteModelViewSet):

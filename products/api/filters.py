@@ -11,6 +11,19 @@ __all__ = [
 ]
 
 
+class BrandFilter(filters.FilterSet):
+    search = filters.CharFilter(method='search_in_fields')
+
+    class Meta:
+        model = ActualProduct
+        fields = ['search']
+
+    def search_in_fields(self, qs, name, value):
+        return qs.filter(
+            title__icontains=value
+        )
+
+
 class ActualProductFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_in_fields')
 
