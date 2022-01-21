@@ -17,7 +17,7 @@ from products.serializers import *
 
 __all__ = [
     'ActualProductDigikalaDataView', 'UpdateVariantDigiDataView', 'UpdateVariantStatusView',
-    'UpdatePriceMinView', 'InvoiceExcelView'
+    'UpdatePriceMinView', 'InvoiceExcelView', 'FileDownloadTest'
 ]
 
 

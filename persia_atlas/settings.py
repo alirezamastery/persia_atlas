@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG')
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'persia-atlas.com', 'www.persia-atlas.com']
 
@@ -140,6 +140,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = config('STATIC_ROOT')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
@@ -228,8 +229,8 @@ DIGIKALA_URLS = {
 }
 
 DIGIKALA_LOGIN_CREDENTIALS = {
-    'login[email]':    'saeeddash94@gmail.com',
-    'login[password]': 'Sd$123456#',
+    'login[email]':    config('DIGI_USERNAME'),
+    'login[password]': config('DIGI_PASSWORD'),
     'remember':        True
 }
 
