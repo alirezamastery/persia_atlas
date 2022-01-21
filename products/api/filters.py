@@ -7,7 +7,7 @@ from ..models import *
 
 __all__ = [
     'ActualProductFilter', 'ProductFilter', 'ProductTypeSelectorValueFilter', 'VariantFilter',
-    'ProductTypeFilter', 'ProductTypeSelectorFilter'
+    'ProductTypeFilter', 'ProductTypeSelectorFilter', 'BrandFilter'
 ]
 
 
