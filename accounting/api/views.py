@@ -2,13 +2,18 @@ import datetime as dt
 
 from django.conf import settings
 from django.db.models import Sum
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
-from ..models import Cost, CostType
-from .serializers import CostReadSerializer, CostWriteSerializer, CostTypeSerializer
+from ..models import *
+from .serializers import *
 from .filters import *
+
+
+__all__ = [
+    'CostTypeViewSet', 'CostViewSet', 'IncomeViewSet', 'ProductCostViewSet'
+]
 
 
 class CostTypeViewSet(ModelViewSet):
@@ -48,3 +53,15 @@ class CostViewSet(ModelViewSet):
                             status=status.HTTP_406_NOT_ACCEPTABLE)
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class IncomeViewSet(ModelViewSet):
+    queryset = Income.objects.all().order_by('-id')
+    serializer_class = IncomeSerializer
+    filterset_class = IncomeFilter
+
+
+class ProductCostViewSet(ModelViewSet):
+    queryset = ProductCost.objects.all().order_by('-id')
+    serializer_class = ProductCostSerializer
+    filterset_class = ProductCostFilter

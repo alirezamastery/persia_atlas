@@ -2,11 +2,11 @@ from django.db.models import Q
 from django_filters import rest_framework as filters
 from django_filters import OrderingFilter
 
-from ..models import Cost, CostType
+from ..models import *
 
 
 __all__ = [
-    'CostTypeFilter', 'CostFilter'
+    'CostTypeFilter', 'CostFilter', 'IncomeFilter', 'ProductCostFilter'
 ]
 
 
@@ -37,3 +37,21 @@ class CostFilter(filters.FilterSet):
         return qs.filter(
             type__title__contains=value
         )
+
+
+class IncomeFilter(filters.FilterSet):
+    date_gte = filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_lte = filters.DateFilter(field_name='date', lookup_expr='lte')
+
+    class Meta:
+        model = Income
+        fields = ['date_gte', 'date_lte']
+
+
+class ProductCostFilter(filters.FilterSet):
+    date_gte = filters.DateFilter(field_name='date', lookup_expr='gte')
+    date_lte = filters.DateFilter(field_name='date', lookup_expr='lte')
+
+    class Meta:
+        model = ProductCost
+        fields = ['date_gte', 'date_lte']
