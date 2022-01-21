@@ -13,3 +13,4 @@ migrations/
 *.sql
 *.xlsx
 *.txt
+*.exe

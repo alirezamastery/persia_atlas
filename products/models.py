@@ -72,7 +72,11 @@ class Invoice(models.Model):
 
 
 class InvoiceItem(models.Model):
-    invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT)
+    invoice = models.ForeignKey(
+        Invoice,
+        on_delete=models.PROTECT,
+        related_name='invoice_items'
+    )
 
     row_number = models.IntegerField()
     code = models.IntegerField()
