@@ -33,7 +33,7 @@ class ActualProductFilter(filters.FilterSet):
 
     def search_in_fields(self, qs, name, value):
         return qs.filter(
-            title__contains=value
+            title__icontains=value
         )
 
 
@@ -44,28 +44,28 @@ class ProductFilter(filters.FilterSet):
 
     class Meta:
         model = Product
-        fields = ['search']
+        fields = ['search', 'is_active', 'price_step']
 
     def search_in_fields(self, qs, name, value):
         return qs.filter(
-            Q(title__contains=value) | Q(dkp=value)
+            Q(title__icontains=value) | Q(dkp=value)
         )
 
 
 class ProductTypeFilter(filters.FilterSet):
-    search = filters.CharFilter(field_name='title', lookup_expr='contains')
+    search = filters.CharFilter(field_name='title', lookup_expr='icontains')
 
     class Meta:
         model = ProductType
-        fields = ['title']
+        fields = ['search']
 
 
 class ProductTypeSelectorFilter(filters.FilterSet):
-    search = filters.CharFilter(field_name='title', lookup_expr='contains')
+    search = filters.CharFilter(field_name='title', lookup_expr='icontains')
 
     class Meta:
         model = ProductTypeSelector
-        fields = ['title']
+        fields = ['search']
 
 
 class ProductTypeSelectorValueFilter(filters.FilterSet):
@@ -81,12 +81,12 @@ class ProductTypeSelectorValueFilter(filters.FilterSet):
 
     def search_in_fields(self, qs, name, value):
         return qs.filter(
-            value__contains=value
+            value__icontains=value
         )
 
 
 class VariantFilter(filters.FilterSet):
-    product_title = filters.CharFilter(field_name='product', lookup_expr='title__contains')
+    product_title = filters.CharFilter(field_name='product', lookup_expr='title__icontains')
     search = filters.CharFilter(method='search_in_fields')
     is_active = filters.BooleanFilter(field_name='is_active')
     has_competition = filters.BooleanFilter(field_name='has_competition')
@@ -97,9 +97,9 @@ class VariantFilter(filters.FilterSet):
 
     class Meta:
         model = ProductVariant
-        fields = ['product', 'search']
+        fields = ['is_active', 'search', 'has_competition']
 
     def search_in_fields(self, qs, name, value):
         return qs.filter(
-            Q(product__title__contains=value) | Q(dkpc=value)
+            Q(product__title__icontains=value) | Q(dkpc=value)
         )
