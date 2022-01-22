@@ -164,7 +164,7 @@ class InvoiceExcelView(APIView):
             names.append(q['name'])
             quantities.append(q['count'])
         df = pd.DataFrame({'name': names, 'quantity': quantities})
-        df['date'] = f'{invoice_obj.start_date} - {invoice_obj.end_date}'
+        df['date'] = f'{invoice_obj.start_date_persian} - {invoice_obj.end_date_persian}'
         return df
 
 
