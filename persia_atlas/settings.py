@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'drf_yasg',
+    'celery',
+    'django_celery_results',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -237,3 +239,6 @@ DIGIKALA_LOGIN_CREDENTIALS = {
 MAX_DAYS_DELETE_COST = 3
 
 GECKO_DRIVER_PATH = config('GECKO_DRIVER_PATH')
+
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'django-cache'
