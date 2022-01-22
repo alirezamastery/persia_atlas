@@ -1,4 +1,6 @@
 import time
+import datetime as dt
+from zoneinfo import ZoneInfo
 import random
 from typing import Optional
 from pprint import pprint
@@ -14,6 +16,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from django.core.management import BaseCommand
 from django.conf import settings
+from khayyam import JalaliDate, JalaliDatetime
 
 from products.models import Invoice, InvoiceItem
 from utils.logging import logger, plogger
@@ -88,7 +91,7 @@ class ScrapeInvoicePageNoDB:
     def run(self):
         self.go_to_invoices()
         self.go_to_invoice_items()
-        self.save_invoice(self.invoice_number)
+        self.save_invoice()
         while True:
             self.extract_table_data()
             pagination_rows = self.get_pagination_row()
@@ -126,13 +129,13 @@ class ScrapeInvoicePageNoDB:
         link.click()
         time.sleep(2)
 
-    def save_invoice(self, invoice_number: int):
-        start_date = self.browser.find_element(By.XPATH, '//input[@name="startDate"]').get_attribute('value')
-        end_date = self.browser.find_element(By.XPATH, '//input[@name="endDate"]').get_attribute('value')
-        start_date = unidecode(start_date)
-        end_date = unidecode(end_date)
-        logger(f'{start_date = }')
-        logger(f'{end_date = }')
+    def save_invoice(self):
+        start_date_persian = self.browser.find_element(By.XPATH, '//input[@name="startDate"]').get_attribute('value')
+        end_date_persian = self.browser.find_element(By.XPATH, '//input[@name="endDate"]').get_attribute('value')
+        start_date_persian = unidecode(start_date_persian)
+        end_date_persian = unidecode(end_date_persian)
+        logger(f'{start_date_persian = }')
+        logger(f'{end_date_persian = }')
         try:
             self.invoice = Invoice.objects.get(number=self.invoice_number)
             logger('this invoice is already in the database', color='yellow')
@@ -140,8 +143,14 @@ class ScrapeInvoicePageNoDB:
             self.invoice.invoice_items.all().delete()
         except Invoice.DoesNotExist:
             logger('saving new invoice in database', color='green')
+            start_date = JalaliDate.strptime(start_date_persian, '%Y/%m/%d').todate()
+            end_date = JalaliDate.strptime(end_date_persian, '%Y/%m/%d').todate()
+            logger(f'{start_date = }')
+            logger(f'{end_date = }')
             self.invoice = Invoice.objects.create(
                 number=self.invoice_number,
+                start_date_persian=start_date_persian,
+                end_date_persian=end_date_persian,
                 start_date=start_date,
                 end_date=end_date
             )
@@ -179,6 +188,10 @@ class ScrapeInvoicePageNoDB:
                 if i == 3:
                     txt = txt.replace('DKPC-', '')
                 row_data[COLUMNS_INDEX_MAP[i]] = txt
+            logger('row persian datetime:', row_data['date_persian'])
+            date_naive = JalaliDatetime.strptime(row_data['date_persian'], '%Y/%m/%d %H:%M').todatetime()
+            date_aware = date_naive.astimezone(tz=ZoneInfo('Asia/Tehran'))
+            row_data['date'] = date_aware
             self.table_rows.append(row_data)
 
     def save_invoice_items(self):

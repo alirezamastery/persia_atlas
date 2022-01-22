@@ -67,8 +67,10 @@ class ProductVariant(models.Model):
 
 class Invoice(models.Model):
     number = models.IntegerField(unique=True)
-    start_date = models.CharField(max_length=255)
-    end_date = models.CharField(max_length=255)
+    start_date_persian = models.CharField(max_length=255)
+    end_date_persian = models.CharField(max_length=255)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
 
 
 class InvoiceItem(models.Model):
@@ -80,7 +82,10 @@ class InvoiceItem(models.Model):
 
     row_number = models.IntegerField()
     code = models.IntegerField()
+
     date_persian = models.CharField(max_length=255)
+    date = models.DateTimeField(blank=True, null=True)
+
     dkpc = models.IntegerField()
     variant_title = models.CharField(max_length=255)
     order_id = models.IntegerField()
