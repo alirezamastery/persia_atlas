@@ -4,17 +4,20 @@ from rest_framework import mixins
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
+from celery.result import AsyncResult
 
 from products.models import *
 from products.serializers import *
 from products.api.filters import *
 from scripts.json_db import JsonDB
+from ...tasks import scrape_invoice_page, just_sleep, just_sleep_and_fail
+from utils.logging import logger, plogger
 
 
 __all__ = [
     'BrandViewSet', 'ActualProductViewSet', 'ProductViewSet', 'ProductTypeViewSet', 'ProductTypeSelectorViewSet',
     'ProductTypeSelectorValueViewSet', 'ProductVariantViewSet', 'InvoiceViewSet', 'InvoiceItemViewSet',
-    'DigiLoginCredentialsView'
+    'DigiLoginCredentialsView', 'ScrapeInvoiceView', 'CeleryTaskStateView', 'TestCeleryTask'
 ]
 
 
@@ -131,3 +134,42 @@ class DigiLoginCredentialsView(APIView):
             self.KEY_PASSWORD: password,
         }
         return Response(response, status=status.HTTP_201_CREATED)
+
+
+class ScrapeInvoiceView(APIView):
+
+    def post(self, request):
+        task = scrape_invoice_page.delay()
+        return Response({'task_id': task.id}, status=status.HTTP_202_ACCEPTED)
+
+
+class TestCeleryTask(APIView):
+
+    def post(self, request):
+        task = just_sleep.delay()
+        return Response({'task_id': task.id}, status=status.HTTP_202_ACCEPTED)
+
+
+class CeleryTaskStateView(APIView):
+
+    def get(self, request, task_id):
+        task = AsyncResult(task_id)
+
+        if task.state == 'FAILURE' or task.state == 'PENDING':
+            response = {
+                'task_id':     task_id,
+                'state':       task.state,
+                'progression': None,
+                'info':        str(task.info)
+            }
+            return Response(response, status=200)
+        # current = task.info.get('current', 0)
+        # total = task.info.get('total', 1)
+        # progression = (int(current) / int(total)) * 100  # to display a percentage of progress of the task
+        response = {
+            'task_id': task_id,
+            'state':   task.state,
+            # 'progression': progression,
+            'info':    None
+        }
+        return Response(response, status=200)
