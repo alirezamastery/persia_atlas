@@ -1,15 +1,12 @@
 import time
-import datetime as dt
-from zoneinfo import ZoneInfo
 import random
 from typing import Optional
+from zoneinfo import ZoneInfo
 from pprint import pprint
 
-import requests
 from bs4 import BeautifulSoup
 from unidecode import unidecode
 from selenium.webdriver import Firefox, FirefoxOptions
-from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.service import Service
@@ -67,6 +64,10 @@ class ScrapeInvoicePageNoDB:
         service = Service(GECKO_DRIVER_PATH)
         self.browser = Firefox(service=service, options=firefox_options)
         self.login()
+
+    def clean_up(self):
+        self.browser.close()
+        self.browser.quit()
 
     def login(self):
         db = JsonDB()
@@ -203,4 +204,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         robot = ScrapeInvoicePageNoDB()
-        robot.run()
+        try:
+            robot.run()
+        except Exception as e:
+            logger('scraping error', e, color='red')
+        finally:
+            robot.clean_up()
