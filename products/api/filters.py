@@ -15,7 +15,7 @@ class BrandFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_in_fields')
 
     class Meta:
-        model = ActualProduct
+        model = Brand
         fields = ['search']
 
     def search_in_fields(self, qs, name, value):
