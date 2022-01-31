@@ -74,6 +74,13 @@ class ProductTypeSelectorValueViewSet(ReadOnlyModelViewSet):
     serializer_class = ProductTypeSelectorValueSerializer
     filterset_class = ProductTypeSelectorValueFilter
 
+    @action(detail=False, methods=['get'])
+    def get_by_list(self, request):
+        ids = request.query_params.getlist('ids[]')
+        qs = self.queryset.filter(pk__in=ids)
+        serializer = self.serializer_class(qs, many=True)
+        return Response(serializer.data)
+
 
 class ProductVariantViewSet(NoDeleteModelViewSet):
     queryset = ProductVariant.objects.all().order_by('-id')
