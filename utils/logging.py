@@ -5,6 +5,8 @@ from zoneinfo import ZoneInfo
 from pprint import pformat
 from textwrap import indent
 
+from django.conf import settings
+
 from colored import fg, bg, attr
 
 
@@ -42,6 +44,9 @@ def get_tehran_datetime():
 
 
 def logger(*args, color: str = 'light_gray', bg_color: str = None):
+    if not settings.CUSTOM_LOGGING:
+        return
+
     date = get_tehran_datetime()
     style = ''
     if color:
@@ -63,6 +68,9 @@ def logger(*args, color: str = 'light_gray', bg_color: str = None):
 
 
 def plogger(data_obj, color: str = '', bg_color: str = ''):
+    if not settings.CUSTOM_LOGGING:
+        return
+
     date = get_tehran_datetime()
     style = ''
     if color:
