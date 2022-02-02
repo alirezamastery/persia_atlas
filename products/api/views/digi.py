@@ -5,6 +5,7 @@ from pathlib import Path
 import pandas as pd
 import requests
 from django.conf import settings
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -55,6 +56,28 @@ class ActualProductDigikalaDataView(APIView):
         }
 
         return Response(response, status=status.HTTP_200_OK)
+
+
+class VariantDigiDataView(APIView):
+
+    def get(self, request, pk):
+        variant = get_object_or_404(ProductVariant, pk=pk)
+        dkpc = variant.dkpc
+        url = get_variant_search_url(dkpc)
+        res = digi_session.get(url)
+        if not res['status']:
+            return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_404_NOT_FOUND)
+        logger(f'{dkpc:*^50}')
+        plogger(res)
+        if len(res['data']['items']) == 0:
+            return Response({'error': f'no variant with dkpc: {dkpc} in digikala site'},
+                            status.HTTP_404_NOT_FOUND)
+        data = res['data']['items'][0]
+        serializer = VariantSerializerDigikalaContext(variant, context={'digi_data': data})
+        return Response(serializer.data)
+
+
+__all__.append('VariantDigiDataView')
 
 
 class UpdateVariantDigiDataView(APIView):
