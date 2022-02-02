@@ -17,6 +17,8 @@ urlpatterns = [
     path('scrape-invoice-page/', ScrapeInvoiceView.as_view()),
     path('celery-task-test/', TestCeleryTask.as_view()),
     path('task-state/<str:task_id>/', CeleryTaskStateView.as_view(), name='task_status'),
+    path('brands-all/', BrandListView.as_view()),
+    path('actual-product-by-brand/', ActualProductListView.as_view()),
 ]
 
 router = SimpleRouter()

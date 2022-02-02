@@ -35,6 +35,29 @@ class BrandViewSet(NoDeleteModelViewSet):
     filterset_class = BrandFilter
 
 
+class BrandListView(APIView):
+
+    def get(self, request):
+        qs = Brand.objects.all()
+        serializer = BrandSerializer(qs, many=True)
+        return Response(serializer.data)
+
+
+__all__.append('BrandListView')
+
+
+class ActualProductListView(APIView):
+
+    def get(self, request):
+        brand_id = request.query_params.get('brand_id')
+        qs = ActualProduct.objects.filter(brand__id=brand_id)
+        serializer = BrandSerializer(qs, many=True)
+        return Response(serializer.data)
+
+
+__all__.append('ActualProductListView')
+
+
 class ActualProductViewSet(NoDeleteModelViewSet):
     queryset = ActualProduct.objects.all().order_by('-id')
     serializer_class = ActualProductSerializer
@@ -67,6 +90,13 @@ class ProductTypeSelectorViewSet(NoDeleteModelViewSet):
     queryset = ProductTypeSelector.objects.all().order_by('-id')
     serializer_class = ProductTypeSelectorSerializer
     filterset_class = ProductTypeSelectorFilter
+
+    @action(detail=False, methods=['get'])
+    def get_by_list(self, request):
+        ids = request.query_params.getlist('ids[]')
+        qs = self.queryset.filter(pk__in=ids)
+        serializer = self.serializer_class(qs, many=True)
+        return Response(serializer.data)
 
 
 class ProductTypeSelectorValueViewSet(ReadOnlyModelViewSet):
