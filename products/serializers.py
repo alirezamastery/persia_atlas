@@ -37,7 +37,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 class ProductVariantWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        fields = ['product', 'dkpc', 'price_min', 'is_active', 'selector_values', 'actual_product']
+        fields = ['product', 'dkpc', 'price_min', 'stop_loss', 'is_active', 'selector_values', 'actual_product']
 
 
 class ActualProductSerializer(serializers.ModelSerializer):

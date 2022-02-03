@@ -55,6 +55,7 @@ class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
     dkpc = models.CharField(max_length=256, unique=True, blank=False, null=False)
     price_min = models.IntegerField(blank=False, null=False)
+    stop_loss = models.IntegerField(default=0, blank=True, null=True)
     is_active = models.BooleanField(default=True, blank=False, null=False)
     has_competition = models.BooleanField(default=True, blank=False, null=False, editable=False)
     selector_values = models.ManyToManyField(ProductTypeSelectorValue, related_name='variants')
