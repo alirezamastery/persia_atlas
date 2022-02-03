@@ -28,6 +28,8 @@ class CostFilter(filters.FilterSet):
     date_gte = filters.DateFilter(field_name='date', lookup_expr='gte')
     date_lte = filters.DateFilter(field_name='date', lookup_expr='lte')
 
+    o = OrderingFilter(fields=['date', 'amount'])
+
     class Meta:
         model = Cost
         fields = '__all__'
@@ -43,6 +45,8 @@ class IncomeFilter(filters.FilterSet):
     date_gte = filters.DateFilter(field_name='date', lookup_expr='gte')
     date_lte = filters.DateFilter(field_name='date', lookup_expr='lte')
 
+    o = OrderingFilter(fields=['date', 'amount'])
+
     class Meta:
         model = Income
         fields = ['date_gte', 'date_lte']
@@ -51,6 +55,8 @@ class IncomeFilter(filters.FilterSet):
 class ProductCostFilter(filters.FilterSet):
     date_gte = filters.DateFilter(field_name='date', lookup_expr='gte')
     date_lte = filters.DateFilter(field_name='date', lookup_expr='lte')
+
+    o = OrderingFilter(fields=['date', 'amount'])
 
     class Meta:
         model = ProductCost
