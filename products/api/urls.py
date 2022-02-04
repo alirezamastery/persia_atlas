@@ -7,7 +7,7 @@ from .views.digi import *
 
 urlpatterns = [
     path('actual-product-variants/<int:pk>/', ActualProductDigikalaDataView.as_view()),
-    path('variant-digi-date/<int:pk>/', VariantDigiDataView.as_view()),
+    path('variant-digi-data/<int:pk>/', VariantDigiDataView.as_view()),
     path('update-variant-data/', UpdateVariantDigiDataView.as_view()),
     path('update-variant-status/', UpdateVariantStatusView.as_view()),
     path('update-variant-price-min/', UpdatePriceMinView.as_view()),
@@ -16,7 +16,8 @@ urlpatterns = [
     path('scrape-invoice-page/', ScrapeInvoiceView.as_view()),
     path('task-state/<str:task_id>/', CeleryTaskStateView.as_view(), name='task_status'),
     path('brands-all/', BrandListView.as_view()),
-    path('actual-product-by-brand/', ActualProductListView.as_view()),
+    path('actual-product-by-brand/<int:brand_id>/', ActualProductByBrandView.as_view()),
+    path('robot-variants/', RobotVariantsFilterView.as_view()),
 
     # for testing purposes:
     path('file-test/', FileDownloadTest.as_view()),

@@ -4,6 +4,7 @@ from rest_framework import mixins
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.generics import ListAPIView
 from celery.result import AsyncResult
 
 from products.models import *
@@ -35,27 +36,24 @@ class BrandViewSet(NoDeleteModelViewSet):
     filterset_class = BrandFilter
 
 
-class BrandListView(APIView):
-
-    def get(self, request):
-        qs = Brand.objects.all()
-        serializer = BrandSerializer(qs, many=True)
-        return Response(serializer.data)
+class BrandListView(ListAPIView):
+    queryset = Brand.objects.all()
+    serializer_class = BrandSerializer
+    pagination_class = None
 
 
 __all__.append('BrandListView')
 
 
-class ActualProductListView(APIView):
+class ActualProductByBrandView(APIView):
 
-    def get(self, request):
-        brand_id = request.query_params.get('brand_id')
+    def get(self, request, brand_id):
         qs = ActualProduct.objects.filter(brand__id=brand_id)
         serializer = BrandSerializer(qs, many=True)
         return Response(serializer.data)
 
 
-__all__.append('ActualProductListView')
+__all__.append('ActualProductByBrandView')
 
 
 class ActualProductViewSet(NoDeleteModelViewSet):
