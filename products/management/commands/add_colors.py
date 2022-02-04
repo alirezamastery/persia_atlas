@@ -156,5 +156,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         selector = ProductTypeSelector.objects.get(title='color')
 
+        # for digi_id, color in COLORS.items():
+        #     ProductTypeSelectorValue.objects.create(digikala_id=digi_id, value=color['name'] , selector=selector)
         for digi_id, color in COLORS.items():
-            ProductTypeSelectorValue.objects.create(digikala_id=digi_id, value=color['name'] , selector=selector)
+            selector_value = ProductTypeSelectorValue.objects.get(digikala_id=digi_id)
+            print(selector_value.value, color['hex'])
+            selector_value.extra_info = color['hex']
+            selector_value.save()
