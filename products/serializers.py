@@ -67,12 +67,14 @@ class ProductTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductType
         fields = '__all__'
+        depth = 1
 
 
 class ProductTypeSelectorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductTypeSelector
         fields = '__all__'
+        depth = 1
 
 
 class ProductTypeSelectorValueSerializer(serializers.ModelSerializer):
