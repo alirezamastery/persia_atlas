@@ -46,6 +46,7 @@ class ProductTypeSelectorValue(models.Model):
     digikala_id = models.IntegerField(unique=True, blank=False, null=False)
     selector = models.ForeignKey(ProductTypeSelector, on_delete=models.CASCADE)
     value = models.CharField(max_length=256, unique=True, blank=False, null=False)
+    extra_info = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f'{self.selector} - {self.value} - {self.digikala_id}'
@@ -59,6 +60,13 @@ class ProductVariant(models.Model):
     is_active = models.BooleanField(default=True, blank=False, null=False)
     has_competition = models.BooleanField(default=True, blank=False, null=False, editable=False)
     selector_values = models.ManyToManyField(ProductTypeSelectorValue, related_name='variants')
+    selector = models.ForeignKey(
+        ProductTypeSelectorValue,
+        related_name='variants_fk',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
     actual_product = models.ForeignKey('ActualProduct', null=True, on_delete=models.SET_NULL,
                                        related_name='variants')
 
