@@ -17,7 +17,7 @@ from utils.logging import logger, plogger
 __all__ = [
     'BrandViewSet', 'ActualProductViewSet', 'ProductViewSet', 'ProductTypeViewSet', 'ProductTypeSelectorViewSet',
     'ProductTypeSelectorValueViewSet', 'ProductVariantViewSet', 'InvoiceViewSet', 'InvoiceItemViewSet',
-    'DigiLoginCredentialsView', 'ScrapeInvoiceView', 'CeleryTaskStateView', 'TestCeleryTask'
+    'DigiLoginCredentialsView', 'ScrapeInvoiceView', 'CeleryTaskStateView'
 ]
 
 
@@ -180,11 +180,24 @@ class ScrapeInvoiceView(APIView):
         return Response({'task_id': task.id}, status=status.HTTP_202_ACCEPTED)
 
 
-class TestCeleryTask(APIView):
+class TestCelerySuccessTask(APIView):
 
     def post(self, request):
         task = just_sleep.delay()
         return Response({'task_id': task.id}, status=status.HTTP_202_ACCEPTED)
+
+
+__all__.append('TestCelerySuccessTask')
+
+
+class TestCeleryFailTask(APIView):
+
+    def post(self, request):
+        task = just_sleep_and_fail.delay()
+        return Response({'task_id': task.id}, status=status.HTTP_202_ACCEPTED)
+
+
+__all__.append('TestCeleryFailTask')
 
 
 class CeleryTaskStateView(APIView):

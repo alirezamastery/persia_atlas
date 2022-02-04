@@ -13,12 +13,15 @@ urlpatterns = [
     path('update-variant-price-min/', UpdatePriceMinView.as_view()),
     path('invoice-excel/', InvoiceExcelView.as_view()),
     path('digi-creds/', DigiLoginCredentialsView.as_view()),
-    path('file-test/', FileDownloadTest.as_view()),
     path('scrape-invoice-page/', ScrapeInvoiceView.as_view()),
-    path('celery-task-test/', TestCeleryTask.as_view()),
     path('task-state/<str:task_id>/', CeleryTaskStateView.as_view(), name='task_status'),
     path('brands-all/', BrandListView.as_view()),
     path('actual-product-by-brand/', ActualProductListView.as_view()),
+
+    # for testing purposes:
+    path('file-test/', FileDownloadTest.as_view()),
+    path('task-test-success/', TestCelerySuccessTask.as_view()),
+    path('task-test-fail/', TestCeleryFailTask.as_view()),
 ]
 
 router = SimpleRouter()
