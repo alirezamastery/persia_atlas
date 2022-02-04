@@ -66,6 +66,18 @@ class ActualProductViewSet(NoDeleteModelViewSet):
             return ActualProductSerializer
         return ActualProductWriteSerializer
 
+    @action(detail=True, methods=['get'])
+    def related_selectors(self, request, pk=None):
+        actual_product = self.get_object()
+        variants = actual_product.variants.all()
+        selector_ids = []
+        for var in variants:
+            selector_ids.append(var.selector.id)
+        selector_ids = set(selector_ids)
+        selector_values = ProductTypeSelectorValue.objects.filter(id__in=selector_ids)
+        serializer = ProductTypeSelectorValueSerializer(selector_values, many=True)
+        return Response(serializer.data)
+
 
 class ProductViewSet(NoDeleteModelViewSet):
     queryset = Product.objects.all().order_by('-id')
