@@ -30,6 +30,12 @@ class Product(models.Model):
 class ProductType(models.Model):
     title = models.CharField(max_length=256)
     selectors = models.ManyToManyField('ProductTypeSelector', related_name='product_types')
+    selector = models.ForeignKey(
+        'ProductTypeSelector',
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='product_types_fk'
+    )
 
     def __str__(self):
         return f'{self.title}'
