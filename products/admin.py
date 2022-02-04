@@ -37,14 +37,15 @@ class ProductVariantAdmin(admin.ModelAdmin):
     list_display = ('dkpc', 'product', 'get_selectors', 'price_min', 'is_active', 'no_competition')
     list_editable = ('price_min', 'is_active')
     readonly_fields = ('is_active',)
-    search_fields = ('dkpc', 'product__title', 'selector_values__value')
+    search_fields = ('dkpc', 'product__title', 'selector__value')
     list_filter = ('is_active',)
     save_on_top = True
     filter_horizontal = ['selector_values']
 
     @admin.display(description='selectors')
     def get_selectors(self, obj):
-        return ' | '.join([f'{s.value} - {s.digikala_id}' for s in obj.selector_values.all()])
+        # return ' | '.join([f'{s.value} - {s.digikala_id}' for s in obj.selector_values.all()])
+        return f'{obj.selector.value} - {obj.selector.digikala_id}'
 
     def no_competition(self, obj):
         return not obj.has_competition

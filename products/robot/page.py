@@ -21,7 +21,10 @@ class PageBase:
         # so far we have only seen one variant selector in each product page
         # so we don't add more than one selector to ProductType objects
         # hence the .first()
-        self.selector = self.product_obj.type.selectors.first()
+        # self.selector = self.product_obj.type.selectors.first()
+
+        # UPDATE: we changed th relation of selector to foreign key:
+        self.selector = self.product_obj.type.selector
 
         page_html = self.get_product_page(product_obj.dkp)
         self.soup = BeautifulSoup(page_html, 'html.parser')
@@ -47,7 +50,8 @@ class PageBase:
         variants data is in a javascript variable called 'ecpd2'
         """
 
-        my_variants_selectors = [v.selector_values.first().digikala_id for v in self.my_variants]
+        # my_variants_selectors = [v.selector_values.first().digikala_id for v in self.my_variants]
+        my_variants_selectors = [v.selector.digikala_id for v in self.my_variants]
         my_variants_dkpcs = [v.dkpc for v in self.my_variants]
 
         ecpd2 = self.extract_javascript_object('ecpd2')
@@ -104,8 +108,9 @@ class CheckPricePage(PageBase):
             #     clr = var.selector_values.first().value
             # else:
             #     clr = 'white'
-            logger(f'selector: {self.selector.title} - value: {var.selector_values.first().value} - '
-                   f'{var.selector_values.first().digikala_id}')
+            # logger(f'selector: {self.selector.title} - value: {var.selector_values.first().value} - '
+            #        f'{var.selector_values.first().digikala_id}')
+            logger(f'selector: {self.selector.title} - value: {var.selector.value} - {var.selector.digikala_id}')
             my_price = self.get_variant_price(var.dkpc)
             if my_price > 0:
                 variants_data[var.dkpc] = self.check_variant_competition(var)
@@ -119,7 +124,8 @@ class CheckPricePage(PageBase):
 
     def check_variant_competition(self, my_var: ProductVariant) -> dict:
         var_info = {'has_competition': False, 'min_price': None}
-        other_variant_ids = self.other_variants[my_var.selector_values.first().digikala_id]
+        # other_variant_ids = self.other_variants[my_var.selector_values.first().digikala_id]
+        other_variant_ids = self.other_variants[my_var.selector.digikala_id]
         if len(other_variant_ids) > 0:
             var_info['has_competition'] = True
             other_prices = self.get_other_prices(other_variant_ids)
