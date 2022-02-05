@@ -18,6 +18,7 @@ urlpatterns = [
     path('brands-all/', BrandListView.as_view()),
     path('actual-product-by-brand/<int:brand_id>/', ActualProductByBrandView.as_view()),
     path('robot-variants/', RobotVariantsFilterView.as_view()),
+    path('inactive-variants/', InactiveVariantsView.as_view()),
 
     # for testing purposes:
     path('file-test/', FileDownloadTest.as_view()),

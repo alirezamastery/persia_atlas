@@ -223,6 +223,17 @@ class FileDownloadTest(APIView):
         return df
 
 
+class InactiveVariantsView(APIView):
+
+    def get(self, request):
+        url = 'https://seller.digikala.com/ajax/variants/search/?sortColumn=&sortOrder=desc&page=1&items=100&search[active]=2'
+        res = digi_session.get(url)
+        return Response(res['data'])
+
+
+__all__.append('InactiveVariantsView')
+
+
 class DigikalaSession:
     COOKIE_FILE = 'session_cookies'
     TIMEOUT = 10
@@ -268,7 +279,7 @@ class DigikalaSession:
             self.login()
             return self.get(url)
         logger(response.url)
-        plogger(response.content)
+        # plogger(response.content)
         return response.json()
 
 
