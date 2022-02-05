@@ -56,7 +56,7 @@ class ActualProductByBrandView(APIView):
 __all__.append('ActualProductByBrandView')
 
 
-class ActualProductViewSet(NoDeleteModelViewSet):
+class ActualProductViewSet(ModelViewSet):
     queryset = ActualProduct.objects.all().order_by('-id')
     serializer_class = ActualProductSerializer
     filterset_class = ActualProductFilter
@@ -136,8 +136,32 @@ class InvoiceViewSet(mixins.CreateModelMixin,
                      mixins.RetrieveModelMixin,
                      mixins.ListModelMixin,
                      GenericViewSet):
-    queryset = Invoice.objects.all()
+    queryset = Invoice.objects.all().order_by('-start_date')
     serializer_class = InvoiceSerializer
+
+    @action(detail=True, methods=['get'])
+    def get_details(self, request, *args, **kwargs):
+        invoice = self.get_object()
+        items = invoice.invoice_items.all()
+        dkp_data = {}
+        serials = []
+
+        for item in items:
+            if item.serial in serials:
+                continue
+            variant = ProductVariant.objects.select_related('product').get(dkpc=item.dkpc)
+            dkp = variant.product.dkp
+            if dkp in dkp_data:
+                dkp_data[dkp]['count'] += 1
+            else:
+                dkp_data[dkp] = {
+                    'count': 1,
+                    'name':  variant.product.title
+                }
+            serials.append(item.serial)
+
+        data = [v for k, v in dkp_data.items()]
+        return Response(data)
 
 
 class InvoiceItemViewSet(mixins.CreateModelMixin,
