@@ -118,7 +118,7 @@ class ProductTypeSelectorValueViewSet(ReadOnlyModelViewSet):
     def get_by_list(self, request):
         ids = request.query_params.getlist('ids[]')
         qs = self.queryset.filter(pk__in=ids)
-        serializer = self.serializer_class(qs, many=True)
+        serializer = self.get_serializer_class()(qs, many=True)
         return Response(serializer.data)
 
 
@@ -130,6 +130,13 @@ class ProductVariantViewSet(NoDeleteModelViewSet):
         if self.request.method == 'GET':
             return ProductVariantSerializer
         return ProductVariantWriteSerializer
+
+    @action(detail=False, methods=['get'])
+    def get_by_list(self, request):
+        dkpc_list = request.query_params.getlist('dkpc[]')
+        qs = self.queryset.filter(dkpc__in=dkpc_list)
+        serializer = self.get_serializer_class()(qs, many=True)
+        return Response(serializer.data)
 
 
 class InvoiceViewSet(mixins.CreateModelMixin,
