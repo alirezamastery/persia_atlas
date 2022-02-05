@@ -138,6 +138,7 @@ class InvoiceViewSet(mixins.CreateModelMixin,
                      GenericViewSet):
     queryset = Invoice.objects.all().order_by('-start_date')
     serializer_class = InvoiceSerializer
+    filterset_class = InvoiceFilter
 
     @action(detail=True, methods=['get'])
     def get_details(self, request, *args, **kwargs):
