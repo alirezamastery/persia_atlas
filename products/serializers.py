@@ -110,6 +110,7 @@ class VariantSerializerDigikalaContext(serializers.ModelSerializer):
         response['warehouse_stock'] = self.context['digi_data']['warehouse_stock_latin']
         response['price'] = self.context['digi_data']['price_sale_latin']
         response['maximum_per_order'] = self.context['digi_data']['maximum_per_order_latin']
+        response['image_src'] = self.context['digi_data']['image_src']
         return response
 
 
