@@ -1,3 +1,4 @@
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .views import *
@@ -5,7 +6,9 @@ from .views import *
 
 router = DefaultRouter()
 
-urlpatterns = []
+urlpatterns = [
+    path('profit/', ProfitView.as_view(), name='profit')
+]
 
 router.register('costs', CostViewSet)
 router.register('cost-types', CostTypeViewSet)

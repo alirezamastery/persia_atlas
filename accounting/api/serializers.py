@@ -3,12 +3,6 @@ from rest_framework import serializers
 from ..models import Cost, CostType, Income, ProductCost
 
 
-__all__ = [
-    'CostTypeSerializer', 'CostReadSerializer', 'CostWriteSerializer', 'IncomeSerializer',
-    'ProductCostSerializer'
-]
-
-
 class CostTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CostType
@@ -39,3 +33,18 @@ class ProductCostSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductCost
         fields = '__all__'
+
+
+class JalaliDateSerializer(serializers.Serializer):
+    j_month = serializers.IntegerField(min_value=1, max_value=12)
+    j_year = serializers.IntegerField()
+
+
+__all__ = [
+    'CostTypeSerializer',
+    'CostReadSerializer',
+    'CostWriteSerializer',
+    'IncomeSerializer',
+    'ProductCostSerializer',
+    'JalaliDateSerializer'
+]
