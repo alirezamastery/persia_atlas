@@ -11,6 +11,7 @@ class Brand(models.Model):
 class ActualProduct(models.Model):
     title = models.CharField(max_length=255, unique=True)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name='actual_products')
+    price_step = models.IntegerField(default=500)
 
     def __str__(self):
         return f'{self.title}'
@@ -21,7 +22,6 @@ class Product(models.Model):
     title = models.CharField(max_length=256)
     is_active = models.BooleanField(default=True, null=False, blank=False)
     type = models.ForeignKey('ProductType', on_delete=models.PROTECT, related_name='products')
-    price_step = models.IntegerField(default=500)
 
     def __str__(self):
         return f'{self.title}'
