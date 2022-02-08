@@ -16,12 +16,6 @@ from products.models import *
 from products.serializers import *
 
 
-__all__ = [
-    'ActualProductDigikalaDataView', 'UpdateVariantDigiDataView', 'UpdateVariantStatusView',
-    'UpdatePriceMinView', 'InvoiceExcelView', 'FileDownloadTest'
-]
-
-
 class ActualProductDigikalaDataView(APIView):
 
     def get(self, request, pk):
@@ -75,9 +69,6 @@ class VariantDigiDataView(APIView):
         data = res['data']['items'][0]
         serializer = VariantSerializerDigikalaContext(variant, context={'digi_data': data})
         return Response(serializer.data)
-
-
-__all__.append('VariantDigiDataView')
 
 
 class UpdateVariantDigiDataView(APIView):
@@ -203,11 +194,6 @@ class FileDownloadTest(APIView):
         overview = pd.concat(dfs)
         overview.set_index(['date', 'name'], inplace=True)
 
-        # with open(self.file_name, 'wb+') as file:
-        #     overview.to_excel(file, sheet_name='products')
-        #     file_path = f'invoice/{self.file_name}'
-        #     saved_file = default_storage.save(file_path, file)
-        #     file_url = default_storage.url(saved_file)
         file_path = f'{settings.MEDIA_DIR_NAME}/invoice/{self.file_name}'
         with open(file_path, 'wb+') as file:
             overview.to_excel(file, sheet_name='products')
@@ -229,9 +215,6 @@ class InactiveVariantsView(APIView):
         url = 'https://seller.digikala.com/ajax/variants/search/?sortColumn=&sortOrder=desc&page=1&items=100&search[active]=2'
         res = digi_session.get(url)
         return Response(res['data'])
-
-
-__all__.append('InactiveVariantsView')
 
 
 class DigikalaSession:
@@ -284,3 +267,14 @@ class DigikalaSession:
 
 
 digi_session = DigikalaSession()
+
+__all__ = [
+    'ActualProductDigikalaDataView',
+    'UpdateVariantDigiDataView',
+    'UpdateVariantStatusView',
+    'UpdatePriceMinView',
+    'FileDownloadTest',
+    'InvoiceExcelView',
+    'VariantDigiDataView',
+    'InactiveVariantsView'
+]

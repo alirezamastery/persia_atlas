@@ -5,12 +5,6 @@ from django_filters import OrderingFilter
 from ..models import *
 
 
-__all__ = [
-    'ActualProductFilter', 'ProductFilter', 'ProductTypeSelectorValueFilter', 'VariantFilter',
-    'ProductTypeFilter', 'ProductTypeSelectorFilter', 'BrandFilter', 'InvoiceFilter'
-]
-
-
 class BrandFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_in_fields')
 
@@ -115,3 +109,15 @@ class InvoiceFilter(filters.FilterSet):
     class Meta:
         model = Invoice
         fields = ['number', 'start_date_gte', 'start_date_lte', 'end_date_gte', 'end_date_lte']
+
+
+__all__ = [
+    'ActualProductFilter',
+    'ProductFilter',
+    'ProductTypeSelectorValueFilter',
+    'VariantFilter',
+    'ProductTypeFilter',
+    'ProductTypeSelectorFilter',
+    'BrandFilter',
+    'InvoiceFilter'
+]

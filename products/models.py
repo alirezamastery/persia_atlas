@@ -113,3 +113,16 @@ class InvoiceItem(models.Model):
     debit_final = models.IntegerField()
     description = models.TextField(blank=True, null=True)
     calculated = models.BooleanField(default=False)
+
+
+__all__ = [
+    'Brand',
+    'ActualProduct',
+    'Product',
+    'ProductType',
+    'ProductTypeSelector',
+    'ProductTypeSelectorValue',
+    'ProductVariant',
+    'Invoice',
+    'InvoiceItem',
+]

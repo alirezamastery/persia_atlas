@@ -15,13 +15,6 @@ from ...tasks import scrape_invoice_page, just_sleep, just_sleep_and_fail
 from utils.logging import logger, plogger
 
 
-__all__ = [
-    'BrandViewSet', 'ActualProductViewSet', 'ProductViewSet', 'ProductTypeViewSet', 'ProductTypeSelectorViewSet',
-    'ProductTypeSelectorValueViewSet', 'ProductVariantViewSet', 'InvoiceViewSet', 'InvoiceItemViewSet',
-    'DigiLoginCredentialsView', 'ScrapeInvoiceView', 'CeleryTaskStateView'
-]
-
-
 class NoDeleteModelViewSet(mixins.CreateModelMixin,
                            mixins.RetrieveModelMixin,
                            mixins.UpdateModelMixin,
@@ -42,18 +35,12 @@ class BrandListView(ListAPIView):
     pagination_class = None
 
 
-__all__.append('BrandListView')
-
-
 class ActualProductByBrandView(APIView):
 
     def get(self, request, brand_id):
         qs = ActualProduct.objects.filter(brand__id=brand_id)
         serializer = BrandSerializer(qs, many=True)
         return Response(serializer.data)
-
-
-__all__.append('ActualProductByBrandView')
 
 
 class ActualProductViewSet(ModelViewSet):
@@ -229,17 +216,11 @@ class TestCelerySuccessTask(APIView):
         return Response({'task_id': task.id}, status=status.HTTP_202_ACCEPTED)
 
 
-__all__.append('TestCelerySuccessTask')
-
-
 class TestCeleryFailTask(APIView):
 
     def post(self, request):
         task = just_sleep_and_fail.delay()
         return Response({'task_id': task.id}, status=status.HTTP_202_ACCEPTED)
-
-
-__all__.append('TestCeleryFailTask')
 
 
 class CeleryTaskStateView(APIView):
@@ -255,13 +236,9 @@ class CeleryTaskStateView(APIView):
                 'info':        str(task.info)
             }
             return Response(response, status=200)
-        # current = task.info.get('current', 0)
-        # total = task.info.get('total', 1)
-        # progression = (int(current) / int(total)) * 100  # to display a percentage of progress of the task
         response = {
             'task_id': task_id,
             'state':   task.state,
-            # 'progression': progression,
             'info':    None
         }
         return Response(response, status=200)
@@ -280,4 +257,22 @@ class RobotVariantsFilterView(APIView):
         return Response(serializer.data)
 
 
-__all__.append('RobotVariantsFilterView')
+__all__ = [
+    'BrandViewSet',
+    'BrandListView',
+    'ActualProductByBrandView',
+    'ActualProductViewSet',
+    'ProductViewSet',
+    'ProductTypeViewSet',
+    'ProductTypeSelectorViewSet',
+    'ProductTypeSelectorValueViewSet',
+    'ProductVariantViewSet',
+    'InvoiceViewSet',
+    'InvoiceItemViewSet',
+    'DigiLoginCredentialsView',
+    'ScrapeInvoiceView',
+    'TestCelerySuccessTask',
+    'TestCeleryFailTask',
+    'CeleryTaskStateView',
+    'RobotVariantsFilterView',
+]

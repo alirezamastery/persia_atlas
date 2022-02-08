@@ -1,17 +1,7 @@
 from rest_framework import serializers
-from .models import (Product, ProductVariant, ProductType, ProductTypeSelector,
-                     ProductTypeSelectorValue, ActualProduct, Brand, Invoice, InvoiceItem)
+
+from .models import *
 from utils.logging import plogger, logger
-
-
-__all__ = [
-    'UpdateVariantPriceMinSerializer', 'UpdateVariantDigiDataSerializer', 'UpdateVariantStatusSerializer',
-    'VariantSerializerDigikalaContext', 'ActualProductSerializer', 'BrandSerializer', 'ProductVariantSerializer',
-    'InvoiceSerializer', 'InvoiceItemSerializer', 'ProductReadSerializer', 'ProductWriteSerializer',
-    'ProductVariantWriteSerializer',
-    'ProductTypeSelectorValueSerializer', 'ProductTypeSelectorSerializer', 'ProductTypeSerializer',
-    'ActualProductWriteSerializer',
-]
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
@@ -37,7 +27,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 class ProductVariantWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        fields = ['product', 'dkpc', 'price_min', 'stop_loss', 'is_active', 'selector_values','selector', 'actual_product']
+        exclude = ['has_competition', 'selector_values']
 
 
 class ActualProductSerializer(serializers.ModelSerializer):
@@ -139,3 +129,23 @@ class UpdateVariantStatusSerializer(serializers.Serializer):
 class UpdateVariantPriceMinSerializer(serializers.Serializer):
     dkpc = serializers.CharField()
     price_min = serializers.IntegerField()
+
+
+__all__ = [
+    'UpdateVariantPriceMinSerializer',
+    'UpdateVariantDigiDataSerializer',
+    'UpdateVariantStatusSerializer',
+    'VariantSerializerDigikalaContext',
+    'ActualProductSerializer',
+    'BrandSerializer',
+    'ProductVariantSerializer',
+    'InvoiceSerializer',
+    'InvoiceItemSerializer',
+    'ProductReadSerializer',
+    'ProductWriteSerializer',
+    'ProductVariantWriteSerializer',
+    'ProductTypeSelectorValueSerializer',
+    'ProductTypeSelectorSerializer',
+    'ProductTypeSerializer',
+    'ActualProductWriteSerializer',
+]
