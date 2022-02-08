@@ -15,7 +15,7 @@ from django.core.management import BaseCommand
 from django.conf import settings
 from khayyam import JalaliDate, JalaliDatetime
 
-from products.models import Invoice, InvoiceItem
+from accounting.models import Invoice, InvoiceItem
 from utils.logging import logger, plogger
 from scripts.json_db import JsonDB
 

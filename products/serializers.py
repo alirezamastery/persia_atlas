@@ -74,18 +74,6 @@ class ProductTypeSelectorValueSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class InvoiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Invoice
-        fields = '__all__'
-
-
-class InvoiceItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = InvoiceItem
-        fields = '__all__'
-
-
 class VariantSerializerDigikalaContext(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
@@ -139,8 +127,6 @@ __all__ = [
     'ActualProductSerializer',
     'BrandSerializer',
     'ProductVariantSerializer',
-    'InvoiceSerializer',
-    'InvoiceItemSerializer',
     'ProductReadSerializer',
     'ProductWriteSerializer',
     'ProductVariantWriteSerializer',

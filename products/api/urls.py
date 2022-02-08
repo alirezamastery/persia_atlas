@@ -11,7 +11,7 @@ urlpatterns = [
     path('update-variant-data/', UpdateVariantDigiDataView.as_view()),
     path('update-variant-status/', UpdateVariantStatusView.as_view()),
     path('update-variant-price-min/', UpdatePriceMinView.as_view()),
-    path('invoice-excel/', InvoiceExcelView.as_view()),
+    # path('invoice-excel/', InvoiceExcelView.as_view()),
     path('digi-creds/', DigiLoginCredentialsView.as_view()),
     path('scrape-invoice-page/', ScrapeInvoiceView.as_view()),
     path('task-state/<str:task_id>/', CeleryTaskStateView.as_view(), name='task_status'),
@@ -35,8 +35,5 @@ router.register('products-types', ProductTypeViewSet)
 router.register('product-type-selectors', ProductTypeSelectorViewSet)
 router.register('product-type-selector-values', ProductTypeSelectorValueViewSet)
 router.register('variants', ProductVariantViewSet)
-
-router.register('invoices', InvoiceViewSet)
-router.register('invoice-items', InvoiceItemViewSet)
 
 urlpatterns += router.urls

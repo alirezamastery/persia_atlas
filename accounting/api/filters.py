@@ -5,11 +5,6 @@ from django_filters import OrderingFilter
 from ..models import *
 
 
-__all__ = [
-    'CostTypeFilter', 'CostFilter', 'IncomeFilter', 'ProductCostFilter'
-]
-
-
 class CostTypeFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_in_fields')
 
@@ -61,3 +56,25 @@ class ProductCostFilter(filters.FilterSet):
     class Meta:
         model = ProductCost
         fields = ['date_gte', 'date_lte']
+
+
+class InvoiceFilter(filters.FilterSet):
+    # number = filters.CharFilter(method='search_in_fields')
+    start_date_gte = filters.DateFilter(field_name='start_date', lookup_expr='gte')
+    start_date_lte = filters.DateFilter(field_name='start_date', lookup_expr='lte')
+
+    end_date_gte = filters.DateFilter(field_name='end_date', lookup_expr='gte')
+    end_date_lte = filters.DateFilter(field_name='end_date', lookup_expr='lte')
+
+    class Meta:
+        model = Invoice
+        fields = ['number', 'start_date_gte', 'start_date_lte', 'end_date_gte', 'end_date_lte']
+
+
+__all__ = [
+    'CostTypeFilter',
+    'CostFilter',
+    'IncomeFilter',
+    'ProductCostFilter',
+    'InvoiceFilter'
+]

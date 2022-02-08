@@ -133,53 +133,53 @@ class UpdatePriceMinView(APIView):
         return Response(serializer.data, status.HTTP_202_ACCEPTED)
 
 
-class InvoiceExcelView(APIView):
-    file_name = 'quantity.xlsx'
-
-    def get(self, request):
-        invoices = Invoice.objects.all()
-        dfs = []
-        for invoice in invoices:
-            df = self.calculate_quantities(invoice)
-            dfs.append(df)
-        overview = pd.concat(dfs)
-        overview.set_index(['date', 'name'], inplace=True)
-
-        file_path = f'{settings.MEDIA_DIR_NAME}/invoice/{self.file_name}'
-        with open(file_path, 'wb+') as file:
-            overview.to_excel(file, sheet_name='products')
-
-        return Response({'path': file_path}, status.HTTP_200_OK)
-
-    @staticmethod
-    def calculate_quantities(invoice_obj: Invoice):
-        items = InvoiceItem.objects.filter(invoice=invoice_obj)
-        dkp_data = {}
-        serials = []
-
-        for item in items:
-            if item.serial in serials:
-                continue
-            variant = ProductVariant.objects.select_related('product').get(dkpc=item.dkpc)
-            dkp = variant.product.dkp
-            if dkp in dkp_data:
-                dkp_data[dkp]['count'] += 1
-            else:
-                dkp_data[dkp] = {
-                    'count': 1,
-                    'name':  variant.product.title
-                }
-
-            serials.append(item.serial)
-        plogger(dkp_data)
-        names = []
-        quantities = []
-        for q in dkp_data.values():
-            names.append(q['name'])
-            quantities.append(q['count'])
-        df = pd.DataFrame({'name': names, 'quantity': quantities})
-        df['date'] = f'{invoice_obj.start_date_persian} - {invoice_obj.end_date_persian}'
-        return df
+# class InvoiceExcelView(APIView):
+#     file_name = 'quantity.xlsx'
+#
+#     def get(self, request):
+#         invoices = Invoice.objects.all()
+#         dfs = []
+#         for invoice in invoices:
+#             df = self.calculate_quantities(invoice)
+#             dfs.append(df)
+#         overview = pd.concat(dfs)
+#         overview.set_index(['date', 'name'], inplace=True)
+#
+#         file_path = f'{settings.MEDIA_DIR_NAME}/invoice/{self.file_name}'
+#         with open(file_path, 'wb+') as file:
+#             overview.to_excel(file, sheet_name='products')
+#
+#         return Response({'path': file_path}, status.HTTP_200_OK)
+#
+#     @staticmethod
+#     def calculate_quantities(invoice_obj: Invoice):
+#         items = InvoiceItem.objects.filter(invoice=invoice_obj)
+#         dkp_data = {}
+#         serials = []
+#
+#         for item in items:
+#             if item.serial in serials:
+#                 continue
+#             variant = ProductVariant.objects.select_related('product').get(dkpc=item.dkpc)
+#             dkp = variant.product.dkp
+#             if dkp in dkp_data:
+#                 dkp_data[dkp]['count'] += 1
+#             else:
+#                 dkp_data[dkp] = {
+#                     'count': 1,
+#                     'name':  variant.product.title
+#                 }
+#
+#             serials.append(item.serial)
+#         plogger(dkp_data)
+#         names = []
+#         quantities = []
+#         for q in dkp_data.values():
+#             names.append(q['name'])
+#             quantities.append(q['count'])
+#         df = pd.DataFrame({'name': names, 'quantity': quantities})
+#         df['date'] = f'{invoice_obj.start_date_persian} - {invoice_obj.end_date_persian}'
+#         return df
 
 
 class FileDownloadTest(APIView):
@@ -274,7 +274,7 @@ __all__ = [
     'UpdateVariantStatusView',
     'UpdatePriceMinView',
     'FileDownloadTest',
-    'InvoiceExcelView',
+    # 'InvoiceExcelView',
     'VariantDigiDataView',
     'InactiveVariantsView'
 ]

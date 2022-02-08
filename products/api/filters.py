@@ -98,19 +98,6 @@ class VariantFilter(filters.FilterSet):
         )
 
 
-class InvoiceFilter(filters.FilterSet):
-    # number = filters.CharFilter(method='search_in_fields')
-    start_date_gte = filters.DateFilter(field_name='start_date', lookup_expr='gte')
-    start_date_lte = filters.DateFilter(field_name='start_date', lookup_expr='lte')
-
-    end_date_gte = filters.DateFilter(field_name='end_date', lookup_expr='gte')
-    end_date_lte = filters.DateFilter(field_name='end_date', lookup_expr='lte')
-
-    class Meta:
-        model = Invoice
-        fields = ['number', 'start_date_gte', 'start_date_lte', 'end_date_gte', 'end_date_lte']
-
-
 __all__ = [
     'ActualProductFilter',
     'ProductFilter',
@@ -119,5 +106,4 @@ __all__ = [
     'ProductTypeFilter',
     'ProductTypeSelectorFilter',
     'BrandFilter',
-    'InvoiceFilter'
 ]
