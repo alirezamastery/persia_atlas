@@ -73,8 +73,12 @@ class ProductVariant(models.Model):
         null=True
     )
 
-    actual_product = models.ForeignKey('ActualProduct', null=True, on_delete=models.SET_NULL,
-                                       related_name='variants')
+    actual_product = models.ForeignKey(
+        'ActualProduct',
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='variants'
+    )
 
     def __str__(self):
         return f'{self.dkpc}'
