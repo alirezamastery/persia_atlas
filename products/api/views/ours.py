@@ -272,12 +272,10 @@ class RobotVariantsFilterView(APIView):
     def get(self, request):
         actual_product_id = request.query_params.get('actual_product_id')
         selector_id = request.query_params.get('selector_id')
-        print(f'{actual_product_id = } | {selector_id = }')
         variants = ProductVariant.objects.filter(
             selector_id=selector_id,
             actual_product_id=actual_product_id
-        )
-        print(variants)
+        ).order_by('id')
         serializer = ProductVariantSerializer(variants, many=True)
         return Response(serializer.data)
 
