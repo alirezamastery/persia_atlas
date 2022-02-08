@@ -76,4 +76,9 @@ class YearProfitView(APIView):
             profit = incomes - costs - product_costs
             profits.append(profit)
 
-        return Response({'profits': profits})
+        data = {
+            'j_year':  j_year,
+            'profits': profits
+        }
+
+        return Response({'data': data})
