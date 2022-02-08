@@ -8,7 +8,8 @@ from .views.profit import *
 router = DefaultRouter()
 
 urlpatterns = [
-    path('profit/', ProfitView.as_view(), name='profit')
+    path('profit/', ProfitView.as_view(), name='profit'),
+    path('profit-year/', YearProfitView.as_view(), name='profit'),
 ]
 
 router.register('costs', CostViewSet)
