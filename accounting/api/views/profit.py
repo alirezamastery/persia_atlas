@@ -57,13 +57,10 @@ class YearProfitView(APIView):
             today = JalaliDate.today()
             j_year = today.year
 
-        print(f'{j_year = }')
-
         profits = []
         for month in range(1, 13):
             first_day = month_first_day(j_year, month)
             last_day = month_last_day(j_year, month)
-            print(first_day)
             costs = Cost.objects \
                         .filter(date__gte=first_day, date__lte=last_day) \
                         .aggregate(sum=Sum('amount'))['sum'] or 0
