@@ -46,7 +46,7 @@ class ActualProductWriteSerializer(serializers.ModelSerializer):
 
 
 class BrandSerializer(serializers.ModelSerializer):
-    actual_products = ActualProductSerializer(many=True, read_only=True)
+    # actual_products = ActualProductSerializer(many=True, read_only=True)
 
     class Meta:
         model = Brand
