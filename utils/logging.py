@@ -43,7 +43,7 @@ def get_tehran_datetime():
     return tehran_dt.strftime('%Y-%m-%d  %H:%M:%S')
 
 
-def logger(*args, color: str = 'light_gray', bg_color: str = None):
+def logger(*args, color: str = '', bg_color: str = ''):
     if not settings.CUSTOM_LOGGING:
         return
 

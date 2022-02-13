@@ -6,21 +6,24 @@ from typing import Union
 from products.models import Product, ProductVariant
 from products.robot.core.base_robot import RobotBase
 from utils.logging import logger, plogger, plogger_flat, LOG_VALUE_WIDTH as LOG_W
-from .page import BuyBoxPage, CheckPricePage
-from .urls import URLS
+from products.robot.page import BuyBoxPage, CheckPricePage
+from products.robot.urls import URLS
+from products.robot.json_extraction import JSONExtractor
+
+
+def random_sleep(seconds: int = 1, gap: int = 1):
+    time.sleep(round(random.uniform(seconds, seconds + gap), 2))
 
 
 class TrailingPriceRobot(RobotBase):
-    PRICE_LOWERING_STEP = 500
     PRICE_GAP_THRESHOLD = 1000
     NO_COMPETITION_JUMP = 0.05
 
-    page_scraper_class = CheckPricePage
+    data_extractor_class = JSONExtractor
 
     help = 'maintains price of our variants below competition price'
 
     def __init__(self, *args, **kwargs):
-        self.tail = kwargs.pop('tail')
         self.dkp = kwargs.pop('dkp')
         super().__init__(*args, **kwargs)
 
@@ -34,10 +37,6 @@ class TrailingPriceRobot(RobotBase):
     def get_active_products(self):
         if self.dkp is not None and self.dkp.isdigit():
             return Product.objects.filter(dkp=self.dkp)
-        elif self.tail is not None and self.tail.isdigit():
-            return Product.objects \
-                       .filter(is_active=True) \
-                       .order_by('-id')[:int(self.tail):-1]
         else:
             return Product.objects.filter(is_active=True)
 
@@ -48,12 +47,8 @@ class TrailingPriceRobot(RobotBase):
         self.no_competition = []
         for product in active_products:
             logger(product.title, color='cyan')
-            try:
-                page = self.page_scraper_class(product)
-            except json.decoder.JSONDecodeError:
-                logger(f'ERROR: failed to load: {product.dkp}', color='red')
-                continue
-            page_data = page.get_page_data()
+            extractor = self.data_extractor_class(self.session, product)
+            page_data = extractor.get_page_data()
             self.out_of_stock += page_data['out_of_stock']
             variants_data = page_data['variants_data']
             if variants_data:
@@ -67,6 +62,7 @@ class TrailingPriceRobot(RobotBase):
             else:
                 self.no_competition.append(dkpc)
                 self.set_no_competition_price(dkpc, var_data)
+            random_sleep()
 
     def handle_competition(self, dkpc: int, var_data: dict):
         my_price = var_data['my_price']
@@ -80,11 +76,12 @@ class TrailingPriceRobot(RobotBase):
 
     def adjust_price(self, dkpc: int, competition_price: int):
         variant = ProductVariant.objects.select_related('product').get(dkpc=dkpc)
-        new_price = competition_price - variant.actual_product.price_step
+        new_price = competition_price - variant.actual_product.price_step * 10
         if new_price < variant.price_min:
             logger(f'{dkpc}: minimum price reached'.center(LOG_W), color='red')
             self.min_reached.append(dkpc)
             return
+        logger(f'{new_price = }')
         self.update_variant_price_toman(dkpc=str(dkpc), price=new_price)
         if not variant.has_competition:
             variant.has_competition = True
@@ -106,7 +103,7 @@ class TrailingPriceRobot(RobotBase):
         payload = {
             'id':                        str(dkpc),
             'lead_time':                 digi_data['lead_time_latin'],
-            'price_sale':                price * 10,
+            'price_sale':                price,
             'marketplace_seller_stock':  digi_data['marketplace_seller_stock_latin'],
             'maximum_per_order':         '5',
             'oldSellerStock':            '5',
@@ -153,6 +150,7 @@ class TrailingPriceRobot(RobotBase):
                 variant = ProductVariant.objects.get(dkpc=dkpc)
                 if new_price > variant.price_min:
                     logger(f'new price: {new_price}')
+                    random_sleep()
                     self.update_variant_price_toman(dkpc, new_price, increasing=True)
                 else:
                     logger(f'can not increase price for: {dkpc} - price is already outside digi price span')

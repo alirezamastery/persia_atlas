@@ -1,7 +1,6 @@
 import requests
 from django.core.management import BaseCommand
 from django.conf import settings
-from products.robot.robots import TrailingPriceRobot
 from utils.logging import logger, plogger
 
 

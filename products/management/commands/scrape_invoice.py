@@ -189,7 +189,6 @@ class ScrapeInvoicePageNoDB:
                 if i == 3:
                     txt = txt.replace('DKPC-', '')
                 row_data[COLUMNS_INDEX_MAP[i]] = txt
-            logger('row persian datetime:', row_data['date_persian'])
             date_naive = JalaliDatetime.strptime(row_data['date_persian'], '%Y/%m/%d %H:%M').todatetime()
             date_aware = date_naive.astimezone(tz=ZoneInfo('Asia/Tehran'))
             row_data['date'] = date_aware
