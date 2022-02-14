@@ -33,7 +33,7 @@ class JSONExtractor:
         if self.page_variants is None:
             logger('product does NOT have any variants in its page!', color='red')
             return {
-                'out_of_stock':  self.my_variants,
+                'out_of_stock':  [var.dkpc for var in self.my_variants],
                 'variants_data': None
             }
 
