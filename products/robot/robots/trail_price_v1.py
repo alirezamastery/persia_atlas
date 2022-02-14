@@ -138,7 +138,7 @@ class TrailingPriceRobot(RobotBase):
                     raise Exception('digikala search result dkpc is different from our variant dkpc!')
                 return digi_item
             else:
-                pass
+                random_sleep()
 
     def check_server_response_for_update(self, response, dkpc, price, increasing):
         if not increasing:
