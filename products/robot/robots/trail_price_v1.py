@@ -16,6 +16,18 @@ def random_sleep(seconds: int = 1, gap: int = 1):
 
 
 class TrailingPriceRobot(RobotBase):
+    """
+    page_data: {
+    'out_of_stock': list[dkpc]
+    'variants_data': dict[dkpc: VarDataDict]
+    }
+
+    VarDataDict: {
+    'has_competition': bool,
+    'min_price': int,
+    'my_price': int
+    }
+    """
     PRICE_GAP_THRESHOLD = 10000
     NO_COMPETITION_JUMP = 0.05
 
