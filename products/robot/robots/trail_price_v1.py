@@ -16,7 +16,7 @@ def random_sleep(seconds: int = 1, gap: int = 1):
 
 
 class TrailingPriceRobot(RobotBase):
-    PRICE_GAP_THRESHOLD = 1000
+    PRICE_GAP_THRESHOLD = 10000
     NO_COMPETITION_JUMP = 0.05
 
     data_extractor_class = JSONExtractor
@@ -77,12 +77,12 @@ class TrailingPriceRobot(RobotBase):
     def adjust_price(self, dkpc: int, competition_price: int):
         variant = ProductVariant.objects.select_related('product').get(dkpc=dkpc)
         new_price = competition_price - variant.actual_product.price_step * 10
-        if new_price < variant.price_min:
+        if new_price < variant.price_min * 10:
             logger(f'{dkpc}: minimum price reached'.center(LOG_W), color='red')
             self.min_reached.append(dkpc)
             return
         logger(f'{new_price = }')
-        self.update_variant_price_toman(dkpc=str(dkpc), price=new_price)
+        self.update_variant_price_toman(dkpc=dkpc, price=new_price)
         if not variant.has_competition:
             variant.has_competition = True
             variant.save()
@@ -175,63 +175,3 @@ class TrailingPriceRobot(RobotBase):
                 'url':      f'https://www.digikala.com/product/dkp-{variant.product.dkp}'
             })
 
-
-class FindNotBuyBoxRobot(RobotBase):
-    help = 'find variants that are not buy box'
-
-    def run(self):
-        self.check_products()
-        self.report()
-
-    def report(self):
-        logger(f'not BUY BOX variants: {len(self.not_buy_box)}'.center(LOG_W), color='yellow')
-        for variant in self.not_buy_box:
-            plogger_flat({
-                'title': variant.title,
-                'color': COLORS[variant.color_code]["name"],
-                'url':   f'https://www.digikala.com/product/dkp-{variant.product.dkp}'
-            })
-
-    def check_products(self):
-        my_products = self.load_active_products()
-        self.not_buy_box = []
-        for dkp, my_variants in my_products.items():
-            logger(my_variants[0].title)
-            page = BuyBoxPage(dkp, my_variants)
-            variants = page.get_all_variants()
-            if variants:
-                self.not_buy_box += page.find_not_buybox()
-            else:
-                logger('product does NOT have variant(s)!', color='red')
-            self.loop_wait()
-
-
-class UpdateMinPriceRobot(RobotBase):
-    help = 'set price of variants to given amount'
-
-    def run(self):
-        self.login()
-        self.set_prices()
-
-    def set_prices(self):
-        for dkp, my_variants in self.active_products.items():
-            logger(my_variants[0].title)
-            page = CheckPricePage(dkp, my_variants)
-            page_data = page.get_page_data()
-            variants_data = page_data['variants_data']
-            if variants_data:
-                self.process_variants_data(variants_data)
-            time.sleep(round(random.uniform(1, 2), 2))
-
-    def process_variants_data(self, variants_data: dict):
-        for dkpc, var_data in variants_data.items():
-            variant_obj = self.orm.get_by_dkpc(dkpc)
-            while True:
-                try:
-                    if var_data['my_price'] < variant_obj.price_min:
-                        logger(f'price of {dkpc} is lower than min', color='yellow')
-                        self.update_variant_price_toman(dkpc, variant_obj.price_min)
-                    break
-                except Exception as e:
-                    logger('ERROR:', e, color='red')
-                    self.exception_wait()
