@@ -76,8 +76,8 @@ class TrailingPriceRobot(RobotBase):
 
     def adjust_price(self, dkpc: int, competition_price: int):
         variant = ProductVariant.objects.select_related('product').get(dkpc=dkpc)
-        new_price = competition_price - variant.actual_product.price_step * 10
-        if new_price < variant.price_min * 10:
+        new_price = competition_price - variant.actual_product.price_step
+        if new_price < variant.price_min:
             logger(f'{dkpc}: minimum price reached'.center(LOG_W), color='red')
             self.min_reached.append(dkpc)
             return
