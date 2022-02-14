@@ -128,7 +128,7 @@ class TrailingPriceRobot(RobotBase):
         while True:
             if response['status']:
                 digi_item = response['data']['items'][0]
-                if not str(digi_item['product_variant_id']) == dkpc:
+                if not digi_item['product_variant_id'] == dkpc:
                     plogger({
                         'error':                            'different variant id from digikala search',
                         'our dkpc':                         dkpc,
