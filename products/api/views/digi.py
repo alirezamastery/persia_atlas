@@ -71,6 +71,22 @@ class VariantDigiDataView(APIView):
         return Response(serializer.data)
 
 
+class VariantDigiDataDKPCView(APIView):
+
+    def get(self, request, dkpc):
+        variant = get_object_or_404(ProductVariant, dkpc=dkpc)
+        url = get_variant_search_url(dkpc)
+        res = digi_session.get(url)
+        if not res['status']:
+            return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_404_NOT_FOUND)
+        if len(res['data']['items']) == 0:
+            return Response({'error': f'no variant with dkpc: {dkpc} in digikala site'},
+                            status.HTTP_404_NOT_FOUND)
+        data = res['data']['items'][0]
+        serializer = VariantSerializerDigikalaContext(variant, context={'digi_data': data})
+        return Response(serializer.data)
+
+
 class UpdateVariantDigiDataView(APIView):
 
     def post(self, request):
@@ -276,5 +292,6 @@ __all__ = [
     'FileDownloadTest',
     # 'InvoiceExcelView',
     'VariantDigiDataView',
-    'InactiveVariantsView'
+    'InactiveVariantsView',
+    'VariantDigiDataDKPCView'
 ]
