@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import APIException
 
 from utils.logging import logger, plogger
 from utils.digi import get_variant_search_url
@@ -261,26 +262,34 @@ class DigikalaSession:
             pickle.dump(self.session.cookies, f)
 
     def post(self, url, payload):
-        response = self.session.post(url,
-                                     data=payload,
-                                     timeout=self.TIMEOUT,
-                                     headers=self.HEADERS)
+        try:
+            response = self.session.post(url,
+                                         data=payload,
+                                         timeout=self.TIMEOUT,
+                                         headers=self.HEADERS)
+        except:
+            raise APIException({'error:''دیجیکالا رید'})
         if 'account/login' in response.url:
             self.login()
             return self.post(url, payload)
         return response.json()
 
     def get(self, url):
-        response = self.session.get(url,
-                                    timeout=self.TIMEOUT,
-                                    headers=self.HEADERS)
+        try:
+            response = self.session.get(url,
+                                        timeout=self.TIMEOUT,
+                                        headers=self.HEADERS)
+        except:
+            raise APIException({'error:': 'دیجیکالا رید'})
         if 'account/login' in response.url:
             self.login()
             return self.get(url)
-        logger(response.url)
+        logger('response.url:', response.url)
         # plogger(response.content)
-        return response.json()
-
+        try:
+            return response.json()
+        except:
+            raise APIException({'error:': 'دیجیکالا رید'})
 
 digi_session = DigikalaSession()
 
