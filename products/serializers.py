@@ -114,6 +114,17 @@ class UpdateVariantStatusSerializer(serializers.Serializer):
     is_active = serializers.BooleanField()
 
 
+class UpdateBrandStatusSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    is_active = serializers.BooleanField()
+
+    @staticmethod
+    def validate_id(value):
+        if not Brand.objects.filter(id=value).exists():
+            raise serializers.ValidationError(f'no brand with id: {value}')
+        return value
+
+
 class UpdateVariantPriceMinSerializer(serializers.Serializer):
     dkpc = serializers.CharField()
     price_min = serializers.IntegerField()
@@ -134,4 +145,5 @@ __all__ = [
     'ProductTypeSelectorSerializer',
     'ProductTypeSerializer',
     'ActualProductWriteSerializer',
+    'UpdateBrandStatusSerializer',
 ]

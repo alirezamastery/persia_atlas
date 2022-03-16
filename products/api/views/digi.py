@@ -137,6 +137,16 @@ class UpdateVariantStatusView(APIView):
         return Response(digikala_res['data'], status.HTTP_408_REQUEST_TIMEOUT)
 
 
+class UpdateBrandVariantsStatusView(APIView):
+
+    def post(self, request):
+        serializer = UpdateBrandStatusSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        task = update_brand_status.delay(data['id'], data['is_active'])
+        return Response({'task_id': task.id}, status=status.HTTP_202_ACCEPTED)
+
+
 class UpdatePriceMinView(APIView):
 
     def post(self, request):
@@ -297,6 +307,7 @@ __all__ = [
     'ActualProductDigikalaDataView',
     'UpdateVariantDigiDataView',
     'UpdateVariantStatusView',
+    'UpdateBrandVariantsStatusView',
     'UpdatePriceMinView',
     'FileDownloadTest',
     # 'InvoiceExcelView',
