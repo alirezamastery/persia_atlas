@@ -1,20 +1,18 @@
 import time
-import pickle
-from pathlib import Path
 
 import pandas as pd
-import requests
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.exceptions import APIException
 
 from utils.logging import logger, plogger
 from utils.digi import get_variant_search_url
 from products.models import *
 from products.serializers import *
+from products.tasks import update_brand_status
+from persia_atlas.digi import digi_session
 
 
 class ActualProductDigikalaDataView(APIView):
@@ -61,7 +59,7 @@ class VariantDigiDataView(APIView):
         url = get_variant_search_url(dkpc)
         res = digi_session.get(url)
         if not res['status']:
-            return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_400_BAD_REQUEST)
         logger(f'{dkpc:*^50}')
         plogger(res)
         if len(res['data']['items']) == 0:
@@ -79,7 +77,7 @@ class VariantDigiDataDKPCView(APIView):
         url = get_variant_search_url(dkpc)
         res = digi_session.get(url)
         if not res['status']:
-            return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_400_BAD_REQUEST)
         if len(res['data']['items']) == 0:
             return Response({'error': f'no variant with dkpc: {dkpc} in digikala site'},
                             status.HTTP_404_NOT_FOUND)
@@ -160,55 +158,6 @@ class UpdatePriceMinView(APIView):
         return Response(serializer.data, status.HTTP_202_ACCEPTED)
 
 
-# class InvoiceExcelView(APIView):
-#     file_name = 'quantity.xlsx'
-#
-#     def get(self, request):
-#         invoices = Invoice.objects.all()
-#         dfs = []
-#         for invoice in invoices:
-#             df = self.calculate_quantities(invoice)
-#             dfs.append(df)
-#         overview = pd.concat(dfs)
-#         overview.set_index(['date', 'name'], inplace=True)
-#
-#         file_path = f'{settings.MEDIA_DIR_NAME}/invoice/{self.file_name}'
-#         with open(file_path, 'wb+') as file:
-#             overview.to_excel(file, sheet_name='products')
-#
-#         return Response({'path': file_path}, status.HTTP_200_OK)
-#
-#     @staticmethod
-#     def calculate_quantities(invoice_obj: Invoice):
-#         items = InvoiceItem.objects.filter(invoice=invoice_obj)
-#         dkp_data = {}
-#         serials = []
-#
-#         for item in items:
-#             if item.serial in serials:
-#                 continue
-#             variant = ProductVariant.objects.select_related('product').get(dkpc=item.dkpc)
-#             dkp = variant.product.dkp
-#             if dkp in dkp_data:
-#                 dkp_data[dkp]['count'] += 1
-#             else:
-#                 dkp_data[dkp] = {
-#                     'count': 1,
-#                     'name':  variant.product.title
-#                 }
-#
-#             serials.append(item.serial)
-#         plogger(dkp_data)
-#         names = []
-#         quantities = []
-#         for q in dkp_data.values():
-#             names.append(q['name'])
-#             quantities.append(q['count'])
-#         df = pd.DataFrame({'name': names, 'quantity': quantities})
-#         df['date'] = f'{invoice_obj.start_date_persian} - {invoice_obj.end_date_persian}'
-#         return df
-
-
 class FileDownloadTest(APIView):
     file_name = 'quantity.xlsx'
 
@@ -244,65 +193,6 @@ class InactiveVariantsView(APIView):
         return Response(res['data'])
 
 
-class DigikalaSession:
-    COOKIE_FILE = 'session_cookies'
-    TIMEOUT = 10
-    HEADERS = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/93.0'}
-
-    def __init__(self):
-        self.session = requests.Session()
-        cookie_file = Path(f'./{self.COOKIE_FILE}')
-        if cookie_file.is_file():
-            # logger('loading cookies', color='yellow')
-            with open('session_cookies', 'rb') as f:
-                self.session.cookies.update(pickle.load(f))
-        else:
-            self.login()
-
-    def login(self):
-        logger('logging in', color='yellow')
-        response = self.session.post(settings.DIGIKALA_LOGIN_URL,
-                                     data=settings.DIGIKALA_LOGIN_CREDENTIALS,
-                                     timeout=10,
-                                     headers=self.HEADERS)
-        if response.url == settings.DIGIKALA_URLS['login']:
-            raise Exception('could not login to digikala')
-        logger('logged in', color='green')
-        with open(f'./{self.COOKIE_FILE}', 'wb') as f:
-            pickle.dump(self.session.cookies, f)
-
-    def post(self, url, payload):
-        try:
-            response = self.session.post(url,
-                                         data=payload,
-                                         timeout=self.TIMEOUT,
-                                         headers=self.HEADERS)
-        except:
-            raise APIException({'error:''دیجیکالا رید'})
-        if 'account/login' in response.url:
-            self.login()
-            return self.post(url, payload)
-        return response.json()
-
-    def get(self, url):
-        try:
-            response = self.session.get(url,
-                                        timeout=self.TIMEOUT,
-                                        headers=self.HEADERS)
-        except:
-            raise APIException({'error:': 'دیجیکالا رید'})
-        if 'account/login' in response.url:
-            self.login()
-            return self.get(url)
-        logger('response.url:', response.url)
-        # plogger(response.content)
-        try:
-            return response.json()
-        except:
-            raise APIException({'error:': 'دیجیکالا رید'})
-
-digi_session = DigikalaSession()
-
 __all__ = [
     'ActualProductDigikalaDataView',
     'UpdateVariantDigiDataView',
@@ -310,7 +200,6 @@ __all__ = [
     'UpdateBrandVariantsStatusView',
     'UpdatePriceMinView',
     'FileDownloadTest',
-    # 'InvoiceExcelView',
     'VariantDigiDataView',
     'InactiveVariantsView',
     'VariantDigiDataDKPCView'

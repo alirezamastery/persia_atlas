@@ -126,8 +126,6 @@ class ProductVariantViewSet(NoDeleteModelViewSet):
         return Response(serializer.data)
 
 
-
-
 class DigiLoginCredentialsView(APIView):
     KEY_PASSWORD = 'digi_password'
     KEY_USERNAME = 'digi_username'
