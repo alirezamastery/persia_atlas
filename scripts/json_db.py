@@ -3,10 +3,17 @@ import json
 
 
 class JsonDB:
-    encoding = 'utf-8'
-    path = './json_db.json'
 
-    def __init__(self):
+    def __init__(
+            self,
+            *args,
+            path: str = './json_db.json',
+            encoding: str = 'utf-8',
+            **kwargs
+    ):
+        self.path = path
+        self.encoding = encoding
+
         p = Path(self.path)
         if p.is_file():
             with open(self.path, 'r', encoding=self.encoding) as file:
