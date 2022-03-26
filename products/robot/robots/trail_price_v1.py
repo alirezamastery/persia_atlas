@@ -29,7 +29,7 @@ class TrailingPriceRobot(RobotBase):
     }
     """
     PRICE_GAP_THRESHOLD = 10000
-    NO_COMPETITION_JUMP = 0.05
+    NO_COMPETITION_JUMP = 0.04
 
     data_extractor_class = JSONExtractor
 
@@ -74,7 +74,7 @@ class TrailingPriceRobot(RobotBase):
             else:
                 self.no_competition.append(dkpc)
                 self.set_no_competition_price(dkpc, var_data)
-            random_sleep()
+            random_sleep(seconds=3)
 
     def handle_competition(self, dkpc: int, var_data: dict):
         my_price = var_data['my_price']
@@ -135,10 +135,22 @@ class TrailingPriceRobot(RobotBase):
     def get_digi_variant_data(self, dkpc: int) -> dict:
         url = f'https://seller.digikala.com/ajax/variants/search/?sortColumn=&sortOrder=desc&page=1&' \
               f'items=10&search[type]=product_variant_id&search[value]={dkpc}&'
-        response = self.session.get(url)
-        response = response.json()
+
         while True:
-            if response['status']:
+            res = self.session.get(url)
+            try:
+                response = res.json()
+            except json.JSONDecodeError:
+                logger('ERROR in json decode')
+                logger(res.status_code)
+                logger(res.content)
+                if res.status_code == 429:
+                    random_sleep(seconds=10)
+                    continue
+                else:
+                    raise
+
+            if response['status'] is True:
                 digi_item = response['data']['items'][0]
                 if not digi_item['product_variant_id'] == dkpc:
                     plogger({
@@ -149,8 +161,12 @@ class TrailingPriceRobot(RobotBase):
                     }, color='red')
                     raise Exception('digikala search result dkpc is different from our variant dkpc!')
                 return digi_item
+
             else:
-                random_sleep()
+                logger('ERROR in getting digi response')
+                logger(res.status_code)
+                logger(res.content)
+                raise RuntimeError(f'ERROR in getting digi response for {dkpc = }')
 
     def check_server_response_for_update(self, response, dkpc, price, increasing):
         if not increasing:
@@ -158,11 +174,11 @@ class TrailingPriceRobot(RobotBase):
         price_range_error = 'قیمت فروش شما در بازه\u200cی قیمت مرجع نیست.'
         if response['status'] is False:
             if response['data']['price'] == price_range_error:
-                new_price = price - 1000
+                new_price = price - 10000
                 variant = ProductVariant.objects.get(dkpc=dkpc)
                 if new_price > variant.price_min:
                     logger(f'new price: {new_price}')
-                    random_sleep()
+                    random_sleep(seconds=3)
                     self.update_variant_price_toman(dkpc, new_price, increasing=True)
                 else:
                     logger(f'can not increase price for: {dkpc} - price is already outside digi price span')
