@@ -11,13 +11,15 @@ from colored import fg, bg, attr
 
 
 DATE_STR_WIDTH = 20
-CALLER_NAME_WIDTH = 0
-SPACES = 1
+CALLER_NAME_WIDTH = 30
+SPACES = 2
 LOG_KEY_WIDTH = DATE_STR_WIDTH + CALLER_NAME_WIDTH + SPACES
 LOG_VALUE_WIDTH = 60
-LINE_SEPARATOR = ''.join(('─' * LOG_KEY_WIDTH, '┼', '─' * LOG_VALUE_WIDTH))
+# LINE_SEPARATOR = ''.join(('─' * LOG_KEY_WIDTH, '┼', '─' * LOG_VALUE_WIDTH))
+LINE_SEPARATOR = ''.join(('─' * LOG_KEY_WIDTH, '─', '─' * LOG_VALUE_WIDTH))
 DELIMITER = '│'
-RESET = attr('reset')
+# RESET = attr('reset')
+RESET = ''
 
 
 def get_call_stack_info():
@@ -28,12 +30,7 @@ def get_call_stack_info():
     """
     call_stack = inspect.stack()
     caller = call_stack[2].function[:CALLER_NAME_WIDTH]
-    _self = call_stack[2][0].f_locals.get('self', None)
-    if _self:
-        _username = getattr(_self, 'user_id', '-----')
-    else:
-        _username = None
-    return caller, _username
+    return caller
 
 
 def get_tehran_datetime():
@@ -47,15 +44,16 @@ def logger(*args, color: str = '', bg_color: str = ''):
     if not settings.CUSTOM_LOGGING:
         return
 
+    caller = get_call_stack_info()
     date = get_tehran_datetime()
     style = ''
-    if color:
-        style += fg(color)
-    if bg_color:
-        style += bg(bg_color)
+    # if color:
+    #     style += fg(color)
+    # if bg_color:
+    #     style += bg(bg_color)
 
     with open('logger.txt', 'a', encoding='utf-8') as log_file:
-        log_file.write(f'{date} {DELIMITER} ')
+        log_file.write(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} ')
         try:
             log_file.write(''.join(*args))
         except:
@@ -63,7 +61,7 @@ def logger(*args, color: str = '', bg_color: str = ''):
         log_file.write('\n')
         log_file.write(LINE_SEPARATOR + '\n')
 
-    print(f'{date} {DELIMITER}{style}', *args, RESET)
+    print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER}{style}', *args, RESET)
     print(LINE_SEPARATOR)
 
 
@@ -71,18 +69,19 @@ def plogger(data_obj, color: str = '', bg_color: str = ''):
     if not settings.CUSTOM_LOGGING:
         return
 
+    caller = get_call_stack_info()
     date = get_tehran_datetime()
     style = ''
-    if color:
-        style += fg(color)
-    if bg_color:
-        style += bg(bg_color)
+    # if color:
+    #     style += fg(color)
+    # if bg_color:
+    #     style += bg(bg_color)
+    indent_str = ' ' * LOG_KEY_WIDTH + DELIMITER
     with open('logger.txt', 'a', encoding='utf-8') as log_file:
-        indent_str = ' ' * LOG_KEY_WIDTH + DELIMITER
         lines = indent(pformat(data_obj), indent_str).splitlines()
         first_line = lines.pop(0)
-        log_file.write(f'{date} {DELIMITER} {first_line[LOG_KEY_WIDTH + 1:]}\n')
-        print(f'{date} {DELIMITER}{style}{first_line[LOG_KEY_WIDTH + 1:]}{RESET}')
+        log_file.write(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} {first_line[LOG_KEY_WIDTH + 1:]}\n')
+        print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} {style}{first_line[LOG_KEY_WIDTH + 1:]}{RESET}')
         for i, line in enumerate(lines):
             log_file.write(line + '\n')
             print(f'{line[:LOG_KEY_WIDTH + 1]}{style}{line[LOG_KEY_WIDTH + 1:]}{RESET}')
