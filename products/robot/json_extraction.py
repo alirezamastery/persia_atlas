@@ -39,7 +39,8 @@ class JSONExtractor:
 
         variants_data = {}
         for var in self.my_variants:
-            logger(f'selector: {self.selector.title} - value: {var.selector.value} - {var.selector.digikala_id}')
+            logger(f'dkpc: {var.dkpc} |'
+                   f' selector: {self.selector.title} - value: {var.selector.value} - {var.selector.digikala_id}')
             my_price = self.get_variant_price(int(var.dkpc))
             logger(f'{my_price = }')
             if my_price > 0:
@@ -58,7 +59,7 @@ class JSONExtractor:
         """
 
         my_variants_selector_ids = [v.selector.digikala_id for v in self.my_variants]
-        my_variants_dkpcs = [int(v.dkpc)for v in self.my_variants]
+        my_variants_dkpcs = [int(v.dkpc) for v in self.my_variants]
         logger(f'{my_variants_selector_ids = }')
         logger(f'{my_variants_dkpcs = }')
 
