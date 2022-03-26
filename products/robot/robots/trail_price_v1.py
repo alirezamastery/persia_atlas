@@ -94,7 +94,7 @@ class TrailingPriceRobot(RobotBase):
             self.min_reached.append(dkpc)
             return
         logger(f'{new_price = }')
-        self.update_variant_price_toman(dkpc=dkpc, price=new_price)
+        self.update_variant_price_rial(dkpc=dkpc, price=new_price)
         if not variant.has_competition:
             variant.has_competition = True
             variant.save()
@@ -106,11 +106,11 @@ class TrailingPriceRobot(RobotBase):
             new_price -= new_price % 100  # round down to closest hundred
             if new_price > var_data['my_price']:
                 logger(f'{dkpc}: no competition - increasing price', color='green')
-                self.update_variant_price_toman(dkpc, new_price, increasing=True)
+                self.update_variant_price_rial(dkpc, new_price, increasing=True)
                 variant.has_competition = False
                 variant.save()
 
-    def update_variant_price_toman(self, dkpc: Union[str, int], price: int, increasing: bool = False):
+    def update_variant_price_rial(self, dkpc: Union[str, int], price: int, increasing: bool = False):
         digi_data = self.get_digi_variant_data(dkpc)
         payload = {
             'id':                        str(dkpc),
@@ -179,7 +179,7 @@ class TrailingPriceRobot(RobotBase):
                 if new_price > variant.price_min:
                     logger(f'new price: {new_price}')
                     random_sleep(seconds=3)
-                    self.update_variant_price_toman(dkpc, new_price, increasing=True)
+                    self.update_variant_price_rial(dkpc, new_price, increasing=True)
                 else:
                     logger(f'can not increase price for: {dkpc} - price is already outside digi price span')
             else:
