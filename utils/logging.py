@@ -52,15 +52,6 @@ def logger(*args, color: str = '', bg_color: str = ''):
     # if bg_color:
     #     style += bg(bg_color)
 
-    with open('logger.txt', 'a', encoding='utf-8') as log_file:
-        log_file.write(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} ')
-        try:
-            log_file.write(''.join(*args))
-        except:
-            log_file.write(str(args))
-        log_file.write('\n')
-        log_file.write(LINE_SEPARATOR + '\n')
-
     print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER}{style}', *args, RESET)
     print(LINE_SEPARATOR)
 
@@ -77,16 +68,12 @@ def plogger(data_obj, color: str = '', bg_color: str = ''):
     # if bg_color:
     #     style += bg(bg_color)
     indent_str = ' ' * LOG_KEY_WIDTH + DELIMITER
-    with open('logger.txt', 'a', encoding='utf-8') as log_file:
-        lines = indent(pformat(data_obj), indent_str).splitlines()
-        first_line = lines.pop(0)
-        log_file.write(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} {first_line[LOG_KEY_WIDTH + 1:]}\n')
-        print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} {style}{first_line[LOG_KEY_WIDTH + 1:]}{RESET}')
-        for i, line in enumerate(lines):
-            log_file.write(line + '\n')
-            print(f'{line[:LOG_KEY_WIDTH + 1]}{style}{line[LOG_KEY_WIDTH + 1:]}{RESET}')
-        log_file.write(LINE_SEPARATOR + '\n')
-        print(LINE_SEPARATOR)
+    lines = indent(pformat(data_obj), indent_str).splitlines()
+    first_line = lines.pop(0)
+    print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} {style}{first_line[LOG_KEY_WIDTH + 1:]}{RESET}')
+    for i, line in enumerate(lines):
+        print(f'{line[:LOG_KEY_WIDTH + 1]}{style}{line[LOG_KEY_WIDTH + 1:]}{RESET}')
+    print(LINE_SEPARATOR)
 
 
 def plogger_flat(data_obj: dict, color: str = 'light_gray', bg_color: str = ''):
@@ -100,13 +87,9 @@ def plogger_flat(data_obj: dict, color: str = 'light_gray', bg_color: str = ''):
     indent_str = ' ' * LOG_KEY_WIDTH + DELIMITER
     max_key_len = max(len(str(key)) for key in data_obj)
     key_format = lambda key: f'{f"{key}:":<{max_key_len + 1}}'
-    with open('logger.txt', 'a', encoding='utf-8') as log_file:
-        for i, (key, value) in enumerate(data_obj.items()):
-            if i == 0:
-                log_file.write(f'{date} {DELIMITER} {key_format(key)} {value}\n')
-                print(f'{date} {DELIMITER} {style}{key_format(key)} {value}{RESET}')
-            else:
-                log_file.write(f'{indent_str} {key_format(key)} {value}\n')
-                print(f'{indent_str} {style}{key_format(key)} {value}{RESET}')
-        log_file.write(LINE_SEPARATOR + '\n')
-        print(LINE_SEPARATOR)
+    for i, (key, value) in enumerate(data_obj.items()):
+        if i == 0:
+            print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} {style}{key_format(key)} {value}{RESET}')
+        else:
+            print(f'{indent_str} {style}{key_format(key)} {value}{RESET}')
+    print(LINE_SEPARATOR)
