@@ -21,6 +21,7 @@ urlpatterns = [
     path('robot-variants/', RobotVariantsFilterView.as_view()),
     path('inactive-variants/', InactiveVariantsView.as_view()),
     path('update-brand-status/', UpdateBrandVariantsStatusView.as_view()),
+    path('robot-status/', RobotStatusView.as_view()),
 
     # for testing purposes:
     path('file-test/', FileDownloadTest.as_view()),

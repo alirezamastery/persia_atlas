@@ -244,3 +244,16 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'django-cache'
 
 CUSTOM_LOGGING = config('CUSTOM_LOGGING')
+
+CACHES = {
+    'default': {
+        'BACKEND':  'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/1',
+        'OPTIONS':  {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
+CACHE_KEY_ROBOT_RUNNING = 'robot_running'
+CACHE_KEY_STOP_ROBOT = 'stop_robot'

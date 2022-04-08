@@ -1,3 +1,6 @@
+from django.core.cache import cache
+from django.conf import settings
+
 from rest_framework.viewsets import ModelViewSet, GenericViewSet, ReadOnlyModelViewSet
 from rest_framework.views import APIView
 from rest_framework import mixins
@@ -206,6 +209,27 @@ class RobotVariantsFilterView(APIView):
         return Response(serializer.data)
 
 
+class RobotStatusView(APIView):
+
+    def get(self, request):
+        if cache.get(settings.CACHE_KEY_STOP_ROBOT) == 'true':
+            running = False
+        else:
+            running = True
+        return Response({'running': running})
+
+    def post(self, request):
+        serializer = StopRobotSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        stop = serializer.data.get('stop')
+        logger(f'ROBOT STOP SIGNAL: {stop}')
+        if stop is True:
+            cache.set(settings.CACHE_KEY_STOP_ROBOT, 'true', timeout=None)
+        else:
+            cache.set(settings.CACHE_KEY_STOP_ROBOT, 'false', timeout=None)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+
+
 __all__ = [
     'BrandViewSet',
     'BrandListView',
@@ -222,4 +246,5 @@ __all__ = [
     'TestCeleryFailTask',
     'CeleryTaskStateView',
     'RobotVariantsFilterView',
+    'RobotStatusView',
 ]

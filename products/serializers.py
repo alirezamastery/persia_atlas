@@ -130,6 +130,13 @@ class UpdateVariantPriceMinSerializer(serializers.Serializer):
     price_min = serializers.IntegerField()
 
 
+class StopRobotSerializer(serializers.Serializer):
+    stop = serializers.BooleanField(required=True)
+
+    class Meta:
+        fields = '__all__'
+
+
 __all__ = [
     'UpdateVariantPriceMinSerializer',
     'UpdateVariantDigiDataSerializer',
@@ -146,4 +153,5 @@ __all__ = [
     'ProductTypeSerializer',
     'ActualProductWriteSerializer',
     'UpdateBrandStatusSerializer',
+    'StopRobotSerializer',
 ]
