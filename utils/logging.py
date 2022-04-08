@@ -90,12 +90,13 @@ def plogger(data_obj, color: str = '', bg_color: str = ''):
 
 
 def plogger_flat(data_obj: dict, color: str = 'light_gray', bg_color: str = ''):
+    caller = get_call_stack_info()
     date = get_tehran_datetime()
     style = ''
-    if color:
-        style += fg(color)
-    if bg_color:
-        style += bg(bg_color)
+    # if color:
+    #     style += fg(color)
+    # if bg_color:
+    #     style += bg(bg_color)
     indent_str = ' ' * LOG_KEY_WIDTH + DELIMITER
     max_key_len = max(len(str(key)) for key in data_obj)
     key_format = lambda key: f'{f"{key}:":<{max_key_len + 1}}'
