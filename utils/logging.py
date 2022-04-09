@@ -30,7 +30,14 @@ def get_call_stack_info():
     """
     call_stack = inspect.stack()
     caller = call_stack[2].function[:CALLER_NAME_WIDTH]
-    return caller
+    _self = call_stack[2][0].f_locals.get('self', None)
+    user_id = None
+    if _self:
+        user = getattr(_self, 'user', None)
+        if user:
+            user_id = getattr(user, 'id', None)
+
+    return caller, user_id
 
 
 def get_tehran_datetime():
@@ -44,7 +51,7 @@ def logger(*args, color: str = '', bg_color: str = ''):
     if not settings.CUSTOM_LOGGING:
         return
 
-    caller = get_call_stack_info()
+    caller, user_id = get_call_stack_info()
     date = get_tehran_datetime()
     style = ''
     # if color:
@@ -53,6 +60,8 @@ def logger(*args, color: str = '', bg_color: str = ''):
     #     style += bg(bg_color)
 
     print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER}{style}', *args, RESET)
+    if user_id is not None:
+        print(f'{f"user_id: {user_id}":>{LOG_KEY_WIDTH - 1}} {DELIMITER} ')
     print(LINE_SEPARATOR)
 
 
@@ -60,7 +69,7 @@ def plogger(data_obj, color: str = '', bg_color: str = ''):
     if not settings.CUSTOM_LOGGING:
         return
 
-    caller = get_call_stack_info()
+    caller, user_id = get_call_stack_info()
     date = get_tehran_datetime()
     style = ''
     # if color:
@@ -69,10 +78,17 @@ def plogger(data_obj, color: str = '', bg_color: str = ''):
     #     style += bg(bg_color)
     indent_str = ' ' * LOG_KEY_WIDTH + DELIMITER
     lines = indent(pformat(data_obj), indent_str).splitlines()
-    first_line = lines.pop(0)
-    print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} {style}{first_line[LOG_KEY_WIDTH + 1:]}{RESET}')
+    # first_line = lines.pop(0)
+    # print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER} {style}{first_line[LOG_KEY_WIDTH + 1:]}{RESET}')
+    print(f'{date} {caller:>{CALLER_NAME_WIDTH}} {DELIMITER}')
     for i, line in enumerate(lines):
-        print(f'{line[:LOG_KEY_WIDTH + 1]}{style}{line[LOG_KEY_WIDTH + 1:]}{RESET}')
+        if user_id and i == 0:
+            print(
+                f'{f"user_id: {user_id}":>{LOG_KEY_WIDTH - 1}} {DELIMITER}'
+                f'{style}{line[LOG_KEY_WIDTH + 1:]}{RESET}'
+            )
+        else:
+            print(f'{line[:LOG_KEY_WIDTH + 1]}{style}{line[LOG_KEY_WIDTH + 1:]}{RESET}')
     print(LINE_SEPARATOR)
 
 
