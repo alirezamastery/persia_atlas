@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from unidecode import unidecode
 
 from products.models import Product, ProductVariant
-from utils.logging import logger, plogger, LOG_VALUE_WIDTH, plogger_flat
+from utils.logging import logger, LOG_VALUE_WIDTH
 
 
 class PageBase:
@@ -50,7 +50,6 @@ class PageBase:
         variants data is in a javascript variable called 'ecpd2'
         """
 
-        # my_variants_selectors = [v.selector_values.first().digikala_id for v in self.my_variants]
         my_variants_selectors = [v.selector.digikala_id for v in self.my_variants]
         my_variants_dkpcs = [v.dkpc for v in self.my_variants]
 
@@ -103,13 +102,6 @@ class CheckPricePage(PageBase):
         self.out_of_stock = []
         variants_data = {}
         for var in self.my_variants:
-            # clr = var.color_code
-            # if self.product_obj.type.selectors.first().title == 'color':
-            #     clr = var.selector_values.first().value
-            # else:
-            #     clr = 'white'
-            # logger(f'selector: {self.selector.title} - value: {var.selector_values.first().value} - '
-            #        f'{var.selector_values.first().digikala_id}')
             logger(f'selector: {self.selector.title} - value: {var.selector.value} - {var.selector.digikala_id}')
             my_price = self.get_variant_price(var.dkpc)
             if my_price > 0:
@@ -124,7 +116,6 @@ class CheckPricePage(PageBase):
 
     def check_variant_competition(self, my_var: ProductVariant) -> dict:
         var_info = {'has_competition': False, 'min_price': None}
-        # other_variant_ids = self.other_variants[my_var.selector_values.first().digikala_id]
         other_variant_ids = self.other_variants[my_var.selector.digikala_id]
         if len(other_variant_ids) > 0:
             var_info['has_competition'] = True
@@ -172,7 +163,7 @@ class BuyBoxPage(PageBase):
         return self.not_buy_box
 
     def check_variant_buybox(self, my_var):
-        logger(f'check color code: {my_var.color_code}', color=COLORS[my_var.color_code]['hex'])
+        logger(f'check color code: {my_var.color_code}')
         other_variant_ids = self.other_variants[my_var.color_code]
         if my_var.is_active and len(other_variant_ids) > 0:
             index_map = self.variant_div_index_map(my_var, other_variant_ids)

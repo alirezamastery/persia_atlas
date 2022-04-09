@@ -9,7 +9,6 @@ from django.conf import settings
 from products.models import Product, ProductVariant
 from products.robot.core.base_robot import RobotBase
 from utils.logging import logger, plogger, plogger_flat, LOG_VALUE_WIDTH as LOG_W
-from products.robot.page import BuyBoxPage, CheckPricePage
 from products.robot.urls import URLS
 from products.robot.json_extraction import JSONExtractor
 from products.robot.exceptions import StopRobot
@@ -76,7 +75,7 @@ class TrailingPriceRobot(RobotBase):
             variants_data = page_data['variants_data']
             if variants_data:
                 self.process_variants_data(variants_data)
-            time.sleep(round(random.uniform(1, 2), 2))
+            random_sleep(seconds=1)
 
     def process_variants_data(self, variants_data: dict):
         for dkpc, var_data in variants_data.items():
@@ -199,11 +198,9 @@ class TrailingPriceRobot(RobotBase):
 
     def report(self):
         logger(f'no competition: {len(self.no_competition)}'.center(LOG_W), color='green')
-        # self.iter_variants_for_report(self.no_competition)
         logger(f'inactive: {len(self.out_of_stock)}'.center(LOG_W), color='red')
         self.iter_variants_for_report(self.out_of_stock)
         logger(f'minimum price reached: {len(self.min_reached)}'.center(LOG_W), color='yellow')
-        # self.iter_variants_for_report(self.min_reached)
 
     @staticmethod
     def iter_variants_for_report(dkpc_list: list):
