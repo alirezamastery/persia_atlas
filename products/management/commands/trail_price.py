@@ -7,6 +7,8 @@ from django.core.management import BaseCommand
 # from products.robot.robots.trail_price_v0 import TrailingPriceRobot
 from products.robot.robots.trail_price_v1 import TrailingPriceRobot
 from utils.logging import get_tehran_datetime, logger
+from products.websocket.utils import send_msg_websocket_group
+from products.websocket.constants import *
 from products.robot.exceptions import StopRobot
 
 
@@ -24,6 +26,10 @@ class Command(BaseCommand):
         robot = TrailingPriceRobot(dkp=dkp)
         try:
             cache.set(settings.CACHE_KEY_ROBOT_RUNNING, 'true', timeout=None)
+            msg = {
+                'robot_running': True
+            }
+            send_msg_websocket_group(ALL_USERS_GROUP, msg, msg_type='robot_status')
             robot.run()
         except StopRobot:
             logger('ROBOT STOPPED')
@@ -36,3 +42,7 @@ class Command(BaseCommand):
                 raise
         finally:
             cache.set(settings.CACHE_KEY_ROBOT_RUNNING, 'false', timeout=None)
+            msg = {
+                'robot_running': False
+            }
+            send_msg_websocket_group(ALL_USERS_GROUP, msg, msg_type='robot_status')
