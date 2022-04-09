@@ -1,16 +1,21 @@
-"""
-ASGI config for persia_atlas project.
-
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/3.2/howto/deployment/asgi/
-"""
-
 import os
 
 from django.core.asgi import get_asgi_application
 
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'persia_atlas.settings')
 
-application = get_asgi_application()
+django_asgi_app = get_asgi_application()
+
+from channels.routing import ProtocolTypeRouter, URLRouter
+from products.websocket.routing import websocket_urlpatterns as robot_urls
+from products.websocket.middleware import TokenAuthMiddleware
+
+
+application = ProtocolTypeRouter({
+    'websocket': TokenAuthMiddleware(
+        URLRouter(
+            robot_urls
+        )
+    )
+})

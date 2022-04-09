@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'products.apps.ProductsConfig',
     'accounting.apps.AccountingConfig',
 
+    'channels',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -84,6 +85,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'persia_atlas.wsgi.application'
+ASGI_APPLICATION = 'persia_atlas.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -257,3 +259,13 @@ CACHES = {
 
 CACHE_KEY_ROBOT_RUNNING = 'robot_running'
 CACHE_KEY_STOP_ROBOT = 'stop_robot'
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
+}
