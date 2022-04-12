@@ -92,7 +92,7 @@ def plogger(data_obj, color: str = '', bg_color: str = ''):
 
 
 def plogger_flat(data_obj: dict, color: str = 'light_gray', bg_color: str = ''):
-    caller = get_call_stack_info()
+    caller, user_id = get_call_stack_info()
     date = get_tehran_datetime()
     style = ''
     # if color:
