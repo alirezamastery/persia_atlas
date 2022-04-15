@@ -93,8 +93,12 @@ class VariantFilter(filters.FilterSet):
         fields = ['is_active', 'search', 'has_competition']
 
     def search_in_fields(self, qs, name, value):
+        if value.isdigit():
+            return qs.filter(
+                Q(product__title__icontains=value) | Q(dkpc=value)
+            )
         return qs.filter(
-            Q(product__title__icontains=value) | Q(dkpc=value)
+            product__title__icontains=value
         )
 
 
