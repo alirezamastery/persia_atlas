@@ -69,7 +69,9 @@ class RobotConsumer(WebsocketConsumer):
         else:
             response = self.create_client_error(f'invalid command: {command}')
 
-        response[USER_RESPONSE]['req_key'] = req_key
+        if response.get(USER_RESPONSE) is not None:
+            response[USER_RESPONSE]['req_key'] = req_key
+
         return response
 
     def create_client_error(self, error_msg: str):
@@ -142,3 +144,4 @@ class RobotConsumer(WebsocketConsumer):
             self.send(text_data=json.dumps(event['message']))
         except Exception as e:
             logger('ERROR:', e, color='red')
+

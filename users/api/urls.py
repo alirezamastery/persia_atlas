@@ -12,6 +12,6 @@ urlpatterns = [
 
 router = DefaultRouter()
 
-# router.register('users', UserViewSet)
+router.register('users', UserViewSet)
 
 urlpatterns += router.urls
