@@ -267,11 +267,10 @@ CACHES = {
 CACHE_KEY_ROBOT_RUNNING = 'robot_running'
 CACHE_KEY_STOP_ROBOT = 'stop_robot'
 
-
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
+        'CONFIG':  {
             'hosts': [('127.0.0.1', 6379)],
         },
     },
