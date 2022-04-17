@@ -165,11 +165,12 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:8080',
-    'http://localhost:3000',
-    'https://persia-atlas.com'
-]
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:8080',
+#     'http://localhost:3000',
+#     'https://persia-atlas.com'
+# ]
+CORS_ALLOW_ALL_ORIGINS = True
 
 # ******************* settings for DRF *******************
 DEFAULT_RENDERER_CLASSES = [
@@ -275,3 +276,5 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

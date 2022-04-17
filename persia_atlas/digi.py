@@ -4,8 +4,14 @@ from pathlib import Path
 import requests
 from django.conf import settings
 from rest_framework.exceptions import APIException
+from rest_framework import status
 
 from utils.logging import logger, plogger
+
+
+class DigikalaServerError(APIException):
+    status_code = status.HTTP_418_IM_A_TEAPOT
+    default_detail = 'Digikala server did not respond'
 
 
 class DigikalaSession:
@@ -30,7 +36,7 @@ class DigikalaSession:
                                      timeout=10,
                                      headers=self.HEADERS)
         if response.url == settings.DIGIKALA_URLS['login']:
-            raise Exception('could not login to digikala')
+            raise DigikalaServerError({'login failed': 'Could not Login to Digikala, maybe password has changed'})
         logger('logged in', color='green')
         with open(f'./{self.COOKIE_FILE}', 'wb') as f:
             pickle.dump(self.session.cookies, f)
@@ -42,7 +48,7 @@ class DigikalaSession:
                                          timeout=self.TIMEOUT,
                                          headers=self.HEADERS)
         except:
-            raise APIException({'error:''دیجیکالا رید'})
+            raise DigikalaServerError()
         if 'account/login' in response.url:
             self.login()
             return self.post(url, payload)
@@ -56,7 +62,7 @@ class DigikalaSession:
         except Exception as e:
             logger('DIGIKALA RESPONSE ERROR')
             logger(e)
-            raise APIException({'error:': 'دیجیکالا رید'})
+            raise DigikalaServerError()
         if 'account/login' in response.url:
             self.login()
             return self.get(url)
@@ -67,7 +73,7 @@ class DigikalaSession:
         except:
             logger('DIGIKALA DECODE ERROR')
             plogger(response.content)
-            raise APIException({'error:': 'دیجیکالا رید'})
+            raise DigikalaServerError()
 
 
 digi_session = DigikalaSession()
