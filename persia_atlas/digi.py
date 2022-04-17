@@ -6,6 +6,7 @@ from django.conf import settings
 from rest_framework.exceptions import APIException
 from rest_framework import status
 
+from scripts.json_db import JsonDB
 from utils.logging import logger, plogger
 
 
@@ -31,11 +32,17 @@ class DigikalaSession:
 
     def login(self):
         logger('logging in', color='yellow')
-        response = self.session.post(settings.DIGIKALA_LOGIN_URL,
-                                     data=settings.DIGIKALA_LOGIN_CREDENTIALS,
+        json_db = JsonDB()
+        login_credentials = {
+            'login[email]':    json_db.get(JsonDB.keys.DIGI_USERNAME),
+            'login[password]': json_db.get(JsonDB.keys.DIGI_PASSWORD),
+        }
+        login_url = settings.DIGIKALA_URLS['login']
+        response = self.session.post(login_url,
+                                     data=login_credentials,
                                      timeout=10,
                                      headers=self.HEADERS)
-        if response.url == settings.DIGIKALA_URLS['login']:
+        if response.url == login_url:
             raise DigikalaServerError({'login failed': 'Could not Login to Digikala, maybe password has changed'})
         logger('logged in', color='green')
         with open(f'./{self.COOKIE_FILE}', 'wb') as f:
