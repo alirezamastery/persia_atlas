@@ -130,26 +130,24 @@ class ProductVariantViewSet(NoDeleteModelViewSet):
 
 
 class DigiLoginCredentialsView(APIView):
-    KEY_PASSWORD = 'digi_password'
-    KEY_USERNAME = 'digi_username'
 
     def get(self, request):
         db = JsonDB()
         response = {
-            self.KEY_USERNAME: db.get(self.KEY_USERNAME),
-            self.KEY_PASSWORD: db.get(self.KEY_PASSWORD),
+            JsonDB.keys.DIGI_USERNAME: db.get(JsonDB.keys.DIGI_USERNAME),
+            JsonDB.keys.DIGI_PASSWORD: db.get(JsonDB.keys.DIGI_PASSWORD),
         }
         return Response(response)
 
     def post(self, request):
         db = JsonDB()
-        username = request.data.get(self.KEY_USERNAME, db.get(self.KEY_USERNAME))
-        password = request.data.get(self.KEY_PASSWORD, db.get(self.KEY_PASSWORD))
-        db.set(self.KEY_USERNAME, username)
-        db.set(self.KEY_PASSWORD, password)
+        username = request.data.get(JsonDB.keys.DIGI_USERNAME, db.get(JsonDB.keys.DIGI_USERNAME))
+        password = request.data.get(JsonDB.keys.DIGI_PASSWORD, db.get(JsonDB.keys.DIGI_PASSWORD))
+        db.set(JsonDB.keys.DIGI_USERNAME, username)
+        db.set(JsonDB.keys.DIGI_PASSWORD, password)
         response = {
-            self.KEY_USERNAME: username,
-            self.KEY_PASSWORD: password,
+            JsonDB.keys.DIGI_USERNAME: username,
+            JsonDB.keys.DIGI_PASSWORD: password,
         }
         return Response(response, status=status.HTTP_201_CREATED)
 

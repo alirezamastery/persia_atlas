@@ -3,7 +3,6 @@ import requests
 from django.contrib.auth import settings
 from utils.logging import logger
 from scripts.json_db import JsonDB
-from products.api.views.ours import DigiLoginCredentialsView
 
 
 class ServerSession:
@@ -13,8 +12,8 @@ class ServerSession:
         # self.login_credentials = settings.DIGIKALA_LOGIN_CREDENTIALS
         json_db = JsonDB()
         self.login_credentials = {
-            'login[email]':    json_db.get(DigiLoginCredentialsView.KEY_USERNAME),
-            'login[password]': json_db.get(DigiLoginCredentialsView.KEY_PASSWORD),
+            'login[email]':    json_db.get(JsonDB.keys.DIGI_USERNAME),
+            'login[password]': json_db.get(JsonDB.keys.DIGI_PASSWORD),
         }
         self.session = requests.Session()
 

@@ -2,7 +2,13 @@ from pathlib import Path
 import json
 
 
+class JsonDBKeys:
+    DIGI_PASSWORD = 'digi_password'
+    DIGI_USERNAME = 'digi_username'
+
+
 class JsonDB:
+    keys = JsonDBKeys()
 
     def __init__(
             self,
