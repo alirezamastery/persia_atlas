@@ -208,6 +208,6 @@ class TrailingPriceRobot(RobotBase):
             variant = ProductVariant.objects.get(dkpc=dkpc)
             plogger_flat({
                 'title':    variant.product.title,
-                'selector': variant.selector_values.first().value,
+                'selector': variant.selector,
                 'url':      f'https://www.digikala.com/product/dkp-{variant.product.dkp}'
             })
