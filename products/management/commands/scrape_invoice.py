@@ -103,7 +103,7 @@ class ScrapeInvoicePageNoDB:
                 break
             next_page = pagination_btns[-2].find_element(By.TAG_NAME, 'a')
             next_page.click()
-            self.random_sleep(3, 1)
+            self.random_sleep(4, 2)
         pprint(self.table_rows)
         self.save_invoice_items()
 

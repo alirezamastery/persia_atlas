@@ -3,6 +3,7 @@ import traceback
 from django.core.cache import cache
 from django.conf import settings
 from django.core.management import BaseCommand
+from requests.exceptions import RequestException
 
 # from products.robot.robots.trail_price_v0 import TrailingPriceRobot
 from products.robot.robots.trail_price_v1 import TrailingPriceRobot
@@ -33,6 +34,8 @@ class Command(BaseCommand):
             robot.run()
         except StopRobot:
             logger('ROBOT STOPPED')
+        except RequestException:
+            pass
         except:
             with open('robot_errors.txt', 'a', encoding='utf-8') as log_file:
                 date = get_tehran_datetime()
