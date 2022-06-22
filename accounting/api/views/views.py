@@ -79,10 +79,13 @@ class InvoiceViewSet(mixins.CreateModelMixin,
         items = invoice.invoice_items.all()
         dkp_data = {}
         serials = []
+        total_count = 0
 
         for item in items:
             if item.serial in serials:
                 continue
+            # we may have to connect InvoiceItem to ProductVariant with a ForeignKey, to
+            # be able to query and GROUP BY, instead of this for loop (if this api usage grows)
             variant = ProductVariant.objects.select_related('product').get(dkpc=item.dkpc)
             dkp = variant.product.dkp
             if dkp in dkp_data:
@@ -93,9 +96,16 @@ class InvoiceViewSet(mixins.CreateModelMixin,
                     'name':  variant.product.title
                 }
             serials.append(item.serial)
+            total_count += 1
 
-        data = [v for k, v in dkp_data.items()]
-        return Response(data)
+        items_data = [v for k, v in dkp_data.items()]
+
+        response = {
+            'items': items_data,
+            'total_count': total_count
+        }
+
+        return Response(response)
 
 
 class InvoiceItemViewSet(mixins.CreateModelMixin,
