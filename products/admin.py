@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import (Product, ProductType, ProductTypeSelector,
-                     ProductTypeSelectorValue, ProductVariant, ActualProduct,
+from .models import (Product, ProductType, VariantSelectorType,
+                     VariantSelector, ProductVariant, ActualProduct,
                      Brand)
 from .forms import ProductVariantAdminForm, ActualProductAdminForm
 
@@ -40,7 +40,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
     search_fields = ('dkpc', 'product__title', 'selector__value')
     list_filter = ('is_active',)
     save_on_top = True
-    filter_horizontal = ['selector_values']
+    filter_horizontal = []
 
     @admin.display(description='selectors')
     def get_selectors(self, obj):
@@ -82,14 +82,14 @@ class ProductTypeAdmin(admin.ModelAdmin):
 
 
 class ProductTypeSelectorValueAdmin(admin.ModelAdmin):
-    list_display = ('digikala_id', 'value', 'selector')
-    readonly_fields = ('digikala_id', 'value', 'selector')
+    list_display = ('digikala_id', 'value', 'selector_type')
+    readonly_fields = ('digikala_id', 'value', 'selector_type')
 
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Brand)
 admin.site.register(ProductType, ProductTypeAdmin)
-admin.site.register(ProductTypeSelector)
-admin.site.register(ProductTypeSelectorValue, ProductTypeSelectorValueAdmin)
+admin.site.register(VariantSelectorType)
+admin.site.register(VariantSelector, ProductTypeSelectorValueAdmin)
 admin.site.register(ProductVariant, ProductVariantAdmin)
 admin.site.register(ActualProduct, ActualProductAdmin)

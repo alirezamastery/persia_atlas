@@ -60,16 +60,16 @@ class ProductTypeSerializer(serializers.ModelSerializer):
         depth = 1
 
 
-class ProductTypeSelectorSerializer(serializers.ModelSerializer):
+class VariantSelectorTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductTypeSelector
+        model = VariantSelectorType
         fields = '__all__'
         depth = 1
 
 
-class ProductTypeSelectorValueSerializer(serializers.ModelSerializer):
+class VariantSelectorSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductTypeSelectorValue
+        model = VariantSelector
         fields = '__all__'
         depth = 1
 
@@ -148,8 +148,8 @@ __all__ = [
     'ProductReadSerializer',
     'ProductWriteSerializer',
     'ProductVariantWriteSerializer',
-    'ProductTypeSelectorValueSerializer',
-    'ProductTypeSelectorSerializer',
+    'VariantSelectorSerializer',
+    'VariantSelectorTypeSerializer',
     'ProductTypeSerializer',
     'ActualProductWriteSerializer',
     'UpdateBrandStatusSerializer',

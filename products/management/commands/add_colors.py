@@ -1,8 +1,5 @@
 from django.core.management import BaseCommand
 
-from products.models import ProductTypeSelectorValue, ProductTypeSelector
-
-
 COLORS = {
     1:   {'hex': '#212121', 'name': 'مشکی', 'bg_hex': '#FFFFFF'},
     2:   {'hex': '#FFFFFF', 'name': 'سفید'},
@@ -154,12 +151,14 @@ COLORS = {
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        selector = ProductTypeSelector.objects.get(title='color')
-
+        # selector = ProductTypeSelector.objects.get(title='color')
+        #
+        # # for digi_id, color in COLORS.items():
+        # #     ProductTypeSelectorValue.objects.create(digikala_id=digi_id, value=color['name'] , selector=selector)
         # for digi_id, color in COLORS.items():
-        #     ProductTypeSelectorValue.objects.create(digikala_id=digi_id, value=color['name'] , selector=selector)
-        for digi_id, color in COLORS.items():
-            selector_value = ProductTypeSelectorValue.objects.get(digikala_id=digi_id)
-            print(selector_value.value, color['hex'])
-            selector_value.extra_info = color['hex']
-            selector_value.save()
+        #     selector_value = ProductTypeSelectorValue.objects.get(digikala_id=digi_id)
+        #     print(selector_value.value, color['hex'])
+        #     selector_value.extra_info = color['hex']
+        #     selector_value.save()
+        pass
+

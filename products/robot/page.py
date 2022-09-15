@@ -24,7 +24,7 @@ class PageBase:
         # self.selector = self.product_obj.type.selectors.first()
 
         # UPDATE: we changed th relation of selector to foreign key:
-        self.selector = self.product_obj.type.selector
+        self.selector = self.product_obj.type.selector_type
 
         page_html = self.get_product_page(product_obj.dkp)
         self.soup = BeautifulSoup(page_html, 'html.parser')
