@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
+from firebase_admin import initialize_app
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'celery',
     'django_celery_results',
+    'fcm_django',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -278,3 +280,5 @@ CHANNEL_LAYERS = {
 }
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+FIREBASE_APP = initialize_app()
