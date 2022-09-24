@@ -63,7 +63,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
         if request.user.mobile == '09358578419':
             return []
         else:
-            return ['product', 'dkpc', 'selector_values']
+            return ['product', 'dkpc', 'selector']
 
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)

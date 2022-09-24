@@ -27,7 +27,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
 class ProductVariantWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
-        exclude = ['has_competition', 'selector_values']
+        exclude = ['has_competition', 'selector']
 
 
 class ActualProductSerializer(serializers.ModelSerializer):
