@@ -282,3 +282,5 @@ CHANNEL_LAYERS = {
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 FIREBASE_APP = initialize_app()
+
+DIGIKALA_API_BASE_URL = 'https://seller.digikala.com/api/v1/'
