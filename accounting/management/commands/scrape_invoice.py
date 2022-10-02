@@ -96,7 +96,7 @@ class ScrapeInvoicePageNoDB:
         while True:
             self.extract_table_data()
             pagination_rows = self.get_pagination_row()
-            if pagination_rows is None:
+            if pagination_rows is None or (isinstance(pagination_rows, list) and len(pagination_rows) == 0):
                 break
             is_last_page, pagination_btns = self.check_pagination_btns(pagination_rows)
             if is_last_page:
