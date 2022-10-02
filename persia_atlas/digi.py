@@ -10,10 +10,6 @@ from scripts.json_db import JsonDB
 from utils.logging import logger, plogger
 
 
-def get_variant_detail(dkpc: int) -> dict:
-    pass
-
-
 class DigikalaServerError(APIException):
     status_code = status.HTTP_418_IM_A_TEAPOT
     default_detail = 'Digikala server did not respond'

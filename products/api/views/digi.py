@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from utils.logging import logger, plogger
-from utils.digi import get_variant_search_url
+from utils.digi import *
 from products.models import *
 from products.serializers import *
 from products.tasks import update_brand_status
@@ -74,16 +74,8 @@ class VariantDigiDataDKPCView(APIView):
 
     def get(self, request, dkpc):
         variant = get_object_or_404(ProductVariant, dkpc=dkpc)
-        url = get_variant_search_url(dkpc)
-        res = digi_session.get(url)
-        if not res['status']:
-            return Response({'error': 'دیجیکالا رید'}, status=status.HTTP_400_BAD_REQUEST)
-        if len(res['data']['items']) == 0:
-            return Response({'error': f'no variant with dkpc: {dkpc} in digikala site'},
-                            status.HTTP_404_NOT_FOUND)
-        data = res['data']['items'][0]
-        serializer = VariantSerializerDigikalaContext(variant, context={'digi_data': data})
-        return Response(serializer.data)
+        data = get_variant_detail(variant.dkpc)
+        return Response(data)
 
 
 class UpdateVariantDigiDataView(APIView):
