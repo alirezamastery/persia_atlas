@@ -10,7 +10,7 @@ class JSONExtractor:
     def __init__(self, robot_session, product: Product):
         self.session = robot_session
         self.product = product
-        self.selector = self.product.type.selector
+        self.selector = self.product.type.selector_type
         self.my_variants = list(self.product.variants.filter(is_active=True))
         self.others_variants = None
         self.page_variants = None

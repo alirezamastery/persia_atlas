@@ -54,15 +54,15 @@ class ProductTypeFilter(filters.FilterSet):
         fields = ['search']
 
 
-class ProductTypeSelectorFilter(filters.FilterSet):
+class VariantSelectorTypeFilter(filters.FilterSet):
     search = filters.CharFilter(field_name='title', lookup_expr='icontains')
 
     class Meta:
-        model = ProductTypeSelector
+        model = VariantSelectorType
         fields = ['search']
 
 
-class ProductTypeSelectorValueFilter(filters.FilterSet):
+class VariantSelectorFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_in_fields')
 
     o = OrderingFilter(
@@ -70,7 +70,7 @@ class ProductTypeSelectorValueFilter(filters.FilterSet):
     )
 
     class Meta:
-        model = ProductTypeSelectorValue
+        model = VariantSelector
         fields = ['search']
 
     def search_in_fields(self, qs, name, value):
@@ -105,9 +105,9 @@ class VariantFilter(filters.FilterSet):
 __all__ = [
     'ActualProductFilter',
     'ProductFilter',
-    'ProductTypeSelectorValueFilter',
+    'VariantSelectorFilter',
     'VariantFilter',
     'ProductTypeFilter',
-    'ProductTypeSelectorFilter',
+    'VariantSelectorTypeFilter',
     'BrandFilter',
 ]

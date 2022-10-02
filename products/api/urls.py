@@ -35,8 +35,8 @@ router.register('brands', BrandViewSet)
 router.register('actual-products', ActualProductViewSet)
 router.register('products', ProductViewSet)
 router.register('products-types', ProductTypeViewSet)
-router.register('product-type-selectors', ProductTypeSelectorViewSet)
-router.register('product-type-selector-values', ProductTypeSelectorValueViewSet)
+router.register('variant-selector-types', VariantSelectorTypeViewSet)
+router.register('variant-selectors', VariantSelectorViewSet)
 router.register('variants', ProductVariantViewSet)
 
 urlpatterns += router.urls

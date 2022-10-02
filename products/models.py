@@ -29,33 +29,32 @@ class Product(models.Model):
 
 class ProductType(models.Model):
     title = models.CharField(max_length=256)
-    selectors = models.ManyToManyField('ProductTypeSelector', related_name='product_types')
-    selector = models.ForeignKey(
-        'ProductTypeSelector',
+    selector_type = models.ForeignKey(
+        'VariantSelectorType',
         on_delete=models.SET_NULL,
         null=True,
-        related_name='product_types_fk'
+        related_name='product_types'
     )
 
     def __str__(self):
         return f'{self.title}'
 
 
-class ProductTypeSelector(models.Model):
+class VariantSelectorType(models.Model):
     title = models.CharField(max_length=256, unique=True, blank=False, null=False)
 
     def __str__(self):
         return f'{self.title}'
 
 
-class ProductTypeSelectorValue(models.Model):
+class VariantSelector(models.Model):
     digikala_id = models.IntegerField(unique=True, blank=False, null=False)
-    selector = models.ForeignKey(ProductTypeSelector, on_delete=models.CASCADE)
+    selector_type = models.ForeignKey(VariantSelectorType, on_delete=models.CASCADE)
     value = models.CharField(max_length=256, unique=True, blank=False, null=False)
     extra_info = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
-        return f'{self.selector} - {self.value} - {self.digikala_id}'
+        return f'{self.selector_type} - {self.value} - {self.digikala_id}'
 
 
 class ProductVariant(models.Model):
@@ -65,10 +64,9 @@ class ProductVariant(models.Model):
     stop_loss = models.IntegerField(default=0, blank=True, null=True)
     is_active = models.BooleanField(default=True, blank=False, null=False)
     has_competition = models.BooleanField(default=True, blank=False, null=False, editable=False)
-    selector_values = models.ManyToManyField(ProductTypeSelectorValue, related_name='variants')
     selector = models.ForeignKey(
-        ProductTypeSelectorValue,
-        related_name='variants_fk',
+        VariantSelector,
+        related_name='variants',
         on_delete=models.SET_NULL,
         null=True
     )
@@ -89,7 +87,7 @@ __all__ = [
     'ActualProduct',
     'Product',
     'ProductType',
-    'ProductTypeSelector',
-    'ProductTypeSelectorValue',
+    'VariantSelectorType',
+    'VariantSelector',
     'ProductVariant',
 ]

@@ -64,8 +64,8 @@ class ActualProductViewSet(ModelViewSet):
         for var in variants:
             selector_ids.append(var.selector.id)
         selector_ids = set(selector_ids)
-        selector_values = ProductTypeSelectorValue.objects.filter(id__in=selector_ids)
-        serializer = ProductTypeSelectorValueSerializer(selector_values, many=True)
+        selector_values = VariantSelector.objects.filter(id__in=selector_ids)
+        serializer = VariantSelectorSerializer(selector_values, many=True)
         return Response(serializer.data)
 
 
@@ -86,10 +86,10 @@ class ProductTypeViewSet(NoDeleteModelViewSet):
     filterset_class = ProductTypeFilter
 
 
-class ProductTypeSelectorViewSet(NoDeleteModelViewSet):
-    queryset = ProductTypeSelector.objects.all().order_by('-id')
-    serializer_class = ProductTypeSelectorSerializer
-    filterset_class = ProductTypeSelectorFilter
+class VariantSelectorTypeViewSet(NoDeleteModelViewSet):
+    queryset = VariantSelectorType.objects.all().order_by('-id')
+    serializer_class = VariantSelectorTypeSerializer
+    filterset_class = VariantSelectorTypeFilter
 
     @action(detail=False, methods=['get'])
     def get_by_list(self, request):
@@ -99,10 +99,10 @@ class ProductTypeSelectorViewSet(NoDeleteModelViewSet):
         return Response(serializer.data)
 
 
-class ProductTypeSelectorValueViewSet(ReadOnlyModelViewSet):
-    queryset = ProductTypeSelectorValue.objects.all().order_by('digikala_id')
-    serializer_class = ProductTypeSelectorValueSerializer
-    filterset_class = ProductTypeSelectorValueFilter
+class VariantSelectorViewSet(ReadOnlyModelViewSet):
+    queryset = VariantSelector.objects.all().order_by('digikala_id')
+    serializer_class = VariantSelectorSerializer
+    filterset_class = VariantSelectorFilter
 
     @action(detail=False, methods=['get'])
     def get_by_list(self, request):
@@ -235,8 +235,8 @@ __all__ = [
     'ActualProductViewSet',
     'ProductViewSet',
     'ProductTypeViewSet',
-    'ProductTypeSelectorViewSet',
-    'ProductTypeSelectorValueViewSet',
+    'VariantSelectorTypeViewSet',
+    'VariantSelectorViewSet',
     'ProductVariantViewSet',
     'DigiLoginCredentialsView',
     'ScrapeInvoiceView',
