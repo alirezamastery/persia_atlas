@@ -129,7 +129,7 @@ class TrailingPriceRobot(RobotBase):
             'price_sale':                price,
             'marketplace_seller_stock':  digi_data['marketplace_seller_stock_latin'],
             'maximum_per_order':         '5',
-            'oldSellerStock':            '5',
+            'oldSellerStock':            digi_data['marketplace_seller_stock_latin'],
             'selling_chanel':            '',
             'is_buy_box_suggestion':     '0',
             'shipping_type':             'digikala',
