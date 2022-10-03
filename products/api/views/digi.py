@@ -75,7 +75,8 @@ class VariantDigiDataDKPCView(APIView):
     def get(self, request, dkpc):
         variant = get_object_or_404(ProductVariant, dkpc=dkpc)
         data = get_variant_detail(variant.dkpc)
-        return Response(data)
+        serializer = VariantSerializerDigikalaContext(variant, context={'digi_data': data})
+        return Response(serializer.data)
 
 
 class UpdateVariantDigiDataView(APIView):
