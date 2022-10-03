@@ -25,14 +25,14 @@ def check_stop_signal():
 class TrailingPriceRobot(RobotBase):
     """
     page_data: {
-    'out_of_stock': list[dkpc]
-    'variants_data': dict[dkpc: VarDataDict]
+        'out_of_stock': list[dkpc]
+        'variants_data': dict[dkpc: VarDataDict]
     }
 
     VarDataDict: {
-    'has_competition': bool,
-    'min_price': int,
-    'my_price': int
+        'has_competition': bool,
+        'min_price': int,
+        'my_price': int
     }
     """
     PRICE_GAP_THRESHOLD = 10000
