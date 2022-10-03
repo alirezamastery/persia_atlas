@@ -13,27 +13,45 @@ def get_variant_search_url(dkpc):
 
 
 def get_variant_api_url(dkpc: int) -> str:
-    return f'{settings.DIGIKALA_API_BASE_URL}variants/{dkpc}/'
+    return f'{settings.DIGIKALA_API_BASE_URL}/variants/{dkpc}/'
 
 
-def get_variant_detail(dkpc: int) -> dict:
-    url = get_variant_api_url(dkpc)
+def send_digikala_api_request(url: str, *, method: str = 'GET', payload: dict = None) -> dict:
     try:
-        res = requests.get(url, headers=settings.DIGIKALA_API_HEADERS)
+        res = requests.request(
+            url=url,
+            headers=settings.DIGIKALA_API_HEADERS,
+            method=method,
+            json=payload
+        )
     except requests.exceptions.RequestException:
         raise APIException('خطا در برقرار ارتباط با دیجیکالا')
     try:
         res_json = res.json()
     except json.decoder.JSONDecodeError:
+        plogger(res.content)
         raise APIException('پاسخ غیر عادی از دیجیکالا دریافت شد')
-    plogger(res_json)
     if res_json['status'] == 'ok':
         return res_json['data']
-    raise APIException(f'digikala response: {res_json["message"]}')
+    raise APIException(res_json)
+
+
+def variant_detail_request(dkpc: int, *, method: str = 'GET', payload: dict = None) -> dict:
+    url = get_variant_api_url(dkpc)
+    return send_digikala_api_request(url=url, method=method, payload=payload)
+
+
+def get_variant_list(query_params: dict) -> dict:
+    url_query = ''
+    for k, v in query_params.items():
+        url_query += f'&{k}={v}'
+    url = f'{settings.DIGIKALA_API_BASE_URL}/variants/?{url_query}'
+    return send_digikala_api_request(url=url, method='GET')
 
 
 __all__ = [
     'get_variant_search_url',
     'get_variant_api_url',
-    'get_variant_detail',
+    'variant_detail_request',
+    'get_variant_list',
 ]

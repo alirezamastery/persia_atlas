@@ -6,12 +6,9 @@ from .views.digi import *
 
 
 urlpatterns = [
-    path('actual-product-variants/<int:pk>/', ActualProductDigikalaDataView.as_view()),
     path('variant-digi-data/<int:pk>/', VariantDigiDataView.as_view()),
     path('variant-digi-data-dkpc/<int:dkpc>/', VariantDigiDataDKPCView.as_view()),
-    path('update-variant-data/', UpdateVariantDigiDataView.as_view()),
-    path('update-variant-status/', UpdateVariantStatusView.as_view()),
-    path('update-variant-price-min/', UpdatePriceMinView.as_view()),
+    path('update-variant-data/<int:dkpc>/', UpdateVariantDigiDataView.as_view()),
     # path('invoice-excel/', InvoiceExcelView.as_view()),
     path('digi-creds/', DigiLoginCredentialsView.as_view()),
     path('scrape-invoice-page/', ScrapeInvoiceView.as_view()),

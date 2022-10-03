@@ -98,9 +98,9 @@ class DKPCListSerializer(serializers.Serializer):
 
 
 class UpdateVariantDigiDataSerializer(serializers.Serializer):
-    dkpc = serializers.CharField()
-    price = serializers.IntegerField()
-    our_stock = serializers.IntegerField()
+    price = serializers.IntegerField(required=False)
+    seller_stock = serializers.IntegerField(required=False)
+    is_active = serializers.BooleanField(required=False)
 
 
 class UpdateVariantStatusSerializer(serializers.Serializer):
@@ -119,11 +119,6 @@ class UpdateBrandStatusSerializer(serializers.Serializer):
         return value
 
 
-class UpdateVariantPriceMinSerializer(serializers.Serializer):
-    dkpc = serializers.CharField()
-    price_min = serializers.IntegerField()
-
-
 class StopRobotSerializer(serializers.Serializer):
     stop = serializers.BooleanField(required=True)
 
@@ -132,7 +127,6 @@ class StopRobotSerializer(serializers.Serializer):
 
 
 __all__ = [
-    'UpdateVariantPriceMinSerializer',
     'UpdateVariantDigiDataSerializer',
     'UpdateVariantStatusSerializer',
     'VariantSerializerDigikalaContext',
