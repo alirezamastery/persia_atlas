@@ -70,7 +70,7 @@ class TrailingPriceRobot(RobotBase):
             logger(product.title, color='cyan')
             extractor = self.data_extractor_class(self.session, product)
             page_data = extractor.get_page_data()
-            self.out_of_stock.append(page_data['out_of_stock'])
+            self.out_of_stock.extend(page_data['out_of_stock'])
             variants_data = page_data['variants_data']
             if variants_data:
                 self.process_variants_data(variants_data)
