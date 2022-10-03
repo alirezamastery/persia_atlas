@@ -10,7 +10,7 @@ class JSONExtractor:
     def __init__(self, robot_session, product: Product):
         self.session = robot_session
         self.product = product
-        self.selector = self.product.type.selector_type
+        self.selector_type = self.product.type.selector_type
         self.my_variants = list(self.product.variants.filter(is_active=True))
         self.others_variants = None
         self.page_variants = None
@@ -40,7 +40,7 @@ class JSONExtractor:
         variants_data = {}
         for var in self.my_variants:
             logger(f'dkpc: {var.dkpc} |'
-                   f' selector: {self.selector.title} - value: {var.selector.value} - {var.selector.digikala_id}')
+                   f' selector: {self.selector_type.title} - value: {var.selector.value} - {var.selector.digikala_id}')
             my_price = self.get_variant_price(int(var.dkpc))
             logger(f'{my_price = }')
             if my_price > 0:
@@ -73,13 +73,13 @@ class JSONExtractor:
 
         self.page_variants = variants
         others_variants = {selector: [] for selector in my_variants_selector_ids}
-        selector_title = self.selector.title
+        selector_title = self.selector_type.title
         logger(f'{selector_title = }')
         for var_data in variants:
             dkpc = var_data['id']
             # right now variants in page only have either color or size and we have only
             # 'size' and 'color' in our database for ProductTypeSelector table
-            var_selector_obj = var_data.get(self.selector.title)
+            var_selector_obj = var_data.get(self.selector_type.title)
             if var_selector_obj is None:
                 raise Exception(f'found a variant that does not have selector data: {dkpc}')
             selector_id = var_selector_obj['id']
