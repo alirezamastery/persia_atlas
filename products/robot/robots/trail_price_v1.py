@@ -1,4 +1,3 @@
-import json
 import time
 import random
 from typing import Union
@@ -8,10 +7,10 @@ from django.conf import settings
 
 from products.models import Product, ProductVariant
 from products.robot.core.base_robot import RobotBase
-from utils.logging import logger, plogger, plogger_flat, LOG_VALUE_WIDTH as LOG_W
-from products.robot.urls import URLS
 from products.robot.json_extraction import JSONExtractor
 from products.robot.exceptions import StopRobot
+from utils.digi import variant_detail_request
+from utils.logging import logger, plogger_flat, LOG_VALUE_WIDTH as LOG_W
 
 
 def random_sleep(seconds: int = 1, gap: int = 1):
@@ -45,6 +44,9 @@ class TrailingPriceRobot(RobotBase):
 
     def __init__(self, *args, **kwargs):
         self.dkp = kwargs.pop('dkp')
+        self.out_of_stock = []
+        self.min_reached = []
+        self.no_competition = []
         super().__init__(*args, **kwargs)
 
     def run(self):
@@ -63,15 +65,12 @@ class TrailingPriceRobot(RobotBase):
 
     def check_products(self):
         active_products = self.get_active_products()
-        self.out_of_stock = []
-        self.min_reached = []
-        self.no_competition = []
         for product in active_products:
             check_stop_signal()
             logger(product.title, color='cyan')
             extractor = self.data_extractor_class(self.session, product)
             page_data = extractor.get_page_data()
-            self.out_of_stock += page_data['out_of_stock']
+            self.out_of_stock.append(page_data['out_of_stock'])
             variants_data = page_data['variants_data']
             if variants_data:
                 self.process_variants_data(variants_data)
@@ -122,62 +121,12 @@ class TrailingPriceRobot(RobotBase):
                 variant.save()
 
     def update_variant_price_rial(self, dkpc: Union[str, int], price: int, increasing: bool = False):
-        digi_data = self.get_digi_variant_data(dkpc)
         payload = {
-            'id':                        str(dkpc),
-            'lead_time':                 digi_data['lead_time_latin'],
-            'price_sale':                price,
-            'marketplace_seller_stock':  digi_data['marketplace_seller_stock_latin'],
-            'maximum_per_order':         '5',
-            'oldSellerStock':            digi_data['marketplace_seller_stock_latin'],
-            'selling_chanel':            '',
-            'is_buy_box_suggestion':     '0',
-            'shipping_type':             'digikala',
-            'seller_shipping_lead_time': '2',
+            'price': price
         }
-        response = self.session.post(URLS['update_product'], data=payload,
-                                     headers={'user-agent': 'Mozilla/5.0'})
+        response = variant_detail_request(dkpc, method='PUT', payload=payload)
         logger(response)
-        decoded = response.content.decode()
-        data = json.loads(decoded)
-        plogger(data)
-        self.check_server_response_for_update(data, dkpc, price, increasing)
-
-    def get_digi_variant_data(self, dkpc: int) -> dict:
-        url = f'https://seller.digikala.com/ajax/variants/search/?sortColumn=&sortOrder=desc&page=1&' \
-              f'items=10&search[type]=product_variant_id&search[value]={dkpc}&'
-
-        while True:
-            res = self.session.get(url)
-            try:
-                response = res.json()
-            except json.JSONDecodeError:
-                logger('ERROR in json decode')
-                logger(res.status_code)
-                logger(res.content)
-                if res.status_code == 429:
-                    random_sleep(seconds=10)
-                    continue
-                else:
-                    raise
-
-            if response['status'] is True:
-                digi_item = response['data']['items'][0]
-                if not digi_item['product_variant_id'] == dkpc:
-                    plogger({
-                        'error':                            'different variant id from digikala search',
-                        'our dkpc':                         dkpc,
-                        'digikala item product_variant_id': digi_item['product_variant_id'],
-                        'digikala item id':                 digi_item['id'],
-                    }, color='red')
-                    raise Exception('digikala search result dkpc is different from our variant dkpc!')
-                return digi_item
-
-            else:
-                logger('ERROR in getting digi response')
-                logger(res.status_code)
-                logger(res.content)
-                raise RuntimeError(f'ERROR in getting digi response for {dkpc = }')
+        self.check_server_response_for_update(response, dkpc, price, increasing)
 
     def check_server_response_for_update(self, response, dkpc, price, increasing):
         if not increasing:
