@@ -132,7 +132,10 @@ class TrailingPriceRobot(RobotBase):
         if not increasing:
             return
         price_range_error = 'قیمت فروش شما در بازه\u200cی قیمت مرجع نیست.'
-        if response['status'] is False:
+        status = response.get('status')
+        if status is None:
+            raise Exception(f'digikala returned a response without status: {response}')
+        if status is False:
             if response['data']['price'] == price_range_error:
                 new_price = price - 10000
                 variant = ProductVariant.objects.get(dkpc=dkpc)
