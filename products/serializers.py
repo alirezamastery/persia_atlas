@@ -126,6 +126,13 @@ class StopRobotSerializer(serializers.Serializer):
         fields = '__all__'
 
 
+class ScrapeInvoiceSerializer(serializers.Serializer):
+    row_number = serializers.IntegerField(default=1, min_value=1, max_value=10)
+
+    class Meta:
+        fields = '__all__'
+
+
 __all__ = [
     'UpdateVariantDigiDataSerializer',
     'UpdateVariantStatusSerializer',
@@ -142,4 +149,5 @@ __all__ = [
     'ActualProductWriteSerializer',
     'UpdateBrandStatusSerializer',
     'StopRobotSerializer',
+    'ScrapeInvoiceSerializer',
 ]

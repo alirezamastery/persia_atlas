@@ -34,9 +34,9 @@ def just_sleep_and_fail():
 
 
 @shared_task
-def scrape_invoice_page():
-    logger.info(f'starting to scrape invoice page')
-    call_command('scrape_invoice')
+def scrape_invoice_page(row_number: int):
+    logger.info(f'starting to scrape invoice page, {row_number = }')
+    call_command(f'scrape_invoice', f'--row={row_number}')
 
 
 @shared_task

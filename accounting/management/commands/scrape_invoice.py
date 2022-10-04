@@ -57,7 +57,8 @@ XPATH_PASSWORD = '/html/body/div[1]/main/div/form/div[2]/div/div/input'
 
 class ScrapeInvoicePageNoDB:
 
-    def __init__(self):
+    def __init__(self, invoice_row_index: int):
+        self.invoice_row_index = invoice_row_index
         firefox_options = FirefoxOptions()
         firefox_options.headless = True
         self.table_rows = []
@@ -112,7 +113,7 @@ class ScrapeInvoicePageNoDB:
         time.sleep(2)
         table = self.browser.find_element(By.TAG_NAME, 'table')
         tbody = table.find_element(By.TAG_NAME, 'tbody')
-        tr = tbody.find_elements(By.TAG_NAME, 'tr')[0]
+        tr = tbody.find_elements(By.TAG_NAME, 'tr')[self.invoice_row_index]
         td = tr.find_elements(By.TAG_NAME, 'td')[13]
         link = td.find_element(By.TAG_NAME, 'a')
         href = link.get_attribute('href')
@@ -201,8 +202,21 @@ class ScrapeInvoicePageNoDB:
 
 class Command(BaseCommand):
 
+    def add_arguments(self, parser):
+        # Named (optional) arguments
+        parser.add_argument(
+            '--row',
+            type=int,
+            default=1,
+        )
+
     def handle(self, *args, **options):
-        robot = ScrapeInvoicePageNoDB()
+        row = options.get('row')
+        if row < 1:
+            raise Exception('row number should be greater than 0')
+        row_index = row - 1
+
+        robot = ScrapeInvoicePageNoDB(row_index)
         try:
             robot.run()
         except Exception as e:
