@@ -53,11 +53,17 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ProductTypeSerializer(serializers.ModelSerializer):
+class ProductTypeReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductType
         fields = '__all__'
         depth = 1
+
+
+class ProductTypeWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductType
+        fields = ['title', 'selector_type']
 
 
 class VariantSelectorTypeSerializer(serializers.ModelSerializer):
@@ -145,7 +151,8 @@ __all__ = [
     'ProductVariantWriteSerializer',
     'VariantSelectorSerializer',
     'VariantSelectorTypeSerializer',
-    'ProductTypeSerializer',
+    'ProductTypeReadSerializer',
+    'ProductTypeWriteSerializer',
     'ActualProductWriteSerializer',
     'UpdateBrandStatusSerializer',
     'StopRobotSerializer',

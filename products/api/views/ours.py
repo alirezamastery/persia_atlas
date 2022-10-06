@@ -82,8 +82,12 @@ class ProductViewSet(NoDeleteModelViewSet):
 
 class ProductTypeViewSet(NoDeleteModelViewSet):
     queryset = ProductType.objects.all().order_by('-id')
-    serializer_class = ProductTypeSerializer
     filterset_class = ProductTypeFilter
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ProductTypeReadSerializer
+        return ProductTypeWriteSerializer
 
 
 class VariantSelectorTypeViewSet(NoDeleteModelViewSet):
