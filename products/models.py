@@ -31,8 +31,7 @@ class ProductType(models.Model):
     title = models.CharField(max_length=256)
     selector_type = models.ForeignKey(
         'VariantSelectorType',
-        on_delete=models.SET_NULL,
-        null=True,
+        on_delete=models.PROTECT,
         related_name='product_types'
     )
 
