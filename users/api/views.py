@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from ..models import User
-from ..serializers import UserSerializer, ProfileSerializer
+from ..serializers import *
 
 
 class UserViewSet(ModelViewSet):
@@ -24,12 +24,12 @@ class ProfileView(APIView):
     http_method_names = ['get', 'patch', 'options']
 
     def get(self, request):
-        serializer = ProfileSerializer(request.user.profile)
+        serializer = ProfileReadSerializer(request.user.profile, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request):
         profile = request.user.profile
-        serializer = ProfileSerializer(data=request.data, instance=profile)
+        serializer = ProfileWriteSerializer(data=request.data, instance=profile, context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
