@@ -132,6 +132,13 @@ class ProductVariantViewSet(NoDeleteModelViewSet):
         serializer = self.get_serializer_class()(qs, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['POST'], url_path='bulk-create')
+    def bulk_create(self, request):
+        serializer = ProductVariantBulkCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'info': 'ok'})
+
 
 class DigiLoginCredentialsView(APIView):
 

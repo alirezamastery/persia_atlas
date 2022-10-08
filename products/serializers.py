@@ -24,6 +24,61 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         depth = 2
 
 
+class BulkVariantItemSerializer(serializers.Serializer):
+    dkpc = serializers.IntegerField()
+    selector = serializers.PrimaryKeyRelatedField(queryset=VariantSelector.objects.all())
+
+
+class ProductVariantBulkCreateSerializer(serializers.Serializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    actual_product = serializers.PrimaryKeyRelatedField(queryset=ActualProduct.objects.all())
+    price_min = serializers.IntegerField()
+    is_active = serializers.BooleanField()
+    variants = BulkVariantItemSerializer(many=True)
+
+    def validate(self, attrs):
+        variants = attrs['variants']
+        dkpc_list = [v['dkpc'] for v in variants]
+        duplicate_variants = ProductVariant.objects.filter(dkpc__in=dkpc_list)
+        if duplicate_variants.count() > 0:
+            txt = ', '.join(str(v.dkpc) for v in duplicate_variants)
+            raise serializers.ValidationError(f'dkpc already exists: {txt}')
+
+        product = attrs['product']
+        duplicate_selectors = []
+        existing_selectors = product.variants.all().values_list('selector_id', flat=True)
+        for variant in variants:
+            if variant['selector'].id in existing_selectors:
+                duplicate_selectors.append(variant['selector'].value)
+        if len(duplicate_selectors) > 0:
+            txt = ', '.join(value for value in duplicate_selectors)
+            raise serializers.ValidationError(
+                f'product variant with selector: {txt} already exists'
+            )
+
+        return attrs
+
+    def create(self, validated_data):
+        product = validated_data['product']
+        actual_product = validated_data['actual_product']
+        price_min = validated_data['price_min']
+        is_active = validated_data['is_active']
+        variants = validated_data['variants']
+        objs = [
+            ProductVariant(
+                product=product,
+                actual_product=actual_product,
+                price_min=price_min,
+                is_active=is_active,
+                dkpc=variant['dkpc'],
+                selector=variant['selector']
+            )
+            for variant in variants
+        ]
+        created_objs = ProductVariant.objects.bulk_create(objs)
+        return created_objs
+
+
 class ProductVariantWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
@@ -157,4 +212,5 @@ __all__ = [
     'UpdateBrandStatusSerializer',
     'StopRobotSerializer',
     'ScrapeInvoiceSerializer',
+    'ProductVariantBulkCreateSerializer'
 ]
