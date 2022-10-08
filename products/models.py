@@ -10,7 +10,7 @@ class Brand(models.Model):
 
 class ActualProduct(models.Model):
     title = models.CharField(max_length=255, unique=True)
-    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, related_name='actual_products')
+    brand = models.ForeignKey(Brand, on_delete=models.PROTECT, related_name='actual_products')
     price_step = models.IntegerField(default=500)
 
     def __str__(self):
@@ -60,22 +60,28 @@ class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
     dkpc = models.IntegerField(unique=True, blank=False, null=False)
     price_min = models.IntegerField(blank=False, null=False)
-    stop_loss = models.IntegerField(default=0, blank=True, null=True)
+    stop_loss = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True, blank=False, null=False)
     has_competition = models.BooleanField(default=True, blank=False, null=False, editable=False)
     selector = models.ForeignKey(
         VariantSelector,
+        on_delete=models.PROTECT,
         related_name='variants',
-        on_delete=models.SET_NULL,
-        null=True
     )
 
     actual_product = models.ForeignKey(
         'ActualProduct',
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name='variants'
+        on_delete=models.PROTECT,
+        related_name='variants',
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['product', 'selector'],
+                name='unique_product_selector'
+            )
+        ]
 
     def __str__(self):
         return f'{self.dkpc}'
