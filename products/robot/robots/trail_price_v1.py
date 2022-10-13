@@ -133,10 +133,8 @@ class TrailingPriceRobot(RobotBase):
             return
         price_range_error = 'قیمت فروش شما در بازه\u200cی قیمت مرجع نیست.'
         status = response.get('status')
-        if status is None:
-            raise Exception(f'digikala returned a response without status: {response}')
-        if status is False:
-            if response['data']['price'] == price_range_error:
+        if status is False or status == 'error':
+            if response['data'].get('price') == price_range_error:
                 new_price = price - 10000
                 variant = ProductVariant.objects.get(dkpc=dkpc)
                 if new_price > variant.price_min:
@@ -146,7 +144,7 @@ class TrailingPriceRobot(RobotBase):
                 else:
                     logger(f'can not increase price for: {dkpc} - price is already outside digi price span')
             else:
-                raise Exception(f'could not update price of: {dkpc}')
+                raise Exception(f'could not update price of {dkpc} | response: {response}')
 
     def report(self):
         logger(f'no competition: {len(self.no_competition)}'.center(LOG_W), color='green')
