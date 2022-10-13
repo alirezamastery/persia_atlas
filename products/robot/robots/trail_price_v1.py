@@ -52,7 +52,6 @@ class TrailingPriceRobot(RobotBase):
     def run(self):
         check_stop_signal()
         logger('CYCLE START'.center(LOG_W), color='green')
-        self.login()
         self.check_products()
         logger('CYCLE END'.center(LOG_W), color='green')
         self.report()
