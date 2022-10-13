@@ -83,7 +83,7 @@ class TrailingPriceRobot(RobotBase):
             else:
                 self.no_competition.append(dkpc)
                 self.set_no_competition_price(dkpc, var_data)
-            random_sleep(seconds=3)
+            random_sleep(seconds=1)
 
     def handle_competition(self, dkpc: int, var_data: dict):
         my_price = var_data['my_price']
@@ -138,7 +138,7 @@ class TrailingPriceRobot(RobotBase):
                 variant = ProductVariant.objects.get(dkpc=dkpc)
                 if new_price > variant.price_min:
                     logger(f'new price: {new_price}')
-                    random_sleep(seconds=3)
+                    random_sleep(seconds=1)
                     self.update_variant_price_rial(dkpc, new_price, increasing=True)
                 else:
                     logger(f'can not increase price for: {dkpc} - price is already outside digi price span')

@@ -20,7 +20,7 @@ class CostReadSerializer(serializers.ModelSerializer):
 class CostWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cost
-        fields = '__all__'
+        fields = ['type', 'amount', 'date', 'description']
 
 
 class IncomeSerializer(serializers.ModelSerializer):
