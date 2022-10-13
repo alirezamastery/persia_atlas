@@ -9,7 +9,7 @@ from products.models import Product, ProductVariant
 from products.robot.core.base_robot import RobotBase
 from products.robot.json_extraction import JSONExtractor
 from products.robot.exceptions import StopRobot
-from utils.digi import variant_detail_request
+from utils.digi import variant_detail_request_from_robot
 from utils.logging import logger, plogger_flat, LOG_VALUE_WIDTH as LOG_W
 
 
@@ -124,7 +124,7 @@ class TrailingPriceRobot(RobotBase):
         payload = {
             'price': price
         }
-        response = variant_detail_request(dkpc, method='PUT', payload=payload)
+        response = variant_detail_request_from_robot(dkpc, method='PUT', payload=payload)
         logger(response)
         self.check_server_response_for_update(response, dkpc, price, increasing)
 

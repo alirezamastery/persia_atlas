@@ -49,9 +49,29 @@ def get_variant_list(query_params: dict) -> dict:
     return send_digikala_api_request(url=url, method='GET')
 
 
+def variant_detail_request_from_robot(
+        dkpc: int,
+        *,
+        method: str = 'GET',
+        payload: dict = None
+) -> dict:
+    url = get_variant_api_url(dkpc)
+    try:
+        res = requests.request(
+            url=url,
+            headers=settings.DIGIKALA_API_HEADERS,
+            method=method,
+            json=payload
+        )
+    except requests.exceptions.RequestException:
+        raise Exception('خطا در برقرار ارتباط با دیجیکالا')
+    return res.json()
+
+
 __all__ = [
     'get_variant_search_url',
     'get_variant_api_url',
     'variant_detail_request',
     'get_variant_list',
+    'variant_detail_request_from_robot',
 ]
