@@ -14,11 +14,15 @@ class RobotConsumer(WebsocketConsumer):
 
     def connect(self):
         self.headers = dict(self.scope['headers'])
+        self.client_type = self.get_client_type()
         # plogger(self.headers)
         self.user = self.scope['user']
         if self.user.is_authenticated:
             self.client_setup()
-            self.accept(subprotocol=self.scope['token'])
+            if self.client_type == 'android':
+                self.accept()
+            else:
+                self.accept(subprotocol=self.scope['token'])
         else:
             self.close()
 
@@ -35,6 +39,13 @@ class RobotConsumer(WebsocketConsumer):
         self.commands = {
             cmd: Command(self.user, self.group_name) for cmd, Command in COMMAND_MAP.items()
         }
+
+    def get_client_type(self):
+        client_type = self.headers.get(b'clienttype')
+        if client_type is None:
+            return None
+        else:
+            return client_type.decode('ascii')
 
     def disconnect(self, close_code):
         if hasattr(self, 'group_name'):
@@ -144,4 +155,3 @@ class RobotConsumer(WebsocketConsumer):
             self.send(text_data=json.dumps(event['message']))
         except Exception as e:
             logger('ERROR:', e, color='red')
-
