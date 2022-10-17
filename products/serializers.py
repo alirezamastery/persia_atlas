@@ -180,8 +180,8 @@ class UpdateBrandStatusSerializer(serializers.Serializer):
         return value
 
 
-class StopRobotSerializer(serializers.Serializer):
-    stop = serializers.BooleanField(required=True)
+class RobotStatusSerializer(serializers.Serializer):
+    robot_is_on = serializers.BooleanField(required=True)
 
     class Meta:
         fields = '__all__'
@@ -210,7 +210,7 @@ __all__ = [
     'ProductTypeWriteSerializer',
     'ActualProductWriteSerializer',
     'UpdateBrandStatusSerializer',
-    'StopRobotSerializer',
+    'RobotStatusSerializer',
     'ScrapeInvoiceSerializer',
     'ProductVariantBulkCreateSerializer'
 ]

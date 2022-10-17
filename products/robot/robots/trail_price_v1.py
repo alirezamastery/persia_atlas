@@ -3,12 +3,12 @@ import random
 from typing import Union
 
 from django.core.cache import cache
-from django.conf import settings
 
 from products.models import Product, ProductVariant
 from products.robot.core.base_robot import RobotBase
 from products.robot.json_extraction import JSONExtractor
 from products.robot.exceptions import StopRobot
+from persia_atlas.cache import CacheKey
 from utils.digi import variant_detail_request_from_robot
 from utils.logging import logger, plogger_flat, LOG_VALUE_WIDTH as LOG_W
 
@@ -17,8 +17,8 @@ def random_sleep(seconds: int = 1, gap: int = 1):
     time.sleep(round(random.uniform(seconds, seconds + gap), 2))
 
 
-def check_stop_signal():
-    if cache.get(settings.CACHE_KEY_STOP_ROBOT) == 'true':
+def check_robot_status():
+    if not bool(cache.get(CacheKey.ROBOT_IS_ON.value)):
         raise StopRobot()
 
 
@@ -50,7 +50,7 @@ class TrailingPriceRobot(RobotBase):
         super().__init__(*args, **kwargs)
 
     def run(self):
-        check_stop_signal()
+        check_robot_status()
         logger('CYCLE START'.center(LOG_W), color='green')
         self.check_products()
         logger('CYCLE END'.center(LOG_W), color='green')
@@ -65,7 +65,7 @@ class TrailingPriceRobot(RobotBase):
     def check_products(self):
         active_products = self.get_active_products()
         for product in active_products:
-            check_stop_signal()
+            check_robot_status()
             logger(product.title, color='cyan')
             extractor = self.data_extractor_class(self.session, product)
             page_data = extractor.get_page_data()
@@ -77,7 +77,7 @@ class TrailingPriceRobot(RobotBase):
 
     def process_variants_data(self, variants_data: dict):
         for dkpc, var_data in variants_data.items():
-            check_stop_signal()
+            check_robot_status()
             if var_data['has_competition']:
                 self.handle_competition(dkpc, var_data)
             else:

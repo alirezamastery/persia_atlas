@@ -1,16 +1,18 @@
 import traceback
+from dataclasses import asdict
 
 from django.core.cache import cache
-from django.conf import settings
 from django.core.management import BaseCommand
 from requests.exceptions import RequestException
 
-# from products.robot.robots.trail_price_v0 import TrailingPriceRobot
 from products.robot.robots.trail_price_v1 import TrailingPriceRobot
 from utils.logging import get_tehran_datetime, logger
 from products.websocket.utils import send_msg_websocket_group
 from products.websocket.constants import *
 from products.robot.exceptions import StopRobot
+from products.websocket.commands.base import ResponseType
+from products.websocket.response_data import RobotRunningData
+from persia_atlas.cache import CacheKey
 
 
 class Command(BaseCommand):
@@ -26,11 +28,7 @@ class Command(BaseCommand):
         dkp = options.get('dkp')
         robot = TrailingPriceRobot(dkp=dkp)
         try:
-            cache.set(settings.CACHE_KEY_ROBOT_RUNNING, 'true', timeout=None)
-            msg = {
-                'robot_running': True
-            }
-            send_msg_websocket_group(ALL_USERS_GROUP, msg, msg_type='robot_status')
+            self.notify_robot_is_running(True)
             robot.run()
         except StopRobot:
             logger('ROBOT STOPPED')
@@ -44,8 +42,14 @@ class Command(BaseCommand):
                 log_file.write('\n' * 2)
                 raise
         finally:
-            cache.set(settings.CACHE_KEY_ROBOT_RUNNING, 'false', timeout=None)
-            msg = {
-                'robot_running': False
-            }
-            send_msg_websocket_group(ALL_USERS_GROUP, msg, msg_type='robot_status')
+            self.notify_robot_is_running(False)
+
+    @staticmethod
+    def notify_robot_is_running(is_running: bool):
+        cache.set(CacheKey.ROBOT_RUNNING.value, is_running, timeout=None)
+        data = RobotRunningData(robot_running=is_running)
+        send_msg_websocket_group(
+            groupname=ALL_USERS_GROUP,
+            msg_type=ResponseType.ROBOT_RUNNING.value,
+            data=asdict(data),
+        )

@@ -13,6 +13,7 @@ from celery.result import AsyncResult
 from products.models import *
 from products.serializers import *
 from products.api.filters import *
+from persia_atlas.cache import CacheKey
 from scripts.json_db import JsonDB
 from ...tasks import scrape_invoice_page, just_sleep, just_sleep_and_fail
 from utils.logging import logger, plogger
@@ -224,21 +225,15 @@ class RobotVariantsFilterView(APIView):
 class RobotStatusView(APIView):
 
     def get(self, request):
-        if cache.get(settings.CACHE_KEY_STOP_ROBOT) == 'true':
-            running = False
-        else:
-            running = True
+        running = bool(cache.get(CacheKey.ROBOT_IS_ON.value))
         return Response({'running': running})
 
     def post(self, request):
-        serializer = StopRobotSerializer(data=request.data)
+        serializer = RobotStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        stop = serializer.data.get('stop')
-        logger(f'ROBOT STOP SIGNAL: {stop}')
-        if stop is True:
-            cache.set(settings.CACHE_KEY_STOP_ROBOT, 'true', timeout=None)
-        else:
-            cache.set(settings.CACHE_KEY_STOP_ROBOT, 'false', timeout=None)
+        robot_is_on = serializer.data.get('robot_is_on')
+        logger(f'ROBOT IS ON: {robot_is_on}')
+        cache.set(CacheKey.ROBOT_IS_ON.value, robot_is_on, timeout=None)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 

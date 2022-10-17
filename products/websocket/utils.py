@@ -2,8 +2,8 @@ from colored import fg, attr
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-from utils.logging import plogger, logger
 from .constants import *
+from utils.logging import plogger, logger
 
 
 def clr_print(*args):
@@ -18,10 +18,10 @@ def get_group_groupname(group_id):
     return f'{NAMEDGROUP_GROUP}{group_id}'
 
 
-def send_msg_websocket_group(groupname: str, msg: dict, msg_type: str):
+def send_msg_websocket_group(groupname: str, msg_type: str, data: dict):
     socket_message = {
         'type': msg_type,
-        'data': msg
+        'data': data
     }
     # plogger(socket_message)
     channel_layer = get_channel_layer()
