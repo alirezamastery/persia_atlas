@@ -1,9 +1,6 @@
-import pandas as pd
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 
 from utils.digi import *
 from products.models import *
@@ -34,45 +31,12 @@ class UpdateVariantDigiDataView(APIView):
         variant = get_object_or_404(ProductVariant, dkpc=dkpc)
         serializer = UpdateVariantDigiDataSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        digi_response = variant_detail_request(variant.dkpc, method='PUT', payload=serializer.validated_data)
+        digi_response = variant_detail_request(
+            variant.dkpc,
+            method='PUT',
+            payload=serializer.validated_data
+        )
         return Response(digi_response)
-
-
-class UpdateBrandVariantsStatusView(APIView):
-
-    def post(self, request):
-        serializer = UpdateBrandStatusSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.data
-        # task = update_brand_status.delay(data['id'], data['is_active'])
-        return Response({'task_id': None}, status=status.HTTP_202_ACCEPTED)
-
-
-class FileDownloadTest(APIView):
-    file_name = 'quantity.xlsx'
-
-    def get(self, request):
-        dfs = []
-        for _ in range(2):
-            df = self.calculate_quantities()
-            dfs.append(df)
-
-        overview = pd.concat(dfs)
-        overview.set_index(['date', 'name'], inplace=True)
-
-        file_path = f'{settings.MEDIA_DIR_NAME}/invoice/{self.file_name}'
-        with open(file_path, 'wb+') as file:
-            overview.to_excel(file, sheet_name='products')
-            file_url = file_path
-        return Response({'path': file_url}, status.HTTP_200_OK)
-
-    @staticmethod
-    def calculate_quantities():
-        names = [x for x in range(10)]
-        quantities = [x for x in range(10)]
-        df = pd.DataFrame({'name': names, 'quantity': quantities})
-        df['date'] = 'test date'
-        return df
 
 
 class InactiveVariantsView(APIView):
@@ -100,10 +64,8 @@ class InactiveVariantsView(APIView):
 
 
 __all__ = [
-    'UpdateVariantDigiDataView',
-    'UpdateBrandVariantsStatusView',
-    'FileDownloadTest',
     'VariantDigiDataView',
+    'VariantDigiDataDKPCView',
+    'UpdateVariantDigiDataView',
     'InactiveVariantsView',
-    'VariantDigiDataDKPCView'
 ]

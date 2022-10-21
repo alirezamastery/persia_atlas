@@ -108,3 +108,12 @@ def plogger_flat(data_obj: dict, color: str = 'light_gray', bg_color: str = ''):
         else:
             print(f'{indent_str} {style}{key_format(key)} {value}{RESET}')
     print(LINE_SEPARATOR)
+
+
+__all__ = [
+    'LOG_KEY_WIDTH',
+    'LOG_VALUE_WIDTH',
+    'logger',
+    'plogger',
+    'plogger_flat',
+]

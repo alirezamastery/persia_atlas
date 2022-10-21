@@ -16,3 +16,8 @@ class CustomPageNumberPagination(PageNumberPagination):
             'items':      data,
             'extra_data': kwargs.get('extra_data')
         })
+
+
+__all__ = [
+    'CustomPageNumberPagination',
+]

@@ -84,7 +84,8 @@ class VariantFilter(filters.FilterSet):
     search = filters.CharFilter(method='search_in_fields')
     is_active = filters.BooleanFilter(field_name='is_active')
     has_competition = filters.BooleanFilter(field_name='has_competition')
-    selector_id = filters.NumberFilter(field_name='selector', lookup_expr='selector__id')
+    selector_id = filters.NumberFilter(field_name='selector')
+    actual_product_id = filters.NumberFilter(field_name='actual_product')
 
     o = OrderingFilter(fields=['dkpc', 'price_min', 'is_active', 'has_competition'])
 
