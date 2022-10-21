@@ -21,8 +21,8 @@ class ProductVariantViewSet(mixins.CreateModelMixin,
             return ProductVariantSerializer
         return ProductVariantWriteSerializer
 
-    @action(detail=False, methods=['get'])
-    def get_by_list(self, request):
+    @action(detail=False, methods=['get'], url_path='get-by-dkpc-list')
+    def get_by_dkpc_list(self, request):
         dkpc_list = request.query_params.getlist('dkpc[]')
         qs = self.queryset.filter(dkpc__in=dkpc_list)
         serializer = self.get_serializer_class()(qs, many=True)

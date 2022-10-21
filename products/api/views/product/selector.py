@@ -17,8 +17,8 @@ class VariantSelectorTypeViewSet(mixins.CreateModelMixin,
     serializer_class = VariantSelectorTypeSerializer
     filterset_class = VariantSelectorTypeFilter
 
-    @action(detail=False, methods=['get'])
-    def get_by_list(self, request):
+    @action(detail=False, methods=['get'], url_path='get-by-id-list')
+    def get_by_id_list(self, request):
         ids = request.query_params.getlist('ids[]')
         qs = self.queryset.filter(pk__in=ids)
         serializer = self.serializer_class(qs, many=True)
@@ -30,8 +30,8 @@ class VariantSelectorViewSet(ReadOnlyModelViewSet):
     serializer_class = VariantSelectorSerializer
     filterset_class = VariantSelectorFilter
 
-    @action(detail=False, methods=['get'])
-    def get_by_list(self, request):
+    @action(detail=False, methods=['get'], url_path='get-by-id-list')
+    def get_by_id_list(self, request):
         ids = request.query_params.getlist('ids[]')
         qs = self.queryset.filter(pk__in=ids)
         serializer = self.get_serializer_class()(qs, many=True)
