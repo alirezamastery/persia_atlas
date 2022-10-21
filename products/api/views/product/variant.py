@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from products.models import *
 from products.serializers import *
 from products.api.filters import *
+from products.tasks import toggle_variants_status
 
 
 class ProductVariantViewSet(mixins.CreateModelMixin,
@@ -34,6 +35,18 @@ class ProductVariantViewSet(mixins.CreateModelMixin,
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'info': 'ok'})
+
+    @action(detail=False, methods=['POST'], url_path='toggle-status')
+    def toggle_status(self, request):
+        serializer = ToggleVariantStatusSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        task = toggle_variants_status.delay(
+            data['actual_product_id'],
+            data['selector_ids'],
+            data['is_active'],
+        )
+        return Response({'task_id': task.id})
 
 
 __all__ = [

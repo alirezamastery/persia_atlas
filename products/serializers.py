@@ -194,6 +194,12 @@ class ScrapeInvoiceSerializer(serializers.Serializer):
         fields = '__all__'
 
 
+class ToggleVariantStatusSerializer(serializers.Serializer):
+    actual_product_id = serializers.IntegerField()
+    selector_ids = serializers.ListSerializer(child=serializers.IntegerField(), allow_empty=False)
+    is_active = serializers.BooleanField()
+
+
 __all__ = [
     'UpdateVariantDigiDataSerializer',
     'UpdateVariantStatusSerializer',
@@ -212,5 +218,6 @@ __all__ = [
     'UpdateBrandStatusSerializer',
     'RobotStatusSerializer',
     'ScrapeInvoiceSerializer',
-    'ProductVariantBulkCreateSerializer'
+    'ProductVariantBulkCreateSerializer',
+    'ToggleVariantStatusSerializer',
 ]
