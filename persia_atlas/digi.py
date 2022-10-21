@@ -82,5 +82,3 @@ class DigikalaSession:
             plogger(response.content)
             raise DigikalaServerError()
 
-
-digi_session = DigikalaSession()

@@ -8,7 +8,6 @@ from rest_framework import status
 from utils.digi import *
 from products.models import *
 from products.serializers import *
-from products.tasks import update_brand_status
 
 
 class VariantDigiDataView(APIView):
@@ -45,8 +44,8 @@ class UpdateBrandVariantsStatusView(APIView):
         serializer = UpdateBrandStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.data
-        task = update_brand_status.delay(data['id'], data['is_active'])
-        return Response({'task_id': task.id}, status=status.HTTP_202_ACCEPTED)
+        # task = update_brand_status.delay(data['id'], data['is_active'])
+        return Response({'task_id': None}, status=status.HTTP_202_ACCEPTED)
 
 
 class FileDownloadTest(APIView):

@@ -1,13 +1,9 @@
 import time
-import random
 
 from django.core.management import call_command
-from django.conf import settings
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
-from products.models import *
-from persia_atlas.digi import digi_session
 
 
 logger = get_task_logger(__name__)
@@ -37,24 +33,3 @@ def just_sleep_and_fail():
 def scrape_invoice_page(row_number: int):
     logger.info(f'starting to scrape invoice page, {row_number = }')
     call_command(f'scrape_invoice', f'--row={row_number}')
-
-
-@shared_task
-def update_brand_status(brand_id: int, is_active: bool):
-    variants = ProductVariant.objects.filter(actual_product__brand_id=brand_id)
-    url = settings.DIGIKALA_URLS['update_variant_status']
-    for variant in variants:
-        logger.info(f'processing dkpc: {variant.dkpc}')
-        payload = {
-            'id':     variant.dkpc,
-            'active': is_active
-        }
-        digikala_res = digi_session.post(url, payload)
-
-        if digikala_res['status']:
-            variant.is_active = is_active
-            variant.save()
-        else:
-            logger.info(f'update of dkpc {variant.dkpc} failed from digikala')
-
-        time.sleep(round(random.uniform(3, 4), 2))
