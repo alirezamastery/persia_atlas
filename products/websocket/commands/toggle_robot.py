@@ -15,7 +15,7 @@ class ToggleRobotStatusCommand(BaseCommand):
 
     def respond(self, payload: dict) -> dict:
         robot_is_on = bool(payload.get('robot_is_on'))
-        cache.set(CacheKey.ROBOT_IS_ON.value, robot_is_on)
+        cache.set(CacheKey.ROBOT_IS_ON.value, robot_is_on, timeout=None)
         data = ToggleRobotData(robot_is_on=robot_is_on)
 
         response_for_me = {
