@@ -11,7 +11,9 @@ from rest_framework import status
 from ...models import *
 from ..serializers import *
 from ..filters import *
+from ..sql import *
 from products.models import ProductVariant
+from utils.query import execute_raw_query
 
 
 class CostTypeViewSet(ModelViewSet):
@@ -76,35 +78,20 @@ class InvoiceViewSet(mixins.CreateModelMixin,
     @action(detail=True, methods=['get'])
     def get_details(self, request, *args, **kwargs):
         invoice = self.get_object()
-        items = invoice.invoice_items.all()
-        dkp_data = {}
-        serials = []
-        total_count = 0
-
-        for item in items:
-            if item.serial in serials:
-                continue
-            # we may have to connect InvoiceItem to ProductVariant with a ForeignKey, to
-            # be able to query and GROUP BY, instead of this for loop (if this api usage grows)
-            variant = ProductVariant.objects.select_related('product').get(dkpc=item.dkpc)
-            dkp = variant.product.dkp
-            if dkp in dkp_data:
-                dkp_data[dkp]['count'] += 1
-            else:
-                dkp_data[dkp] = {
-                    'count': 1,
-                    'name':  variant.product.title
-                }
-            serials.append(item.serial)
-            total_count += 1
-
-        items_data = [v for k, v in dkp_data.items()]
+        params = {'invoice_id': invoice.id}
+        result = execute_raw_query(sql=SQL_INVOICE_ACTUAL_PRODUCT_COUNT, params=params)
+        total_count = result[0][-1]
+        items = [{
+            'row_number':        row[0],
+            'actual_product_id': row[1],
+            'title':             row[2],
+            'count':             row[3],
+        } for row in result]
 
         response = {
-            'items': items_data,
+            'items':       items,
             'total_count': total_count
         }
-
         return Response(response)
 
 
