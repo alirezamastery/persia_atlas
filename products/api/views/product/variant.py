@@ -7,9 +7,11 @@ from products.models import *
 from products.serializers import *
 from products.api.filters import *
 from products.tasks import toggle_variants_status
+from persia_atlas.drf import OptionalPagination
 
 
-class ProductVariantViewSet(mixins.CreateModelMixin,
+class ProductVariantViewSet(OptionalPagination,
+                            mixins.CreateModelMixin,
                             mixins.RetrieveModelMixin,
                             mixins.UpdateModelMixin,
                             mixins.ListModelMixin,
