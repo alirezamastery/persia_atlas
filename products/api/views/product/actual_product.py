@@ -26,7 +26,7 @@ class ActualProductViewSet(ModelViewSet):
             return ActualProductSerializer
         return ActualProductWriteSerializer
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=['get'], url_path='related-selectors')
     def related_selectors(self, request, pk=None):
         actual_product = self.get_object()
         variants = actual_product.variants.all()
