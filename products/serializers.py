@@ -147,37 +147,10 @@ class VariantSerializerDigikalaContext(serializers.ModelSerializer):
         return response
 
 
-class DKPCListSerializer(serializers.Serializer):
-    dkpc_list = serializers.ListField(child=serializers.CharField(), allow_empty=False)
-
-    def validate(self, data):
-        dkpc_list = data.get('dkpc_list')
-        for dkpc in dkpc_list:
-            if not ProductVariant.objects.filter(dkpc=dkpc).exists():
-                raise serializers.ValidationError(f'no variant whit dkpc {dkpc} found id database')
-        return data
-
-
 class UpdateVariantDigiDataSerializer(serializers.Serializer):
     price = serializers.IntegerField(required=False)
     seller_stock = serializers.IntegerField(required=False)
     is_active = serializers.BooleanField(required=False)
-
-
-class UpdateVariantStatusSerializer(serializers.Serializer):
-    dkpc = serializers.CharField()
-    is_active = serializers.BooleanField()
-
-
-class UpdateBrandStatusSerializer(serializers.Serializer):
-    id = serializers.CharField()
-    is_active = serializers.BooleanField()
-
-    @staticmethod
-    def validate_id(value):
-        if not Brand.objects.filter(id=value).exists():
-            raise serializers.ValidationError(f'no brand with id: {value}')
-        return value
 
 
 class RobotStatusSerializer(serializers.Serializer):
@@ -202,7 +175,6 @@ class ToggleVariantStatusSerializer(serializers.Serializer):
 
 __all__ = [
     'UpdateVariantDigiDataSerializer',
-    'UpdateVariantStatusSerializer',
     'VariantSerializerDigikalaContext',
     'ActualProductSerializer',
     'BrandSerializer',
@@ -215,7 +187,6 @@ __all__ = [
     'ProductTypeReadSerializer',
     'ProductTypeWriteSerializer',
     'ActualProductWriteSerializer',
-    'UpdateBrandStatusSerializer',
     'RobotStatusSerializer',
     'ScrapeInvoiceSerializer',
     'ProductVariantBulkCreateSerializer',

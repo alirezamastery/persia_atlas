@@ -2,7 +2,7 @@ import requests
 
 from django.contrib.auth import settings
 from utils.logging import logger
-from scripts.json_db import JsonDB
+from utils.json_db import JsonDB
 
 
 class ServerSession:

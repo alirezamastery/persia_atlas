@@ -6,7 +6,7 @@ from django.conf import settings
 from rest_framework.exceptions import APIException
 from rest_framework import status
 
-from scripts.json_db import JsonDB
+from utils.json_db import JsonDB
 from utils.logging import logger, plogger
 
 

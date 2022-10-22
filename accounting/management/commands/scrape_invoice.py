@@ -16,8 +16,8 @@ from django.conf import settings
 from khayyam import JalaliDate, JalaliDatetime
 
 from accounting.models import Invoice, InvoiceItem
-from utils.logging import logger, plogger
-from scripts.json_db import JsonDB
+from utils.logging import logger
+from utils.json_db import JsonDB
 
 
 COLUMNS_INDEX_MAP = {
