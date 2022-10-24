@@ -37,7 +37,8 @@ class RobotConsumer(WebsocketConsumer):
             self.channel_name
         )
         self.commands = {
-            cmd: Command(self.user, self.group_name) for cmd, Command in COMMAND_MAP.items()
+            cmd: Command(self.user, self.group_name, self.client_type)
+            for cmd, Command in COMMAND_MAP.items()
         }
 
     def get_client_type(self):
@@ -69,53 +70,33 @@ class RobotConsumer(WebsocketConsumer):
 
     def process_request_data(self, request: dict):
         command = request.get('command')
-        req_key = request.get('req_key')
 
         if command in self.commands:
             try:
-                response = self.commands[command].respond(request.get('payload'))
+                response = self.commands[command].get_response(request)
             except InvalidClientPayload as e:
                 response = self.create_client_error(str(e))
 
         else:
             response = self.create_client_error(f'invalid command: {command}')
 
-        if response.get(USER_RESPONSE) is not None:
-            response[USER_RESPONSE]['req_key'] = req_key
-
         return response
 
     def create_client_error(self, error_msg: str):
         logger(error_msg, color='red')
         return {
-            USER_CHANNEL:  get_user_groupname(user_id=self.user.mobile),
-            USER_RESPONSE: {
+            self.group_name: [{
                 'type': 'error',
                 'data': error_msg
-            }
+            }]
         }
 
     def send_to_client(self, response: dict):
-        if response.get(USER_CHANNEL):
-            self.direct_message(response[USER_CHANNEL], response[USER_RESPONSE])
-
-        if others_channel := response.get(OTHERS_CHANNEL):
-            logger(f'Other Receiver(s): {others_channel}'.center(LOG_VALUE_WIDTH, ' '))
-            others_response = response[OTHERS_RESPONSE]
-
-            if isinstance(others_channel, (list, tuple)):
-                for channel, response in zip(others_channel, others_response):
-                    logger(channel, response['type'], color='cyan')
-                    if channel.startswith(NAMEDGROUP_USER):
-                        self.direct_message(channel, response)
-                    else:
-                        self.group_message(channel, response)
-
-            elif others_channel.startswith(NAMEDGROUP_USER):
-                self.direct_message(others_channel, others_response)
-
+        for groupname, msg_list in response.items():
+            if groupname.startswith(NAMEDGROUP_USER):
+                [self.direct_message(groupname, msg) for msg in msg_list]
             else:
-                self.group_message(others_channel, others_response)
+                [self.group_message(groupname, msg) for msg in msg_list]
 
     def direct_message(self, group_name: str, msg: dict):
         async_to_sync(self.channel_layer.group_send)(

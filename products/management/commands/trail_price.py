@@ -10,7 +10,7 @@ from utils.logging import get_tehran_datetime, logger
 from products.websocket.utils import send_msg_websocket_group
 from products.websocket.constants import *
 from products.robot.exceptions import StopRobot
-from products.websocket.commands.base import ResponseType
+from products.websocket.response import ResponseType
 from products.websocket.response_data import RobotRunningData
 from persia_atlas.cache import CacheKey
 
