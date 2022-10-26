@@ -18,7 +18,7 @@ class CostTypeViewSet(ModelViewSet):
 
 
 class CostViewSet(ModelViewSet):
-    queryset = Cost.objects.all().order_by('-id')
+    queryset = Cost.objects.all().order_by('-date')
     filterset_class = CostFilter
 
     def get_serializer_class(self):

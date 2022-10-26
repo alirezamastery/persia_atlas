@@ -6,7 +6,7 @@ from ..filters import IncomeFilter
 
 
 class IncomeViewSet(ModelViewSet):
-    queryset = Income.objects.all().order_by('-id')
+    queryset = Income.objects.all().order_by('-date')
     serializer_class = IncomeSerializer
     filterset_class = IncomeFilter
 
