@@ -58,7 +58,7 @@ class VariantSelector(models.Model):
 
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='variants')
-    dkpc = models.IntegerField(unique=True, blank=False, null=False)
+    dkpc = models.PositiveBigIntegerField(unique=True, blank=False, null=False)
     price_min = models.IntegerField(blank=False, null=False)
     stop_loss = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True, blank=False, null=False)

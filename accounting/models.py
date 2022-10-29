@@ -65,7 +65,7 @@ class InvoiceItem(models.Model):
     date_persian = models.CharField(max_length=255)
     date = models.DateTimeField(blank=True, null=True)
 
-    dkpc = models.BigIntegerField()
+    dkpc = models.PositiveBigIntegerField()
     variant_title = models.CharField(max_length=255)
     order_id = models.BigIntegerField()
     serial = models.CharField(max_length=255)
