@@ -64,7 +64,9 @@ class ScrapeInvoicePageNoDB:
         self.table_rows = []
         service = Service(GECKO_DRIVER_PATH)
         self.browser = Firefox(service=service, options=firefox_options)
+        logger('login attempt')
         self.login()
+        logger('login complete')
 
     def clean_up(self):
         self.browser.close()
