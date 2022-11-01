@@ -12,6 +12,7 @@ from ..serializers import *
 class UserViewSet(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    pagination_class = None
 
 
 def change_file_name(file_name: str):
