@@ -6,6 +6,7 @@ from ..utils import get_user_groupname
 
 class WebRTCSignalCommand(BaseCommand):
     SENDER_RESPONSE_TYPE = ResponseType.WEBRTC_SIGNAL.value
+    OTHERS_RESPONSE_TYPE = ResponseType.WEBRTC_SIGNAL.value
 
     def respond(self, request: RequestType):
         payload = request['payload']
