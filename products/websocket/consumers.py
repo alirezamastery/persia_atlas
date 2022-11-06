@@ -54,6 +54,10 @@ class RobotConsumer(WebsocketConsumer):
                 self.group_name,
                 self.channel_name
             )
+            async_to_sync(self.channel_layer.group_discard)(
+                ALL_USERS_GROUP,
+                self.channel_name
+            )
 
     def receive(self, text_data=None, bytes_data=None):
         try:
