@@ -7,6 +7,9 @@ from .utils import get_user_groupname
 from .command_map import COMMAND_MAP
 from .exceptions import InvalidClientPayload
 from .constants import *
+from .response import ResponseType
+from users.serializers import UserSerializer
+from utils.cache import add_online_user, remove_online_user
 from utils.logging import logger, plogger, LOG_VALUE_WIDTH
 
 
@@ -23,6 +26,8 @@ class RobotConsumer(WebsocketConsumer):
                 self.accept()
             else:
                 self.accept(subprotocol=self.scope['token'])
+            add_online_user(self.user.id)
+            self.notify_user_status(is_online=True)
         else:
             self.close()
 
@@ -49,6 +54,8 @@ class RobotConsumer(WebsocketConsumer):
             return client_type.decode('ascii')
 
     def disconnect(self, close_code):
+        self.notify_user_status(is_online=False)
+
         if hasattr(self, 'group_name'):
             async_to_sync(self.channel_layer.group_discard)(
                 self.group_name,
@@ -58,6 +65,23 @@ class RobotConsumer(WebsocketConsumer):
                 ALL_USERS_GROUP,
                 self.channel_name
             )
+
+        remove_online_user(self.user.id)
+
+    def notify_user_status(self, is_online: bool):
+        host = self.headers.get(b'host').decode('ascii')
+        if host.startswith('localhost'):
+            host = f'http://{host}'
+        else:
+            host = f'https://{host}'
+        msg = {
+            'type': ResponseType.USER_STATUS.value,
+            'data': {
+                'user':      UserSerializer(self.user, context={'host': host}).data,
+                'is_online': is_online
+            }
+        }
+        self.group_message(ALL_USERS_GROUP, msg)
 
     def receive(self, text_data=None, bytes_data=None):
         try:

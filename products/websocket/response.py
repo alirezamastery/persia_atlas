@@ -8,6 +8,8 @@ class ResponseType(Enum):
 
     WEBRTC_SIGNAL = 'webrtc_signal'
 
+    USER_STATUS = 'user_status'
+
 
 __all__ = [
     'ResponseType'
