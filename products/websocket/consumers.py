@@ -114,7 +114,7 @@ class RobotConsumer(WebsocketConsumer):
         logger(error_msg, color='red')
         return {
             self.group_name: [{
-                'type': 'error',
+                'type': ResponseType.ERROR.value,
                 'data': error_msg
             }]
         }

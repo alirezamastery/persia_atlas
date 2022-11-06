@@ -2,6 +2,8 @@ from enum import Enum
 
 
 class ResponseType(Enum):
+    ERROR = 'error'
+
     FETCH = 'fetch_response'
     TOGGLE_ROBOT = 'toggle_robot'
     ROBOT_RUNNING = 'robot_running'
