@@ -10,8 +10,8 @@ def clr_print(*args):
     print(fg('green'), *args, attr('reset'))
 
 
-def get_user_groupname(user_id):
-    return f'{NAMEDGROUP_USER}{user_id}'
+def get_user_groupname(mobile: str) -> str:
+    return f'{NAMEDGROUP_USER}{mobile}'
 
 
 def get_group_groupname(group_id):
