@@ -50,6 +50,11 @@ def toggle_variants_status(
         .values_list('dkpc', flat=True)
     print(f'{dkpc_list = }')
 
+    if is_active is True:
+        for dkpc in dkpc_list:
+            variant_detail_request(dkpc, method='PUT', payload={'seller_stock': 3})
+            time.sleep(0.2)
+
     for dkpc in dkpc_list:
         variant_detail_request(dkpc, method='PUT', payload={'is_active': is_active})
         time.sleep(0.2)
