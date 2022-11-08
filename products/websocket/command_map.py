@@ -7,4 +7,5 @@ COMMAND_MAP = {
     1: FetchCommand,
     2: ToggleRobotStatusCommand,
     3: WebRTCSignalCommand,
+    4: WebRTCAnswered,
 }

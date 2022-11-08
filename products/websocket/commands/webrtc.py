@@ -20,6 +20,14 @@ class WebRTCSignalCommand(BaseCommand):
         )
 
 
+class WebRTCAnswered(BaseCommand):
+    SENDER_RESPONSE_TYPE = ResponseType.WEBRTC_ANSWERED.value
+
+    def respond(self, request: RequestType) -> None:
+        self.add_response_for_me({})
+
+
 __all__ = [
     'WebRTCSignalCommand',
+    'WebRTCAnswered',
 ]
