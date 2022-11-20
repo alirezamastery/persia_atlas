@@ -54,8 +54,6 @@ class RobotConsumer(WebsocketConsumer):
             return client_type.decode('ascii')
 
     def disconnect(self, close_code):
-        self.notify_user_status(is_online=False)
-
         if hasattr(self, 'group_name'):
             async_to_sync(self.channel_layer.group_discard)(
                 self.group_name,
@@ -66,7 +64,9 @@ class RobotConsumer(WebsocketConsumer):
                 self.channel_name
             )
 
-        remove_online_user(self.user.id)
+        if hasattr(self, 'user') and self.user.is_authenticated:
+            self.notify_user_status(is_online=False)
+            remove_online_user(self.user.id)
 
     def notify_user_status(self, is_online: bool):
         host = self.headers.get(b'host').decode('ascii')
