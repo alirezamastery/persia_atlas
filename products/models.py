@@ -18,8 +18,8 @@ class ActualProduct(models.Model):
 
 
 class Product(models.Model):
-    dkp = models.CharField(max_length=256, unique=True, blank=False, null=False)
-    title = models.CharField(max_length=256)
+    dkp = models.CharField(max_length=255, unique=True, blank=False, null=False)
+    title = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True, null=False, blank=False)
     type = models.ForeignKey('ProductType', on_delete=models.PROTECT, related_name='products')
 
@@ -28,7 +28,7 @@ class Product(models.Model):
 
 
 class ProductType(models.Model):
-    title = models.CharField(max_length=256)
+    title = models.CharField(max_length=255)
     selector_type = models.ForeignKey(
         'VariantSelectorType',
         on_delete=models.PROTECT,
@@ -40,7 +40,7 @@ class ProductType(models.Model):
 
 
 class VariantSelectorType(models.Model):
-    title = models.CharField(max_length=256, unique=True, blank=False, null=False)
+    title = models.CharField(max_length=255, unique=True, blank=False, null=False)
 
     def __str__(self):
         return f'{self.title}'
@@ -49,7 +49,7 @@ class VariantSelectorType(models.Model):
 class VariantSelector(models.Model):
     digikala_id = models.IntegerField(unique=True, blank=False, null=False)
     selector_type = models.ForeignKey(VariantSelectorType, on_delete=models.CASCADE)
-    value = models.CharField(max_length=256, unique=True, blank=False, null=False)
+    value = models.CharField(max_length=255, unique=True, blank=False, null=False)
     extra_info = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
