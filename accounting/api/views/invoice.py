@@ -5,7 +5,7 @@ from rest_framework import mixins
 from rest_framework import status
 
 from ...models import *
-from ..serializers import *
+from accounting.api.serializers.accounting import *
 from ..filters import *
 from ..sql import *
 from utils.query import execute_raw_query

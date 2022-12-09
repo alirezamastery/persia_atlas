@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from ..models import *
+from accounting.models import *
 
 
 class CostTypeSerializer(serializers.ModelSerializer):

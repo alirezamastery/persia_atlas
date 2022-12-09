@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 
 from ...models import Income
-from ..serializers import IncomeSerializer
+from accounting.api.serializers.accounting import IncomeSerializer
 from ..filters import IncomeFilter
 
 
