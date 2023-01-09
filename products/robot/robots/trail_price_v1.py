@@ -2,10 +2,10 @@ import time
 import random
 from typing import Union
 
+from requests.exceptions import RequestException
 from django.core.cache import cache
 
 from products.models import Product, ProductVariant
-from products.robot.core.base_robot import RobotBase
 from products.robot.json_extraction import JSONExtractor
 from products.robot.exceptions import StopRobot
 from persia_atlas.cache import CacheKey
@@ -22,7 +22,7 @@ def check_robot_status():
         raise StopRobot()
 
 
-class TrailingPriceRobot(RobotBase):
+class TrailingPriceRobot:
     """
     page_data: {
         'out_of_stock': list[dkpc]
@@ -67,7 +67,11 @@ class TrailingPriceRobot(RobotBase):
         for product in active_products:
             check_robot_status()
             logger(product.title, color='cyan')
-            extractor = self.data_extractor_class(self.session, product)
+            try:
+                extractor = self.data_extractor_class(product)
+            except RequestException:
+                logger('ERROR in requesting the page')
+                continue
             page_data = extractor.get_page_data()
             self.out_of_stock.extend(page_data['out_of_stock'])
             variants_data = page_data['variants_data']

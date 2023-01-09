@@ -25,6 +25,10 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        already_running = cache.get(CacheKey.ROBOT_RUNNING.value)
+        if already_running:
+            raise Exception('robot is already running')
+
         dkp = options.get('dkp')
         robot = TrailingPriceRobot(dkp=dkp)
         try:
@@ -33,7 +37,7 @@ class Command(BaseCommand):
         except StopRobot:
             logger('ROBOT STOPPED')
         except RequestException:
-            pass
+            logger('there was a request exception')
         except:
             with open('robot_errors.txt', 'a', encoding='utf-8') as log_file:
                 date = get_tehran_datetime()

@@ -1,4 +1,5 @@
-import json
+import requests
+from requests.exceptions import RequestException
 
 from ..models import Product, ProductVariant
 from utils.logging import logger, plogger
@@ -7,8 +8,7 @@ from utils.logging import logger, plogger
 class JSONExtractor:
     base_url = 'https://api.digikala.com/v1/product/'
 
-    def __init__(self, robot_session, product: Product):
-        self.session = robot_session
+    def __init__(self, product: Product):
         self.product = product
         self.selector_type = self.product.type.selector_type
         self.my_variants = list(self.product.variants.filter(is_active=True))
@@ -21,7 +21,9 @@ class JSONExtractor:
 
         url = self.get_product_url()
         try:
-            self.data = self.session.get(url).json()
+            self.data = requests.get(url, timeout=5).json()
+        except RequestException as e:
+            raise e
         except Exception as e:
             logger('ERROR in getting product json data:', e, color='red')
 
