@@ -3,7 +3,6 @@ import random
 from typing import Union
 from abc import ABC, abstractmethod
 
-from products.models import Product
 from .server import ServerSession
 from utils.logging import logger, plogger
 
