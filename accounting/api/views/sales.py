@@ -1,3 +1,5 @@
+from zoneinfo import ZoneInfo
+
 from django.db.models import Min
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -25,26 +27,31 @@ class SalesCountView(APIView):
         now = JalaliDatetime.now()
         now_year = now.year
         now_month = now.month
-        j_months = []
+        j_months_start = []
+        j_next_months_start = []
         j_month = start_month
         j_year = start_year
         while j_year < now_year or (j_year == now_year and j_month < now_month):
-            start = JalaliDatetime(j_year, j_month, 1)
-            j_months.append(start)
+            month_start = JalaliDatetime(j_year, j_month, 1)
+            j_months_start.append(month_start)
             if j_month == 12:
                 j_year += 1
                 j_month = 1
             else:
                 j_month += 1
+            next_month_start = JalaliDatetime(j_year, j_month, 1)
+            j_next_months_start.append(next_month_start)
 
-        months = [j.todatetime() for j in j_months]
-
+        months_start = [j.todatetime().astimezone(tz=ZoneInfo('UTC')) for j in j_months_start]
+        next_months_start = [j.todatetime().astimezone(tz=ZoneInfo('UTC')) for j in j_next_months_start]
+        params = {
+            'months_start':      months_start,
+            'next_months_start': next_months_start,
+            'ap_id':             serializer.validated_data['ap_id']
+        }
         response = {
             'actual_product': ActualProductSerializer(actual_product).data,
-            'sales':          raw_query_auto_named(
-                sql=SQL_ACTUAL_PRODUCT_SALES_BY_MONTH,
-                params={'months': months, 'ap_id': serializer.validated_data['ap_id']}
-            )
+            'sales':          raw_query_auto_named(SQL_ACTUAL_PRODUCT_SALES_BY_MONTH, params=params)
         }
 
         return Response(response)

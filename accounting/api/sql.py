@@ -36,18 +36,28 @@ FROM
 
 SQL_ACTUAL_PRODUCT_SALES_BY_MONTH = """
 WITH
-    months AS (
+    months_start AS (
         SELECT
-            m AS month
+            m                    AS month_start
+          , ROW_NUMBER() OVER () AS num
         FROM
-            UNNEST(%(months)s) AS m
+            UNNEST(%(months_start)s) AS m
     )
+  , next_months_start AS (
+    SELECT
+        m                    AS next_month_start
+      , ROW_NUMBER() OVER () AS num
+    FROM
+        UNNEST(%(next_months_start)s) AS m
+)
   , date_ranges AS (
     SELECT
-        m.month                                                           AS month_start
-      , LEAD(m.month::DATE, 1, NOW()::DATE) OVER (ORDER BY m.month::DATE) AS month_end
+        ms.month_start
+      , nms.next_month_start
     FROM
-        months AS m
+        months_start          AS ms
+        INNER JOIN next_months_start AS nms
+                   ON ms.num = nms.num
 )
   , range_count AS (
     SELECT
@@ -57,12 +67,10 @@ WITH
         accounting_invoiceitem             AS item
         INNER JOIN products_productvariant AS var
                    ON var.dkpc = item.dkpc
-        INNER JOIN products_product        AS p
-                   ON p.id = var.product_id
         INNER JOIN products_actualproduct  AS ap
                    ON var.actual_product_id = ap.id
         INNER JOIN date_ranges             AS dr
-                   ON item.date >= dr.month_start AND item.date < dr.month_end
+                   ON item.date >= dr.month_start AND item.date < dr.next_month_start
     WHERE
         ap.id = %(ap_id)s
     GROUP BY
@@ -71,7 +79,7 @@ WITH
   , result AS (
     SELECT
         dr.month_start
-      , dr.month_end
+      , dr.next_month_start
       , COALESCE(range_count.cnt, 0) AS count
     FROM
         date_ranges AS dr
