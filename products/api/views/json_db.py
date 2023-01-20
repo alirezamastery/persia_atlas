@@ -2,28 +2,26 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from utils.json_db import JsonDB
+from utils.json_db import jdb
 
 
 class DigiLoginCredentialsView(APIView):
 
     def get(self, request):
-        db = JsonDB()
         response = {
-            JsonDB.keys.DIGI_USERNAME: db.get(JsonDB.keys.DIGI_USERNAME),
-            JsonDB.keys.DIGI_PASSWORD: db.get(JsonDB.keys.DIGI_PASSWORD),
+            jdb.keys.DIGI_USERNAME: jdb.get(jdb.keys.DIGI_USERNAME),
+            jdb.keys.DIGI_PASSWORD: jdb.get(jdb.keys.DIGI_PASSWORD),
         }
         return Response(response)
 
     def post(self, request):
-        db = JsonDB()
-        username = request.data.get(JsonDB.keys.DIGI_USERNAME, db.get(JsonDB.keys.DIGI_USERNAME))
-        password = request.data.get(JsonDB.keys.DIGI_PASSWORD, db.get(JsonDB.keys.DIGI_PASSWORD))
-        db.set(JsonDB.keys.DIGI_USERNAME, username)
-        db.set(JsonDB.keys.DIGI_PASSWORD, password)
+        username = request.data.get(jdb.keys.DIGI_USERNAME, jdb.get(jdb.keys.DIGI_USERNAME))
+        password = request.data.get(jdb.keys.DIGI_PASSWORD, jdb.get(jdb.keys.DIGI_PASSWORD))
+        jdb.set(jdb.keys.DIGI_USERNAME, username)
+        jdb.set(jdb.keys.DIGI_PASSWORD, password)
         response = {
-            JsonDB.keys.DIGI_USERNAME: username,
-            JsonDB.keys.DIGI_PASSWORD: password,
+            jdb.keys.DIGI_USERNAME: username,
+            jdb.keys.DIGI_PASSWORD: password,
         }
         return Response(response, status=status.HTTP_201_CREATED)
 

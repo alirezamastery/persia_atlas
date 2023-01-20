@@ -17,7 +17,7 @@ from khayyam import JalaliDate, JalaliDatetime
 
 from accounting.models import Invoice, InvoiceItem
 from utils.logging import logger
-from utils.json_db import JsonDB
+from utils.json_db import jdb
 
 
 COLUMNS_INDEX_MAP = {
@@ -70,9 +70,8 @@ class ScrapeInvoicePageNoDB:
         self.browser.quit()
 
     def login(self):
-        db = JsonDB()
-        username = db.get('digi_username')
-        password = db.get('digi_password')
+        username = jdb.get('digi_username')
+        password = jdb.get('digi_password')
         creds = {
             'login[email]':    username,
             'login[password]': password

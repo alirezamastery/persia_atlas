@@ -38,3 +38,10 @@ class JsonDB:
     def _write(self):
         with open(self.path, 'w', encoding=self.encoding) as file:
             json.dump(self.db, file)
+
+
+jdb = JsonDB()
+
+__all__ = [
+    'jdb',
+]

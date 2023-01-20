@@ -6,7 +6,7 @@ from django.conf import settings
 from rest_framework.exceptions import APIException
 from rest_framework import status
 
-from utils.json_db import JsonDB
+from utils.json_db import jdb
 from utils.logging import logger, plogger
 
 
@@ -32,10 +32,9 @@ class DigikalaSession:
 
     def login(self):
         logger('logging in', color='yellow')
-        json_db = JsonDB()
         login_credentials = {
-            'login[email]':    json_db.get(JsonDB.keys.DIGI_USERNAME),
-            'login[password]': json_db.get(JsonDB.keys.DIGI_PASSWORD),
+            'login[email]':    jdb.get(jdb.keys.DIGI_USERNAME),
+            'login[password]': jdb.get(jdb.keys.DIGI_PASSWORD),
         }
         login_url = settings.DIGIKALA_URLS['login']
         response = self.session.post(login_url,
