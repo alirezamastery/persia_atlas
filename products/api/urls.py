@@ -20,6 +20,7 @@ urlpatterns = [
     path('file-test/', FileDownloadTest.as_view()),
     path('task-test-success/', TestCelerySuccessTask.as_view()),
     path('task-test-fail/', TestCeleryFailTask.as_view()),
+    path('stream-chunk/', StreamVideoChunkView.as_view()),
 ]
 
 router = SimpleRouter()
