@@ -11,6 +11,7 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
 from django.core.management import BaseCommand
 from django.conf import settings
 from khayyam import JalaliDate, JalaliDatetime
@@ -94,6 +95,7 @@ class ScrapeInvoicePageNoDB:
         logger('login complete')
         self.go_to_invoices()
         self.go_to_invoice_items()
+        self.select_display_100()
         self.save_invoice()
         while True:
             self.extract_table_data()
@@ -131,6 +133,14 @@ class ScrapeInvoicePageNoDB:
         logger(f'{href = }')
         link.click()
         time.sleep(2)
+
+    def select_display_100(self):
+        select = Select(self.browser.find_element(
+            By.XPATH,
+            '/html/body/main/div/div[2]/div[2]/div[2]/section/header/div[1]/div/label/select'
+        ))
+        select.select_by_value('100')
+        time.sleep(3)
 
     def save_invoice(self):
         start_date_persian = self.browser.find_element(By.XPATH, '//input[@name="startDate"]').get_attribute('value')
