@@ -93,6 +93,7 @@ class ScrapeInvoicePageNoDB:
         logger('login attempt')
         self.login()
         logger('login complete')
+        time.sleep(4)
         self.go_to_invoices()
         self.go_to_invoice_items()
         self.select_display_100()
@@ -113,7 +114,7 @@ class ScrapeInvoicePageNoDB:
 
     def go_to_invoices(self):
         self.browser.get(DIGI_URLS['invoice_list'])
-        time.sleep(2)
+        time.sleep(4)
         table = self.browser.find_element(By.TAG_NAME, 'table')
         tbody = table.find_element(By.TAG_NAME, 'tbody')
         tr = tbody.find_elements(By.TAG_NAME, 'tr')[self.invoice_row_index]
