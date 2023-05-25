@@ -39,8 +39,6 @@ COLUMNS_INDEX_MAP = {
     14: 'calculated',
 }
 
-GECKO_DRIVER_PATH = settings.GECKO_DRIVER_PATH
-
 LOGIN_URL = 'https://seller.digikala.com/account/login/?_back=https://seller.digikala.com/'
 DIGI_URLS = {
     'login':        'https://seller.digikala.com/account/login/?_back=https://seller.digikala.com/',
@@ -52,8 +50,8 @@ LOGIN_CREDENTIALS = {
     # 'remember':        True
 }
 
-XPATH_USERNAME = '/html/body/div[1]/main/div/form/div[1]/div/div/input'
-XPATH_PASSWORD = '/html/body/div[1]/main/div/form/div[2]/div/div/input'
+XPATH_USERNAME = '/html/body/div[1]/section/div[1]/form/label/div/section/input'
+XPATH_PASSWORD = '/html/body/div[1]/section/div[1]/form/label/div/section/input'
 
 
 class ScrapeInvoicePageNoDB:
@@ -62,8 +60,9 @@ class ScrapeInvoicePageNoDB:
         self.invoice_row_index = invoice_row_index
         firefox_options = FirefoxOptions()
         firefox_options.headless = True
+        firefox_options.binary_location = settings.FIREFOX_BINARY
         self.table_rows = []
-        service = Service(GECKO_DRIVER_PATH)
+        service = Service(settings.GECKO_DRIVER_PATH)
         self.browser = Firefox(service=service, options=firefox_options)
 
     def clean_up(self):
@@ -78,11 +77,16 @@ class ScrapeInvoicePageNoDB:
             'login[password]': password
         }
         self.browser.get(LOGIN_URL)
-        username_btn = self.browser.find_element(By.XPATH, XPATH_USERNAME)
-        password_btn = self.browser.find_element(By.XPATH, XPATH_PASSWORD)
-        username_btn.send_keys(creds['login[email]'])
-        password_btn.send_keys(creds['login[password]'])
-        submit_btn = self.browser.find_element(By.ID, 'btnSubmit')
+        self.random_sleep(7, 1)
+        username_input = self.browser.find_element(By.XPATH, XPATH_USERNAME)
+        username_input.send_keys(creds['login[email]'])
+        submit_btn = self.browser.find_element(By.XPATH, '/html/body/div[1]/section/div[1]/form/div/button/div')
+        submit_btn.click()
+        self.random_sleep(3, 1)
+
+        password_input = self.browser.find_element(By.XPATH, XPATH_PASSWORD)
+        password_input.send_keys(creds['login[password]'])
+        submit_btn = self.browser.find_element(By.XPATH, '/html/body/div[1]/section/div[1]/form/div[2]/button/div')
         submit_btn.click()
 
     @staticmethod
