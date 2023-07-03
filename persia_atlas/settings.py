@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'products.apps.ProductsConfig',
     'accounting.apps.AccountingConfig',
+    'shop.apps.ShopConfig',
 
     'channels',
     'rest_framework',
@@ -169,6 +170,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
     'http://localhost:9000',
     'http://localhost:9200',
     'https://persia-atlas.com'

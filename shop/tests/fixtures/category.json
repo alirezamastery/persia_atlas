@@ -1,0 +1,143 @@
+[
+  {
+    "model": "shop.brand",
+    "pk": 1,
+    "fields": {
+      "title": "کارا"
+    }
+  },
+  {
+    "model": "shop.variantselectortype",
+    "pk": 1,
+    "fields": {
+      "title": "رنگ",
+      "code": "color"
+    }
+  },
+  {
+    "model": "shop.productattribute",
+    "pk": 1,
+    "fields": {
+      "title": "تعداد طبقه"
+    }
+  },
+  {
+    "model": "shop.productattribute",
+    "pk": 2,
+    "fields": {
+      "title": "ارتفاع"
+    }
+  },
+  {
+    "model": "shop.productattribute",
+    "pk": 3,
+    "fields": {
+      "title": "حجم داخلی"
+    }
+  },
+  {
+    "model": "shop.productattribute",
+    "pk": 4,
+    "fields": {
+      "title": "قفل"
+    }
+  },
+  {
+    "model": "shop.productcategory",
+    "pk": 1,
+    "fields": {
+      "title": "جعبه ابزار",
+      "selector_type_id": 1,
+      "depth": 0
+    }
+  },
+  {
+    "model": "shop.productcategoryattribute",
+    "pk": 1,
+    "fields": {
+      "category": 1,
+      "attribute": 1
+    }
+  },
+  {
+    "model": "shop.productcategoryattribute",
+    "pk": 2,
+    "fields": {
+      "category": 1,
+      "attribute": 2
+    }
+  },
+  {
+    "model": "shop.product",
+    "pk": 1,
+    "fields": {
+      "brand_id": 1,
+      "title": "16 اینج",
+      "category_id": 1,
+      "is_active": true,
+      "slug": "16-اینج",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.product",
+    "pk": 2,
+    "fields": {
+      "brand_id": 1,
+      "title": "13 اینج",
+      "category_id": 1,
+      "is_active": true,
+      "slug": "13-اینج",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productattributevalue",
+    "pk": 1,
+    "fields": {
+      "product_id": 1,
+      "attribute_id": 1,
+      "value": "3",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productattributevalue",
+    "pk": 2,
+    "fields": {
+      "product_id": 1,
+      "attribute_id": 2,
+      "value": "20 cm",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productattributevalue",
+    "pk": 3,
+    "fields": {
+      "product_id": 2,
+      "attribute_id": 1,
+      "value": "2",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productattributevalue",
+    "pk": 4,
+    "fields": {
+      "product_id": 2,
+      "attribute_id": 2,
+      "value": "10 cm",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.variantselectorvalue",
+    "pk": 1,
+    "fields": {
+      "type_id": 1,
+      "value": "red"
+    }
+  }
+]
+

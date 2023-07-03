@@ -1,0 +1,259 @@
+[
+  {
+    "model": "shop.brand",
+    "pk": 1,
+    "fields": {
+      "title": "کارا"
+    }
+  },
+  {
+    "model": "shop.brand",
+    "pk": 2,
+    "fields": {
+      "title": "سبلان"
+    }
+  },
+  {
+    "model": "shop.variantselectortype",
+    "pk": 1,
+    "fields": {
+      "title": "رنگ",
+      "code": "color"
+    }
+  },
+  {
+    "model": "shop.productattribute",
+    "pk": 1,
+    "fields": {
+      "title": "تعداد طبقه"
+    }
+  },
+  {
+    "model": "shop.productattribute",
+    "pk": 2,
+    "fields": {
+      "title": "ارتفاع"
+    }
+  },
+  {
+    "model": "shop.productattribute",
+    "pk": 3,
+    "fields": {
+      "title": "حجم داخلی"
+    }
+  },
+  {
+    "model": "shop.productattribute",
+    "pk": 4,
+    "fields": {
+      "title": "قفل"
+    }
+  },
+  {
+    "model": "shop.productcategory",
+    "pk": 1,
+    "fields": {
+      "title": "جعبه ابزار",
+      "selector_type_id": 1,
+      "depth": 0,
+      "path": "0001"
+    }
+  },
+  {
+    "model": "shop.productcategory",
+    "pk": 2,
+    "fields": {
+      "title": "سطل زباله",
+      "selector_type_id": 1,
+      "depth": 0,
+      "path": "0002"
+    }
+  },
+  {
+    "model": "shop.productcategoryattribute",
+    "pk": 1,
+    "fields": {
+      "category": 1,
+      "attribute": 1
+    }
+  },
+  {
+    "model": "shop.productcategoryattribute",
+    "pk": 2,
+    "fields": {
+      "category": 1,
+      "attribute": 2
+    }
+  },
+  {
+    "model": "shop.productcategoryattribute",
+    "pk": 3,
+    "fields": {
+      "category": 2,
+      "attribute": 3
+    }
+  },
+  {
+    "model": "shop.product",
+    "pk": 1,
+    "fields": {
+      "brand_id": 1,
+      "title": "16 اینج",
+      "category_id": 1,
+      "is_active": true,
+      "slug": "16-اینج",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.product",
+    "pk": 2,
+    "fields": {
+      "brand_id": 1,
+      "title": "13 اینج",
+      "category_id": 1,
+      "is_active": true,
+      "slug": "13-اینج",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.product",
+    "pk": 3,
+    "fields": {
+      "brand_id": 1,
+      "title": "240 لیتری",
+      "category_id": 2,
+      "is_active": true,
+      "slug": "240-لیتری",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productattributevalue",
+    "pk": 1,
+    "fields": {
+      "product_id": 1,
+      "attribute_id": 1,
+      "value": "3",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productattributevalue",
+    "pk": 2,
+    "fields": {
+      "product_id": 1,
+      "attribute_id": 2,
+      "value": "20 cm",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productattributevalue",
+    "pk": 3,
+    "fields": {
+      "product_id": 2,
+      "attribute_id": 1,
+      "value": "2",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productattributevalue",
+    "pk": 4,
+    "fields": {
+      "product_id": 2,
+      "attribute_id": 2,
+      "value": "10 cm",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productattributevalue",
+    "pk": 5,
+    "fields": {
+      "product_id": 3,
+      "attribute_id": 3,
+      "value": "240 لیتر",
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.variantselectorvalue",
+    "pk": 1,
+    "fields": {
+      "type_id": 1,
+      "value": "red"
+    }
+  },
+  {
+    "model": "shop.variantselectorvalue",
+    "pk": 2,
+    "fields": {
+      "type_id": 1,
+      "value": "blue"
+    }
+  },
+  {
+    "model": "shop.productvariant",
+    "pk": 1,
+    "fields": {
+      "product_id": 1,
+      "selector_value_id": 1,
+      "price": 200000,
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productvariant",
+    "pk": 2,
+    "fields": {
+      "product_id": 1,
+      "selector_value_id": 2,
+      "price": 185000,
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productvariant",
+    "pk": 3,
+    "fields": {
+      "product_id": 2,
+      "selector_value_id": 1,
+      "price": 100000,
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productvariant",
+    "pk": 4,
+    "fields": {
+      "product_id": 2,
+      "selector_value_id": 2,
+      "price": 110000,
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productvariant",
+    "pk": 5,
+    "fields": {
+      "product_id": 3,
+      "selector_value_id": 1,
+      "price": 940000,
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  },
+  {
+    "model": "shop.productvariant",
+    "pk": 6,
+    "fields": {
+      "product_id": 3,
+      "selector_value_id": 2,
+      "price": 920000,
+      "created_at": "2023-01-01 00:00:00+00"
+    }
+  }
+]
+
