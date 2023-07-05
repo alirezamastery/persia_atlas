@@ -40,8 +40,8 @@ class CategoryAdminViewset(ModelViewSet):
         response = super().get_paginated_response(data)
         if response.data['next'] is None:
             response.data['items'].insert(0, {
-                'id':    None,
-                'title': '-- root --'
+                'id':    0,
+                'title': '-- سرشاخه --'
             })
         return response
 

@@ -156,7 +156,8 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         instance.title = validated_data.get('title', instance.title)
         instance.description = validated_data.get('description', instance.description)
         instance.is_active = validated_data.get('is_active', instance.is_active)
-        instance.category = validated_data.get('category', instance.category)
+        # don't change the category after product creation!
+        # instance.category = validated_data.get('category', instance.category)
         instance.save()
 
         attribute_values = validated_data.pop('attribute_values')

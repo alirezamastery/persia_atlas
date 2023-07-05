@@ -6,6 +6,7 @@ from shop.models import *
 
 __all__ = [
     'ProductCategoryFilter',
+    'ProductAttributeFilter',
     'VariantSelectorTypeFilter',
 ]
 
@@ -15,6 +16,14 @@ class ProductCategoryFilter(filters.FilterSet):
 
     class Meta:
         model = ProductCategory
+        fields = ['search']
+
+
+class ProductAttributeFilter(filters.FilterSet):
+    search = filters.CharFilter(field_name='title', lookup_expr='icontains')
+
+    class Meta:
+        model = ProductAttribute
         fields = ['search']
 
 
