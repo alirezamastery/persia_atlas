@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from shop.models import *
 from .category import *
+from shop.models import *
 from shop.queries import get_product_with_attrs
 
 
@@ -24,19 +24,28 @@ class BrandSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'product', 'url', 'is_main', 'description']
+
+
 class ProductListSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
     category = ProductCategoryReadSerializer(read_only=True)
+    images = ImageSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
         fields = [
+            'id',
             'brand',
             'title',
             'description',
             'is_active',
             'slug',
             'category',
+            'images',
         ]
 
 
@@ -60,10 +69,12 @@ class ProductDetailSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
     category = ProductCategoryReadSerializer(read_only=True)
     attribute_values = ProductAttributeValueReadSerializer(read_only=True, many=True)
+    images = ImageSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
         fields = [
+            'id',
             'brand',
             'title',
             'description',
@@ -71,13 +82,24 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'slug',
             'category',
             'attribute_values',
+            'images',
         ]
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        if self.context.get('get_variants') is True:
+
+        if self.context.get('is_retrieve') is True:
             variants = ProductVariant.objects.select_related('selector_value').filter(product=instance)
             response['variants'] = ProductVariantReadSerializer(variants, many=True).data
+
+            images = instance.images.all().order_by('-is_main')
+            response['images'] = ImageSerializer(images, many=True).data
+
+        if self.context.get('is_list') is True:
+            main_img = instance.images.filter(is_main=True).first()
+            if main_img is not None:
+                response['main_img'] = ImageSerializer(main_img).data
+
         return response
 
 
@@ -89,11 +111,18 @@ class ProductAttributeValueWriteSerializer(serializers.Serializer):
         fields = ['attribute', 'value']
 
 
+class NewProductImageWriteSerializer(serializers.Serializer):
+    file = serializers.CharField()
+    is_main = serializers.BooleanField()
+
+
 class ProductWriteSerializer(serializers.ModelSerializer):
     attribute_values = serializers.ListSerializer(
         child=ProductAttributeValueWriteSerializer(),
         allow_empty=True
     )
+    new_images = serializers.ListSerializer(child=NewProductImageWriteSerializer(), allow_empty=True)
+    main_img = serializers.PrimaryKeyRelatedField(queryset=ProductImage.objects.all(), required=False)
 
     class Meta:
         model = Product
@@ -104,6 +133,8 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             'is_active',
             'category',
             'attribute_values',
+            'new_images',
+            'main_img',
         ]
 
     def validate(self, attrs):
@@ -162,12 +193,40 @@ class ProductWriteSerializer(serializers.ModelSerializer):
 
         attribute_values = validated_data.pop('attribute_values')
         for av in attribute_values:
-            attr = ProductAttributeValue.objects.get(product=instance, attribute=av['attribute'])
-            print('attr:', attr)
-            attr.value = av['value']
-            attr.save()
+            print('attr:', av)
+            try:
+                attr = ProductAttributeValue.objects.get(product=instance, attribute=av['attribute'])
+                attr.value = av['value']
+                attr.save()
+            except ProductAttributeValue.DoesNotExist:
+                ProductAttributeValue.objects.create(
+                    product=instance,
+                    attribute=av['attribute'],
+                    value=av['value']
+                )
 
         product = get_product_with_attrs(instance.id)
+
+        return product
+
+    def save(self, **kwargs):
+        product = super().save(**kwargs)
+
+        main_img = self.validated_data.get('main_img', None)
+        print(f'{main_img = }')
+        if main_img is not None:
+            main_img.is_main = True
+            main_img.save()
+
+        new_images = self.validated_data.get('new_images')
+        print(f'{new_images = }')
+        for img in new_images:
+            print(f'{img = }')
+            url = img['file']
+            is_main = img['is_main']
+            if url.startswith('/media/'):
+                url = url.replace('/media/', '/', 1)
+            ProductImage.objects.create(url=url, product=product, is_main=is_main)
 
         return product
 

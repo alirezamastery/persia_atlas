@@ -30,8 +30,10 @@ class ProductViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        if self.action == 'get_with_details':
-            context['get_variants'] = True
+        if self.action == 'retrieve' or self.action == 'get_with_details':
+            context['is_retrieve'] = True
+        if self.action == 'list':
+            context['is_list'] = True
         return context
 
     def retrieve(self, request, *args, **kwargs):
@@ -40,9 +42,9 @@ class ProductViewSet(ModelViewSet):
         serializer = self.get_serializer(product)
         return Response(serializer.data)
 
-    @action(methods=['GET'], detail=True, url_path='with-details')
-    def get_with_details(self, request, *args, **kwargs):
-        pk = kwargs.get('pk')
-        product = get_product_with_attrs(pk)
-        serializer = self.get_serializer(product)
-        return Response(serializer.data)
+    # @action(methods=['GET'], detail=True, url_path='with-details')
+    # def get_with_details(self, request, *args, **kwargs):
+    #     pk = kwargs.get('pk')
+    #     product = get_product_with_attrs(pk)
+    #     serializer = self.get_serializer(product)
+    #     return Response(serializer.data)
