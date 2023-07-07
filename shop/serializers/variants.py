@@ -5,33 +5,23 @@ from shop.models import *
 
 
 __all__ = [
-    'VariantSelectorTypeSerializer',
     'VariantSelectorValueReadSerializer',
-    'VariantSelectorValueWriteSerializer',
     'ProductVariantReadSerializer',
     'ProductVariantWriteSerializer',
 ]
 
 
-class VariantSelectorTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VariantSelectorType
-        fields = '__all__'
-
-
 class VariantSelectorValueReadSerializer(serializers.ModelSerializer):
+    class VariantSelectorTypeSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = VariantSelectorType
+            fields = ['id', 'title', 'code']
+
     type = VariantSelectorTypeSerializer(read_only=True)
 
     class Meta:
         model = VariantSelectorValue
         fields = '__all__'
-
-
-class VariantSelectorValueWriteSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = VariantSelectorValue
-        fields = ['type', 'value', 'extra_info']
 
 
 class ProductVariantReadSerializer(serializers.ModelSerializer):
@@ -43,8 +33,9 @@ class ProductVariantReadSerializer(serializers.ModelSerializer):
             'id',
             'product',
             'selector_value',
-            'price',
             'is_active',
+            'price',
+            'inventory',
         ]
 
 

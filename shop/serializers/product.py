@@ -25,9 +25,22 @@ class BrandSerializer(serializers.ModelSerializer):
 
 
 class ImageSerializer(serializers.ModelSerializer):
+    url = serializers.SerializerMethodField(method_name='get_absolute_url')
+
     class Meta:
         model = ProductImage
         fields = ['id', 'product', 'url', 'is_main', 'description']
+
+    def get_absolute_url(self, obj):
+        if not obj.file:
+            return None
+        url = obj.file.url
+        request = self.context.get('request')
+        if request is not None:
+            return request.build_absolute_uri(url)
+        if (host := self.context.get('host')) is not None:
+            return f'{host}{url}'
+        return url
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -47,6 +60,14 @@ class ProductListSerializer(serializers.ModelSerializer):
             'category',
             'images',
         ]
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        main_img = instance.images.filter(is_main=True).first()
+        if main_img is not None:
+            context = {'request': self.context.get('request')}
+            response['main_img'] = ImageSerializer(main_img, context=context).data
+        return response
 
 
 class ProductAttributeSerializer(serializers.ModelSerializer):
@@ -93,12 +114,12 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             response['variants'] = ProductVariantReadSerializer(variants, many=True).data
 
             images = instance.images.all().order_by('-is_main')
-            response['images'] = ImageSerializer(images, many=True).data
+            response['images'] = ImageSerializer(images, many=True, context=self.context).data
 
         if self.context.get('is_list') is True:
             main_img = instance.images.filter(is_main=True).first()
             if main_img is not None:
-                response['main_img'] = ImageSerializer(main_img).data
+                response['main_img'] = ImageSerializer(main_img, context=self.context).data
 
         return response
 
@@ -122,7 +143,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         allow_empty=True
     )
     new_images = serializers.ListSerializer(child=NewProductImageWriteSerializer(), allow_empty=True)
-    main_img = serializers.PrimaryKeyRelatedField(queryset=ProductImage.objects.all(), required=False)
+    main_img = serializers.PrimaryKeyRelatedField(queryset=ProductImage.objects.all(), required=False, allow_null=True)
 
     class Meta:
         model = Product
@@ -222,11 +243,11 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         print(f'{new_images = }')
         for img in new_images:
             print(f'{img = }')
-            url = img['file']
+            file = img['file']
             is_main = img['is_main']
-            if url.startswith('/media/'):
-                url = url.replace('/media/', '/', 1)
-            ProductImage.objects.create(url=url, product=product, is_main=is_main)
+            if file.startswith('/media/'):
+                file = file.replace('/media/', '/', 1)
+            ProductImage.objects.create(file=file, product=product, is_main=is_main)
 
         return product
 

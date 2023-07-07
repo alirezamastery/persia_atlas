@@ -14,7 +14,7 @@ class ImageReadSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'product',
-            'url',
+            'file',
             'is_main',
             'description',
         ]

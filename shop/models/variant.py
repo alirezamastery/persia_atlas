@@ -20,8 +20,9 @@ class ProductVariant(models.Model):
         related_name='product_variants'
     )
 
-    price = models.PositiveBigIntegerField()
     is_active = models.BooleanField(default=True)
+    price = models.PositiveBigIntegerField()
+    inventory = models.PositiveIntegerField()
 
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
@@ -56,6 +57,7 @@ class VariantSelectorValue(models.Model):
         on_delete=models.PROTECT,
         related_name='values'
     )
+    title = models.CharField(max_length=255, unique=True)
     value = models.CharField(max_length=255, unique=True)
     extra_info = models.TextField(default='')
 

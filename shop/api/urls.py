@@ -17,8 +17,8 @@ router.register('categories-admin', CategoryAdminViewset, basename='categories_a
 router.register('product-attrs', ProductAttributeViewSet, basename='product-attrs')
 router.register('products', ProductViewSet, basename='products')
 router.register('images', ImageViewSet, basename='images')
-router.register('variants', ProductVariantViewSet, basename='variants')
 router.register('selector-types', VariantSelectorTypeViewSet, basename='selector_types')
+router.register('variants', ProductVariantViewSet, basename='variants')
 router.register('orders', OrderViewSet, basename='orders')
 
 urlpatterns += router.urls

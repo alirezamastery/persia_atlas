@@ -20,7 +20,7 @@ __all__ = [
 class ImageViewSet(ModelViewSet):
     queryset = ProductImage.objects.all().order_by('id')
     serializer_class = ImageReadSerializer
-    permission_classes = [IsAdmin | ReadOnly]
+    permission_classes = [IsAdmin]
 
     @action(methods=['POST'], detail=False, url_path='upload')
     def upload(self, request, *args, **kwargs):
