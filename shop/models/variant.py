@@ -23,6 +23,7 @@ class ProductVariant(models.Model):
     is_active = models.BooleanField(default=True)
     price = models.PositiveBigIntegerField()
     inventory = models.PositiveIntegerField()
+    max_in_order = models.PositiveIntegerField()
 
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)

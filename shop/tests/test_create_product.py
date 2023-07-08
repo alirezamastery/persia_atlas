@@ -27,6 +27,8 @@ class TestProduct(APITransactionTestCase):
         )
         ProductCategoryAttribute.objects.create(category=self.category, attribute=self.attribute_1)
         ProductCategoryAttribute.objects.create(category=self.category, attribute=self.attribute_2)
+        self.selector_1 = VariantSelectorValue.objects.create(type=self.selector_type, title='مشکلی', value='#000')
+        self.selector_2 = VariantSelectorValue.objects.create(type=self.selector_type, title='سفید', value='#fff')
 
     def test_1_create_product(self):
         payload = {
@@ -43,11 +45,31 @@ class TestProduct(APITransactionTestCase):
                     'attribute': self.attribute_2.id,
                     'value':     '20 cm'
                 }
-            ]
+            ],
+            'new_images':       [
+                {'file': '/media/test1.jpg/', 'is_main': False},
+                {'file': '/media/test2.jpg/', 'is_main': True},
+            ],
+            'main_img':         None,
         }
         response = self.client.post(self.url_base, data=payload, format='json')
         print(response.status_code)
         data = response.data
         print(json.dumps(response.data, indent=4))
         self.assertEqual(response.status_code, 201)
-        self.product = Product.objects.first()
+
+        # Adding Variants:
+        payload = [
+            {
+                'product':        data['id'],
+                'selector_value': self.selector_1.id,
+                'is_active':      True,
+                'price':          10000,
+                'max_in_order':   2,
+                'inventory':      10,
+            }
+        ]
+        print('ggg:', f'{self.url_base}add-variants/')
+        response = self.client.post(f'{self.url_base}add-variants/', data=payload, format='json')
+        data = response.data
+        print(json.dumps(data, indent=4))

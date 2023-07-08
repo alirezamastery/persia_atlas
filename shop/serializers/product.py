@@ -13,6 +13,7 @@ __all__ = [
     'ProductListSerializer',
     'ProductAttributeValueWriteSerializer',
     'ProductWriteSerializer',
+    # 'AddProductVariantSerializer',
 ]
 
 from .variants import ProductVariantReadSerializer
@@ -253,3 +254,17 @@ class ProductWriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return ProductDetailSerializer(instance).data
+
+
+# class AddProductVariantSerializer(serializers.Serializer):
+#     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+#     selector_value = serializers.PrimaryKeyRelatedField(queryset=VariantSelectorValue.objects.all())
+#     is_active = serializers.BooleanField()
+#     max_in_order = serializers.IntegerField(min_value=1)
+#     inventory = serializers.IntegerField(min_value=0)
+#     price = serializers.IntegerField(min_value=100)
+#
+#
+#     class Meta:
+#         model = ProductVariant
+

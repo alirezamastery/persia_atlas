@@ -36,6 +36,7 @@ class ProductVariantReadSerializer(serializers.ModelSerializer):
             'is_active',
             'price',
             'inventory',
+            'max_in_order',
         ]
 
 
@@ -47,8 +48,10 @@ class ProductVariantWriteSerializer(serializers.ModelSerializer):
         fields = [
             'product',
             'selector_value',
-            'price',
             'is_active',
+            'price',
+            'inventory',
+            'max_in_order',
         ]
         validators = [
             UniqueTogetherValidator(

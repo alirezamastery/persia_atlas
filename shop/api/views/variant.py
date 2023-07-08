@@ -15,7 +15,6 @@ __all__ = [
 class ProductVariantViewSet(ModelViewSet):
     queryset = ProductVariant.objects.all()
     permission_classes = [IsAdmin | ReadOnly]
-    filterset_class = VariantSelectorTypeFilter
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:

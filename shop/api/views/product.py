@@ -42,6 +42,13 @@ class ProductViewSet(ModelViewSet):
         serializer = self.get_serializer(product)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['POST'], url_path='add-variants')
+    def add_variants(self, request, *args, **kwargs):
+        serializer = ProductVariantWriteSerializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'variants': serializer.data})
+
     # @action(methods=['GET'], detail=True, url_path='with-details')
     # def get_with_details(self, request, *args, **kwargs):
     #     pk = kwargs.get('pk')
