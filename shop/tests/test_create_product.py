@@ -64,10 +64,17 @@ class TestProduct(APITransactionTestCase):
                 'product':        data['id'],
                 'selector_value': self.selector_1.id,
                 'is_active':      True,
-                'price':          10000,
-                'max_in_order':   2,
+                'price':          100000,
+                'max_in_order':   4,
                 'inventory':      10,
-            }
+            }, {
+                'product':        data['id'],
+                'selector_value': self.selector_2.id,
+                'is_active':      False,
+                'price':          120000,
+                'max_in_order':   3,
+                'inventory':      15,
+            },
         ]
         print('ggg:', f'{self.url_base}add-variants/')
         response = self.client.post(f'{self.url_base}add-variants/', data=payload, format='json')

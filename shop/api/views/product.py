@@ -47,7 +47,7 @@ class ProductViewSet(ModelViewSet):
         serializer = ProductVariantWriteSerializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'variants': serializer.data})
+        return Response(serializer.data)
 
     # @action(methods=['GET'], detail=True, url_path='with-details')
     # def get_with_details(self, request, *args, **kwargs):
