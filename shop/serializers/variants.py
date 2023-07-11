@@ -11,13 +11,28 @@ __all__ = [
 ]
 
 
-class VariantSelectorValueReadSerializer(serializers.ModelSerializer):
-    class VariantSelectorTypeSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = VariantSelectorType
-            fields = ['id', 'title', 'code']
+class _VariantSelectorTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VariantSelectorType
+        fields = ['id', 'title', 'code']
 
-    type = VariantSelectorTypeSerializer(read_only=True)
+
+class _ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = [
+            'id',
+            'brand',
+            'title',
+            'description',
+            'is_active',
+            'slug',
+            'category',
+        ]
+
+
+class VariantSelectorValueReadSerializer(serializers.ModelSerializer):
+    type = _VariantSelectorTypeSerializer(read_only=True)
 
     class Meta:
         model = VariantSelectorValue
@@ -25,6 +40,7 @@ class VariantSelectorValueReadSerializer(serializers.ModelSerializer):
 
 
 class ProductVariantReadSerializer(serializers.ModelSerializer):
+    product = _ProductSerializer(read_only=True)
     selector_value = VariantSelectorValueReadSerializer(read_only=True)
 
     class Meta:

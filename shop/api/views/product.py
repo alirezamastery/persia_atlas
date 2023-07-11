@@ -2,7 +2,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 
-from shop.models import *
+from shop.api.filters import ProductFilter
+from shop.models import Product
 from shop.serializers import *
 from shop.queries import get_product_with_attrs
 from utils.drf.permissions import IsAdmin, ReadOnly
@@ -19,6 +20,7 @@ class ProductViewSet(ModelViewSet):
         .select_related('category') \
         .all() \
         .order_by('id')
+    filterset_class = ProductFilter
     permission_classes = [IsAdmin | ReadOnly]
 
     def get_serializer_class(self):

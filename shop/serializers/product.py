@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .category import *
+from .category import ProductCategoryReadSerializer
 from shop.models import *
 from shop.queries import get_product_with_attrs
 
@@ -11,21 +11,11 @@ __all__ = [
     'ProductAttributeValueReadSerializer',
     'ProductDetailSerializer',
     'ProductListSerializer',
-    'ProductAttributeValueWriteSerializer',
     'ProductWriteSerializer',
-    # 'AddProductVariantSerializer',
 ]
 
-from .variants import ProductVariantReadSerializer
 
-
-class BrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Brand
-        fields = '__all__'
-
-
-class ImageSerializer(serializers.ModelSerializer):
+class _ImageSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField(method_name='get_absolute_url')
 
     class Meta:
@@ -44,10 +34,72 @@ class ImageSerializer(serializers.ModelSerializer):
         return url
 
 
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = '__all__'
+
+
+class ProductAttributeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductAttribute
+        fields = '__all__'
+
+
+class ProductAttributeValueReadSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    attribute = ProductAttributeSerializer(read_only=True)
+    value = serializers.CharField()
+
+    class Meta:
+        model = ProductAttributeValue
+        fields = ['id', 'attribute', 'value']
+
+
+class _SelectorTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VariantSelectorType
+        fields = [
+            'id',
+            'title',
+            'code',
+        ]
+
+
+class _SelectorValueSerializer(serializers.ModelSerializer):
+    type = _SelectorTypeSerializer(read_only=True)
+
+    class Meta:
+        model = VariantSelectorValue
+        fields = [
+            'id',
+            'type',
+            'title',
+            'value',
+            'extra_info',
+        ]
+
+
+class _VariantSerializer(serializers.ModelSerializer):
+    selector_value = _SelectorValueSerializer(read_only=True)
+
+    class Meta:
+        model = ProductVariant
+        fields = [
+            'id',
+            'product',
+            'selector_value',
+            'is_active',
+            'price',
+            'inventory',
+            'max_in_order',
+        ]
+
+
 class ProductListSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
     category = ProductCategoryReadSerializer(read_only=True)
-    images = ImageSerializer(read_only=True, many=True)
+    images = _ImageSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
@@ -67,31 +119,15 @@ class ProductListSerializer(serializers.ModelSerializer):
         main_img = instance.images.filter(is_main=True).first()
         if main_img is not None:
             context = {'request': self.context.get('request')}
-            response['main_img'] = ImageSerializer(main_img, context=context).data
+            response['main_img'] = _ImageSerializer(main_img, context=context).data
         return response
-
-
-class ProductAttributeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductAttribute
-        fields = '__all__'
-
-
-class ProductAttributeValueReadSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-    attribute = ProductAttributeSerializer(read_only=True)
-    value = serializers.CharField()
-
-    class Meta:
-        model = ProductAttributeValue
-        fields = ['id', 'attribute', 'value']
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(read_only=True)
     category = ProductCategoryReadSerializer(read_only=True)
     attribute_values = ProductAttributeValueReadSerializer(read_only=True, many=True)
-    images = ImageSerializer(read_only=True, many=True)
+    images = _ImageSerializer(read_only=True, many=True)
 
     class Meta:
         model = Product
@@ -112,38 +148,50 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
         if self.context.get('is_retrieve') is True:
             variants = ProductVariant.objects.select_related('selector_value').filter(product=instance)
-            response['variants'] = ProductVariantReadSerializer(variants, many=True).data
+            response['variants'] = _VariantSerializer(variants, many=True).data
 
             images = instance.images.all().order_by('-is_main')
-            response['images'] = ImageSerializer(images, many=True, context=self.context).data
+            response['images'] = _ImageSerializer(images, many=True, context=self.context).data
 
         if self.context.get('is_list') is True:
             main_img = instance.images.filter(is_main=True).first()
             if main_img is not None:
-                response['main_img'] = ImageSerializer(main_img, context=self.context).data
+                response['main_img'] = _ImageSerializer(main_img, context=self.context).data
 
         return response
 
 
-class ProductAttributeValueWriteSerializer(serializers.Serializer):
+class _ProductAttributeValueWriteSerializer(serializers.Serializer):
     attribute = serializers.PrimaryKeyRelatedField(queryset=ProductAttribute.objects.all())
     value = serializers.CharField()
 
     class Meta:
         fields = ['attribute', 'value']
 
+    def update(self, instance, validated_data):
+        pass
 
-class NewProductImageWriteSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        pass
+
+
+class _NewProductImageWriteSerializer(serializers.Serializer):
     file = serializers.CharField()
     is_main = serializers.BooleanField()
+
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
 
 
 class ProductWriteSerializer(serializers.ModelSerializer):
     attribute_values = serializers.ListSerializer(
-        child=ProductAttributeValueWriteSerializer(),
+        child=_ProductAttributeValueWriteSerializer(),
         allow_empty=True
     )
-    new_images = serializers.ListSerializer(child=NewProductImageWriteSerializer(), allow_empty=True)
+    new_images = serializers.ListSerializer(child=_NewProductImageWriteSerializer(), allow_empty=True)
     main_img = serializers.PrimaryKeyRelatedField(queryset=ProductImage.objects.all(), required=False, allow_null=True)
 
     class Meta:
@@ -254,17 +302,3 @@ class ProductWriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return ProductDetailSerializer(instance).data
-
-
-# class AddProductVariantSerializer(serializers.Serializer):
-#     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-#     selector_value = serializers.PrimaryKeyRelatedField(queryset=VariantSelectorValue.objects.all())
-#     is_active = serializers.BooleanField()
-#     max_in_order = serializers.IntegerField(min_value=1)
-#     inventory = serializers.IntegerField(min_value=0)
-#     price = serializers.IntegerField(min_value=100)
-#
-#
-#     class Meta:
-#         model = ProductVariant
-
