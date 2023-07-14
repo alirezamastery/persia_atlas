@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from shop.models import *
-from .read import ProductCategoryReadSerializer
+from .read import ProductCategoryDetailSerializer
 
 
 __all__ = [
@@ -80,4 +80,4 @@ class ProductCategoryWriteSerializer(serializers.Serializer):
         return category
 
     def to_representation(self, category):
-        return ProductCategoryReadSerializer(category).data
+        return ProductCategoryDetailSerializer(category).data

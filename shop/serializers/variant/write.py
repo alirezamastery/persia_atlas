@@ -6,11 +6,12 @@ from .read import ProductVariantReadSerializer
 
 
 __all__ = [
-    'ProductVariantWriteSerializer',
+    'ProductVariantCreateSerializer',
+    'ProductVariantUpdateSerializer',
 ]
 
 
-class ProductVariantWriteSerializer(serializers.ModelSerializer):
+class ProductVariantCreateSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.select_related('category').all())
 
     class Meta:
@@ -42,3 +43,9 @@ class ProductVariantWriteSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return ProductVariantReadSerializer(instance).data
+
+
+class ProductVariantUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = ['is_active', 'price', 'inventory', 'max_in_order']
