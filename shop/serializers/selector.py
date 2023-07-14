@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 
 from ..models import *
 
@@ -15,16 +16,18 @@ class _VariantSelectorValueReadSerializer(serializers.ModelSerializer):
 
 
 class VariantSelectorTypeReadSerializer(serializers.ModelSerializer):
+    values = serializers.SerializerMethodField(method_name='get_values')
+
     class Meta:
         model = VariantSelectorType
         fields = [
             'id',
             'title',
             'code',
+            'values',
         ]
 
-    def to_representation(self, instance):
-        response = super().to_representation(instance)
-        values = VariantSelectorValue.objects.filter(type=instance)
-        response['values'] = _VariantSelectorValueReadSerializer(values, many=True).data
-        return response
+    @extend_schema_field(_VariantSelectorValueReadSerializer)
+    def get_values(self, obj: VariantSelectorType):
+        values = VariantSelectorValue.objects.filter(type=obj)
+        return _VariantSelectorValueReadSerializer(values, many=True).data

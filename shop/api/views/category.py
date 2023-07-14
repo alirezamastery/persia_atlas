@@ -1,9 +1,8 @@
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import SAFE_METHODS
-from rest_framework.response import Response
 
 from shop.models import *
-from shop.serializers import *
+from shop.serializers.category import *
 from shop.api.filters import ProductCategoryFilter
 from utils.drf.permissions import IsAdmin
 
@@ -19,7 +18,11 @@ class CategoryViewSet(ReadOnlyModelViewSet):
         .select_related('selector_type') \
         .all() \
         .order_by('id')
-    serializer_class = ProductCategoryReadSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ProductCategoryListSerializer
+        return ProductCategoryDetailSerializer
 
 
 class CategoryAdminViewset(ModelViewSet):
@@ -31,8 +34,10 @@ class CategoryAdminViewset(ModelViewSet):
     permission_classes = [IsAdmin]
 
     def get_serializer_class(self):
-        if self.request.method in SAFE_METHODS:
-            return ProductCategoryReadSerializer
+        if self.action == 'list':
+            return ProductCategoryListSerializer
+        if self.action == 'retrieve' or self.request.method in SAFE_METHODS:
+            return ProductCategoryDetailSerializer
         return ProductCategoryWriteSerializer
 
     def get_paginated_response(self, data):
@@ -43,8 +48,3 @@ class CategoryAdminViewset(ModelViewSet):
                 'title': '-- سرشاخه --'
             })
         return response
-
-    def retrieve(self, request, *args, **kwargs):
-        category = self.get_object()
-        serializer = self.get_serializer(category, context={'with_details': True})
-        return Response(serializer.data)

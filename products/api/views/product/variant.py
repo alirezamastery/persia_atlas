@@ -9,7 +9,7 @@ from rest_framework.exceptions import APIException
 from products.models import *
 from products.serializers import *
 from products.api.filters import *
-from persia_atlas.drf import OptionalPagination
+from utils.drf.pagination import OptionalPagination
 from utils.digi import variant_detail_request
 
 

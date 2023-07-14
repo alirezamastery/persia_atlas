@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'celery',
     'django_celery_results',
     'fcm_django',
+    'drf_spectacular',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -190,7 +191,6 @@ if DEBUG:
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES':     [
         'rest_framework.permissions.IsAuthenticated',
-        # 'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
@@ -200,7 +200,8 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS':        (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_PAGINATION_CLASS':       'persia_atlas.drf.CustomPageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS':       'utils.drf.pagination.CustomPageNumberPagination',
+    # 'DEFAULT_SCHEMA_CLASS':           'utils.drf.drf_spectacular.CustomAutoSchema',
 }
 # *********************************************************
 
@@ -286,4 +287,8 @@ FIREBASE_APP = initialize_app()
 DIGIKALA_API_BASE_URL = 'https://seller.digikala.com/api/v1'
 DIGIKALA_API_HEADERS = {
     'Authorization': config('DIGIKALA_API_KEY')
+}
+
+SPECTACULAR_SETTINGS = {
+    'SCHEMA_PATH_PREFIX': r'/api/',
 }

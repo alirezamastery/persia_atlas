@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from drf_spectacular.utils import extend_schema_field
 
 from shop.models import *
 from .sub import *
@@ -28,6 +29,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             'main_img',
         ]
 
+    @extend_schema_field(_ImageReadSerializer)
     def get_main_img(self, obj: Product):
         main_img = obj.images.filter(is_main=True).first()
         if main_img is not None:
@@ -57,10 +59,12 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'images',
         ]
 
+    @extend_schema_field(_VariantSerializer)
     def get_variants(self, obj: Product):
         variants = ProductVariant.objects.select_related('selector_value__type').filter(product=obj)
         return _VariantSerializer(variants, many=True).data
 
+    @extend_schema_field(_ImageReadSerializer)
     def get_images(self, obj: Product):
         images = obj.images.all().order_by('-is_main')
         return _ImageReadSerializer(images, many=True, context=self.context).data

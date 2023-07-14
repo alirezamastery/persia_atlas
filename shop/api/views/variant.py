@@ -13,7 +13,11 @@ __all__ = [
 
 
 class ProductVariantViewSet(ModelViewSet):
-    queryset = ProductVariant.objects.all()
+    queryset = ProductVariant.objects \
+        .select_related('product') \
+        .select_related('selector_value__type') \
+        .all() \
+        .order_by('id')
     filterset_class = ProductVariantFilter
     permission_classes = [IsAdmin | ReadOnly]
 

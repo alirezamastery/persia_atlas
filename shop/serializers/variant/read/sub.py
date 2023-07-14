@@ -34,4 +34,4 @@ class _VariantSelectorValueReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = VariantSelectorValue
-        fields = '__all__'
+        fields = ['id', 'type', 'title', 'value', 'extra_info']

@@ -7,6 +7,8 @@ from rest_framework import permissions
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
+from utils.drf.drf_spectacular import *
+
 
 urlpatterns_main = [
     path('admin/', admin.site.urls),
@@ -37,6 +39,10 @@ schema_view = get_schema_view(
 urlpatterns = urlpatterns_main + [
     # drf-yasg:
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    # drf-spectacular:
+    path('api/schema/', CustomSpectacularAPIView.as_view(), name='spec_schema'),
+    path('api/schema/swagger-ui/', CustomSpectacularSwaggerView.as_view(url_name='spec_schema'), name='spec_swagger'),
+    path('api/schema/redoc/', CustomSpectacularRedocView.as_view(url_name='spec_schema'), name='spec_redoc'),
 ]
 
 if settings.DEBUG:

@@ -2,6 +2,14 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 
+class OptionalPagination:
+
+    def paginate_queryset(self, queryset):
+        if self.paginator and self.request.query_params.get(self.paginator.page_query_param, None) is None:
+            return None
+        return super().paginate_queryset(queryset)
+
+
 class CustomPageNumberPagination(PageNumberPagination):
     page_size = 20
     page_size_query_param = 'page_size'
@@ -19,5 +27,6 @@ class CustomPageNumberPagination(PageNumberPagination):
 
 
 __all__ = [
+    'OptionalPagination',
     'CustomPageNumberPagination',
 ]

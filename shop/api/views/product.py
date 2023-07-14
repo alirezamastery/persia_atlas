@@ -1,10 +1,12 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
+from drf_spectacular.utils import extend_schema
 
 from shop.models import Product
 from shop.serializers import *
 from shop.api.filters import ProductFilter
+from shop.api.schema import *
 from shop.queries import get_product_with_attrs
 from utils.drf.permissions import IsAdmin, ReadOnly
 
