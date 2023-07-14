@@ -2,46 +2,17 @@ from django.db.models import Prefetch
 from rest_framework import serializers
 
 from shop.models import *
+from .sub import *
+from ..read import OrderReadSerializer
 
 
 __all__ = [
-    'OrderReadSerializer',
     'OrderWriteSerializer',
 ]
 
 
-class OrderItemVariantSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductVariant
-        fields = ['id', 'product_id', 'selector_value_id', 'is_active']
-
-
-class OrderItemReadSerializer(serializers.ModelSerializer):
-    item = OrderItemVariantSerializer(read_only=True)
-
-    class Meta:
-        model = OrderItem
-        fields = ['id', 'item', 'price', 'quantity']
-
-
-class OrderItemWriteSerializer(serializers.Serializer):
-    variant = serializers.PrimaryKeyRelatedField(queryset=ProductVariant.objects.all())
-    quantity = serializers.IntegerField()
-
-    class Meta:
-        fields = ['variant', 'quantity']
-
-
-class OrderReadSerializer(serializers.ModelSerializer):
-    items = OrderItemReadSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = Order
-        fields = ['id', 'user', 'price_sum', 'items', 'is_canceled']
-
-
 class OrderWriteSerializer(serializers.ModelSerializer):
-    items = serializers.ListSerializer(child=OrderItemWriteSerializer(), allow_empty=False)
+    items = serializers.ListSerializer(child=_OrderItemWriteSerializer(), allow_empty=False)
 
     class Meta:
         model = Order

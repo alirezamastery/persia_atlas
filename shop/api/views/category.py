@@ -1,11 +1,10 @@
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
-from rest_framework.decorators import action
 
-from ..filters import ProductCategoryFilter
 from shop.models import *
 from shop.serializers import *
+from shop.api.filters import ProductCategoryFilter
 from utils.drf.permissions import IsAdmin
 
 

@@ -1,10 +1,10 @@
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 
-from utils.drf.mixins import GetByIdList
-from ..filters import ProductAttributeFilter
 from shop.models import ProductAttribute
-from shop.serializers import ProductAttributeSerializer
+from shop.serializers import ProductAttributeReadWriteSerializer
+from shop.api.filters import ProductAttributeFilter
+from utils.drf.mixins import GetByIdList
 from utils.drf.permissions import IsAdmin
 
 
@@ -20,6 +20,6 @@ class ProductAttributeViewSet(mixins.CreateModelMixin,
                               GenericViewSet,
                               GetByIdList):
     queryset = ProductAttribute.objects.all().order_by('id')
-    serializer_class = ProductAttributeSerializer
+    serializer_class = ProductAttributeReadWriteSerializer
     filterset_class = ProductAttributeFilter
     permission_classes = [IsAdmin]

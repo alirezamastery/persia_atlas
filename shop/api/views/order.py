@@ -1,14 +1,11 @@
 from django.db.models import Prefetch
-from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
-from rest_framework.decorators import action
 from rest_framework.permissions import SAFE_METHODS
 
 from shop.models import *
 from shop.serializers import *
-from shop.queries import get_product_with_attrs
-from utils.drf.permissions import IsAdmin, IsAuthenticated
+from utils.drf.permissions import IsAuthenticated
 
 
 __all__ = [

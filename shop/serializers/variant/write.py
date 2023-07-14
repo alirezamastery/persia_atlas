@@ -2,58 +2,12 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from shop.models import *
+from .read import ProductVariantReadSerializer
 
 
 __all__ = [
-    'VariantSelectorValueReadSerializer',
-    'ProductVariantReadSerializer',
     'ProductVariantWriteSerializer',
 ]
-
-
-class _VariantSelectorTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VariantSelectorType
-        fields = ['id', 'title', 'code']
-
-
-class _ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = [
-            'id',
-            'brand',
-            'title',
-            'description',
-            'is_active',
-            'slug',
-            'category',
-        ]
-
-
-class VariantSelectorValueReadSerializer(serializers.ModelSerializer):
-    type = _VariantSelectorTypeSerializer(read_only=True)
-
-    class Meta:
-        model = VariantSelectorValue
-        fields = '__all__'
-
-
-class ProductVariantReadSerializer(serializers.ModelSerializer):
-    product = _ProductSerializer(read_only=True)
-    selector_value = VariantSelectorValueReadSerializer(read_only=True)
-
-    class Meta:
-        model = ProductVariant
-        fields = [
-            'id',
-            'product',
-            'selector_value',
-            'is_active',
-            'price',
-            'inventory',
-            'max_in_order',
-        ]
 
 
 class ProductVariantWriteSerializer(serializers.ModelSerializer):

@@ -4,11 +4,11 @@ from shop.models import Brand
 
 
 __all__ = [
-    'BrandSerializer',
+    'BrandReadWriteSerializer',
 ]
 
 
-class BrandSerializer(serializers.ModelSerializer):
+class BrandReadWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Brand
-        fields = ['user', 'items']
+        fields = ['id', 'title']
