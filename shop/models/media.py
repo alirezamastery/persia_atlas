@@ -8,7 +8,7 @@ __all__ = [
 
 class ProductImage(models.Model):
     product = models.ForeignKey('shop.Product', on_delete=models.CASCADE, related_name='images')
-    file = models.ImageField('products/img')
+    file = models.ImageField(upload_to='product/img')
     is_main = models.BooleanField(default=False)
     description = models.TextField(default='', blank=True)
 

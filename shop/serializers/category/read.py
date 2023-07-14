@@ -29,7 +29,7 @@ class ProductCategoryDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductCategory
-        fields = ['id', 'title', 'selector_type']
+        fields = ['id', 'title', 'selector_type', 'parent_node_id', 'attributes']
 
     @extend_schema_field(OpenApiTypes.INT)
     def get_parent_node_id(self, obj: ProductCategory):

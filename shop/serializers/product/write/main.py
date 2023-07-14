@@ -1,38 +1,14 @@
 from rest_framework import serializers
 
 from shop.models import *
-from .read import ProductDetailSerializer
+from shop.serializers.product import ProductDetailSerializer
 from shop.queries import get_product_with_attrs
+from .sub import *
 
 
 __all__ = [
     'ProductWriteSerializer',
 ]
-
-
-class _ProductAttributeValueWriteSerializer(serializers.Serializer):
-    attribute = serializers.PrimaryKeyRelatedField(queryset=ProductAttribute.objects.all())
-    value = serializers.CharField()
-
-    class Meta:
-        fields = ['attribute', 'value']
-
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
-
-
-class _NewProductImageWriteSerializer(serializers.Serializer):
-    file = serializers.CharField()
-    is_main = serializers.BooleanField()
-
-    def update(self, instance, validated_data):
-        pass
-
-    def create(self, validated_data):
-        pass
 
 
 class ProductWriteSerializer(serializers.ModelSerializer):
@@ -132,10 +108,12 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         product = super().save(**kwargs)
 
         main_img = self.validated_data.get('main_img', None)
-        print(f'{main_img = }')
+        print(f'{main_img = } - file: {main_img.file}')
         if main_img is not None:
             main_img.is_main = True
             main_img.save()
+            product.thumbnail = main_img.file
+            product.save()
 
         new_images = self.validated_data.get('new_images')
         print(f'{new_images = }')
@@ -146,6 +124,9 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             if file.startswith('/media/'):
                 file = file.replace('/media/', '/', 1)
             ProductImage.objects.create(file=file, product=product, is_main=is_main)
+            if is_main:
+                product.thumbnail = file
+                product.save()
 
         return product
 

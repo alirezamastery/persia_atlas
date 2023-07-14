@@ -29,7 +29,7 @@ class ImageViewSet(ModelViewSet):
             return Response({'error': 'unacceptable file format for image'}, status=400)
 
         new_name = f'{uuid.uuid4().hex}.{extension}'
-        path = f'units/images/{new_name}'
+        path = f'product/img/{new_name}'
         saved_file = default_storage.save(path, file)
         file_url = default_storage.url(saved_file)
         response = {
