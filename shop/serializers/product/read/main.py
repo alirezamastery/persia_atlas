@@ -14,7 +14,6 @@ __all__ = [
 class ProductListSerializer(serializers.ModelSerializer):
     brand = _BrandReadSerializer(read_only=True)
     category = _CategoryReadSerializer(read_only=True)
-    main_img = serializers.SerializerMethodField(method_name='get_main_img')
 
     class Meta:
         model = Product
@@ -25,16 +24,9 @@ class ProductListSerializer(serializers.ModelSerializer):
             'description',
             'is_active',
             'slug',
+            'thumbnail',
             'category',
-            'main_img',
         ]
-
-    @extend_schema_field(_ImageReadSerializer)
-    def get_main_img(self, obj: Product):
-        main_img = obj.images.filter(is_main=True).first()
-        if main_img is not None:
-            return _ImageReadSerializer(main_img, context=self.context).data
-        return None
 
 
 class ProductDetailSerializer(serializers.ModelSerializer):
@@ -53,6 +45,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'description',
             'is_active',
             'slug',
+            'thumbnail',
             'category',
             'attribute_values',
             'variants',

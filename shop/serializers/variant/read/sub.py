@@ -18,6 +18,7 @@ class _ProductSerializer(serializers.ModelSerializer):
             'title',
             'description',
             'is_active',
+            'thumbnail',
             'slug',
             'category',
         ]
