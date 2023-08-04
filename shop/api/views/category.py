@@ -1,10 +1,12 @@
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.permissions import SAFE_METHODS
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from shop.models import *
 from shop.serializers.category import *
 from shop.api.filters import ProductCategoryFilter
-from utils.drf.permissions import IsAdmin
+from utils.drf.permissions import IsAdmin, ReadOnly
 
 
 __all__ = [
@@ -18,11 +20,17 @@ class CategoryViewSet(ReadOnlyModelViewSet):
         .select_related('selector_type') \
         .all() \
         .order_by('id')
+    permission_classes = [ReadOnly]
 
     def get_serializer_class(self):
         if self.action == 'list':
             return ProductCategoryListSerializer
         return ProductCategoryDetailSerializer
+
+    @action(detail=False, methods=['GET'], url_path='get-tree')
+    def get_tree(self, request):
+        tree_structure = ProductCategory.dump_bulk_custom()
+        return Response({'tree': tree_structure})
 
 
 class CategoryAdminViewset(ModelViewSet):

@@ -7,6 +7,7 @@ __all__ = [
     '_BrandReadSerializer',
     '_ImageReadSerializer',
     '_AttributeValueReadSerializer',
+    '_VariantForProductListSerializer',
     '_VariantSerializer',
     '_CategoryReadSerializer',
 ]
@@ -74,6 +75,19 @@ class _SelectorValueSerializer(serializers.ModelSerializer):
             'title',
             'value',
             'extra_info',
+        ]
+
+
+class _VariantForProductListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = [
+            'id',
+            'selector_value',
+            'is_active',
+            'price',
+            'inventory',
+            'max_in_order',
         ]
 
 

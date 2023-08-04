@@ -15,11 +15,12 @@ __all__ = [
 
 
 class ProductViewSet(ModelViewSet):
-    queryset = Product.objects \
-        .select_related('brand') \
-        .select_related('category') \
-        .all() \
-        .order_by('id')
+    # queryset = Product.objects \
+    #     .select_related('brand') \
+    #     .select_related('category') \
+    #     .prefetch_related('variants__selector_value__type') \
+    #     .all() \
+    #     .order_by('id')
     filterset_class = ProductFilter
     permission_classes = [IsAdmin | ReadOnly]
 
@@ -29,6 +30,22 @@ class ProductViewSet(ModelViewSet):
         if self.action == 'retrieve':
             return ProductDetailSerializer
         return ProductWriteSerializer
+
+    def get_queryset(self):
+        if self.action == 'list':
+            return Product.objects \
+                .select_related('brand') \
+                .select_related('category') \
+                .prefetch_related('variants__selector_value__type') \
+                .all() \
+                .order_by('id')
+        return Product.objects \
+            .select_related('brand') \
+            .select_related('category') \
+            .prefetch_related('variants__selector_value__type') \
+            .prefetch_related('attribute_values') \
+            .all() \
+            .order_by('id')
 
     def retrieve(self, request, *args, **kwargs):
         pk = kwargs.get('pk')

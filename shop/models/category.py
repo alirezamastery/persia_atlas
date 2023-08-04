@@ -58,12 +58,15 @@ class ProductCategory(MP_Node):
                 # this happens immediately after a load_bulk
                 del fields[pk_field]
 
-            newobj = {'data': fields, 'title': fields['title']}
+            newobj = {
+                # 'data': fields,
+                'title': fields['title'],
+                'selector_type': fields['selector_type']
+            }
             if keep_ids:
                 newobj[pk_field] = pyobj['pk']
 
-            if (not parent and depth == 1) or \
-                    (parent and len(path) == len(parent.path)):
+            if (not parent and depth == 1) or (parent and len(path) == len(parent.path)):
                 ret.append(newobj)
             else:
                 parentpath = klass._get_basepath(path, depth - 1)
