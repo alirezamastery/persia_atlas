@@ -11,7 +11,7 @@ __all__ = [
 
 class _VariantSelectorValueReadSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VariantSelectorValue
+        model = SelectorValue
         fields = ['id', 'type', 'title', 'value', 'extra_info']
 
 
@@ -19,7 +19,7 @@ class VariantSelectorTypeReadSerializer(serializers.ModelSerializer):
     values = serializers.SerializerMethodField(method_name='get_values')
 
     class Meta:
-        model = VariantSelectorType
+        model = SelectorType
         fields = [
             'id',
             'title',
@@ -28,6 +28,6 @@ class VariantSelectorTypeReadSerializer(serializers.ModelSerializer):
         ]
 
     @extend_schema_field(_VariantSelectorValueReadSerializer)
-    def get_values(self, obj: VariantSelectorType):
-        values = VariantSelectorValue.objects.filter(type=obj)
+    def get_values(self, obj: SelectorType):
+        values = SelectorValue.objects.filter(type=obj)
         return _VariantSelectorValueReadSerializer(values, many=True).data

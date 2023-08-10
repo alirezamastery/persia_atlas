@@ -1,5 +1,12 @@
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework import serializers
+
+
+__all__ = [
+    'OptionalPagination',
+    'GetByIdList',
+]
 
 
 class OptionalPagination:
@@ -19,8 +26,3 @@ class GetByIdList:
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
-
-__all__ = [
-    'OptionalPagination',
-    'GetByIdList',
-]

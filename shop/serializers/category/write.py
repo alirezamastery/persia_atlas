@@ -11,10 +11,10 @@ __all__ = [
 
 class ProductCategoryWriteSerializer(serializers.Serializer):
     title = serializers.CharField()
-    parent = serializers.PrimaryKeyRelatedField(queryset=ProductCategory.objects.all(), allow_null=True)
-    selector_type = serializers.PrimaryKeyRelatedField(queryset=VariantSelectorType.objects.all())
+    parent = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all(), allow_null=True)
+    selector_type = serializers.PrimaryKeyRelatedField(queryset=SelectorType.objects.all())
     attributes = serializers.ListSerializer(
-        child=serializers.PrimaryKeyRelatedField(queryset=ProductAttribute.objects.all()),
+        child=serializers.PrimaryKeyRelatedField(queryset=Attribute.objects.all()),
         allow_empty=True,
         default=[]
     )
@@ -29,13 +29,13 @@ class ProductCategoryWriteSerializer(serializers.Serializer):
             'selector_type': validated_data['selector_type']
         }
         if parent_node is None:
-            category = ProductCategory.add_root(**child_data)
+            category = Category.add_root(**child_data)
         else:
             category = parent_node.add_child(**child_data)
 
         attr_ids = set(attr.id for attr in validated_data['attributes'])
         for attr_id in attr_ids:
-            ProductCategoryAttribute.objects.create(category=category, attribute_id=attr_id)
+            CategoryAttribute.objects.create(category=category, attribute_id=attr_id)
 
         return category
 
@@ -46,18 +46,18 @@ class ProductCategoryWriteSerializer(serializers.Serializer):
         parent_node = validated_data.get('parent', -1)
         if parent_node != -1:
             if parent_node is None:
-                category.move(ProductCategory.get_first_root_node(), pos='sorted-sibling')
+                category.move(Category.get_first_root_node(), pos='sorted-sibling')
             elif not parent_node.id == category.id:
                 category.move(parent_node, pos='sorted-child')
 
-        current_attrs = ProductCategoryAttribute.objects.filter(category=category)
+        current_attrs = CategoryAttribute.objects.filter(category=category)
         current_attr_ids = set(attr.attribute_id for attr in current_attrs)
         request_attr_ids = set(attr.id for attr in validated_data.get('attributes', []))
         new_attr_ids = request_attr_ids - current_attr_ids
         removed_attr_ids = current_attr_ids - request_attr_ids
 
         for new_attr_id in new_attr_ids:
-            ProductCategoryAttribute.objects.create(category=category, attribute_id=new_attr_id)
+            CategoryAttribute.objects.create(category=category, attribute_id=new_attr_id)
 
             product_attr_objs = []
             for product in category.products.all():
@@ -68,8 +68,8 @@ class ProductCategoryWriteSerializer(serializers.Serializer):
 
         for removed_attr_id in removed_attr_ids:
             try:
-                ProductCategoryAttribute.objects.get(attribute_id=removed_attr_id).delete()
-            except ProductCategoryAttribute.DoesNotExist:
+                CategoryAttribute.objects.get(attribute_id=removed_attr_id).delete()
+            except CategoryAttribute.DoesNotExist:
                 pass
             for product in category.products.all():
                 try:

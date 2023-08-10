@@ -13,13 +13,13 @@ __all__ = [
 
 class _AttributeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductAttribute
+        model = Attribute
         fields = ['id', 'title', 'description']
 
 
 class ProductCategoryListSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductCategory
+        model = Category
         fields = ['id', 'title', 'selector_type']
 
 
@@ -28,19 +28,19 @@ class ProductCategoryDetailSerializer(serializers.ModelSerializer):
     attributes = serializers.SerializerMethodField('get_attributes')
 
     class Meta:
-        model = ProductCategory
+        model = Category
         fields = ['id', 'title', 'selector_type', 'parent_node_id', 'attributes']
 
     @extend_schema_field(OpenApiTypes.INT)
-    def get_parent_node_id(self, obj: ProductCategory):
+    def get_parent_node_id(self, obj: Category):
         parent_node = obj.get_parent()
         return parent_node.id if parent_node is not None else 0
 
     @extend_schema_field(_AttributeSerializer)
-    def get_attributes(self, obj: ProductCategory):
-        attribute_ids = ProductCategoryAttribute.objects \
+    def get_attributes(self, obj: Category):
+        attribute_ids = CategoryAttribute.objects \
             .filter(category=obj) \
             .select_related('attribute') \
             .values_list('attribute_id', flat=True)
-        attributes = ProductAttribute.objects.filter(id__in=attribute_ids)
+        attributes = Attribute.objects.filter(id__in=attribute_ids)
         return _AttributeSerializer(attributes, many=True).data

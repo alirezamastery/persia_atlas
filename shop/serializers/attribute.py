@@ -1,14 +1,14 @@
 from rest_framework import serializers
 
-from shop.models import ProductAttribute
+from shop.models import Attribute
 
 
 __all__ = [
-    'ProductAttributeReadWriteSerializer',
+    'AttributeReadWriteSerializer',
 ]
 
 
-class ProductAttributeReadWriteSerializer(serializers.ModelSerializer):
+class AttributeReadWriteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductAttribute
+        model = Attribute
         fields = ['id', 'title', 'description']

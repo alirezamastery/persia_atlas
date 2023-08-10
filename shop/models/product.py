@@ -29,13 +29,13 @@ class Product(models.Model):
     thumbnail = models.ImageField(upload_to='product/main_img')
 
     category = models.ForeignKey(
-        'shop.ProductCategory',
+        'shop.Category',
         on_delete=models.PROTECT,
         related_name='products'
     )
 
     attribute_values = models.ManyToManyField(
-        'shop.ProductAttribute',
+        'shop.Attribute',
         through='shop.ProductAttributeValue',
         # related_name='products', will cause error in queries!
     )
@@ -55,7 +55,7 @@ class Product(models.Model):
 
 class ProductAttributeValue(models.Model):
     product = models.ForeignKey('shop.Product', on_delete=models.CASCADE)
-    attribute = models.ForeignKey('shop.ProductAttribute', on_delete=models.CASCADE)
+    attribute = models.ForeignKey('shop.Attribute', on_delete=models.CASCADE)
 
     value = models.TextField()
     extra_info = models.TextField(default='', blank=True)

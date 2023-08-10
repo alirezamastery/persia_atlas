@@ -5,18 +5,18 @@ from rest_framework.response import Response
 
 from shop.models import *
 from shop.serializers.category import *
-from shop.api.filters import ProductCategoryFilter
+from shop.api.filters import CategoryFilter
 from utils.drf.permissions import IsAdmin, ReadOnly
 
 
 __all__ = [
-    'CategoryViewSet',
-    'CategoryAdminViewset',
+    'CategoryViewSetPublic',
+    'CategoryViewsetAdmin',
 ]
 
 
-class CategoryViewSet(ReadOnlyModelViewSet):
-    queryset = ProductCategory.objects \
+class CategoryViewSetPublic(ReadOnlyModelViewSet):
+    queryset = Category.objects \
         .select_related('selector_type') \
         .all() \
         .order_by('id')
@@ -29,16 +29,16 @@ class CategoryViewSet(ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['GET'], url_path='get-tree')
     def get_tree(self, request):
-        tree_structure = ProductCategory.dump_bulk_custom()
+        tree_structure = Category.dump_bulk_custom()
         return Response({'tree': tree_structure})
 
 
-class CategoryAdminViewset(ModelViewSet):
-    queryset = ProductCategory.objects \
+class CategoryViewsetAdmin(ModelViewSet):
+    queryset = Category.objects \
         .select_related('selector_type') \
         .all() \
         .order_by('id')
-    filterset_class = ProductCategoryFilter
+    filterset_class = CategoryFilter
     permission_classes = [IsAdmin]
 
     def get_serializer_class(self):

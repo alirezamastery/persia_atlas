@@ -11,7 +11,7 @@ class Order(models.Model):
     # id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='shop_orders')
 
-    items = models.ManyToManyField('shop.ProductVariant', through='shop.OrderItem')
+    items = models.ManyToManyField('shop.Variant', through='shop.OrderItem')
 
     price_sum = models.PositiveBigIntegerField()
     is_canceled = models.BooleanField(default=False)
@@ -25,7 +25,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey('shop.Order', on_delete=models.PROTECT)
-    item = models.ForeignKey('shop.ProductVariant', on_delete=models.PROTECT)
+    item = models.ForeignKey('shop.Variant', on_delete=models.PROTECT)
 
     price = models.PositiveBigIntegerField()
     quantity = models.PositiveIntegerField()

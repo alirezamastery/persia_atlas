@@ -6,59 +6,41 @@ from shop.models import *
 
 
 __all__ = [
-    'ProductCategoryFilter',
     'ProductAttributeFilter',
     'ProductFilter',
     'VariantSelectorTypeFilter',
-    'ProductVariantFilter',
+    'VariantFilter',
 ]
-
-
-class ProductCategoryFilter(filters.FilterSet):
-    search = filters.CharFilter(field_name='title', lookup_expr='icontains')
-
-    class Meta:
-        model = ProductCategory
-        fields = ['search']
-
 
 class ProductAttributeFilter(filters.FilterSet):
     search = filters.CharFilter(field_name='title', lookup_expr='icontains')
 
     class Meta:
-        model = ProductAttribute
+        model = Attribute
         fields = ['search']
 
 
 class ProductFilter(filters.FilterSet):
-    search = filters.CharFilter(method='search_in_fields')
-    is_active = filters.BooleanFilter(field_name='is_active')
+    q = filters.CharFilter(method='search_in_fields')
+    maxp = filters.NumberFilter(field_name='price', lookup_expr='gte')
+    minp = filters.NumberFilter(field_name='price', lookup_expr='lte')
+    has_inv = filters.BooleanFilter(method='has_inentory')
 
     class Meta:
         model = Product
-        fields = ['search']
+        fields = ['q', 'maxp', 'minp']
 
     def search_in_fields(self, qs, name, value):
         return qs.filter(Q(title__icontains=value) | Q(brand__title=value))
+
+    def has_inentory(self, qs, name, value):
+        return qs.filter(total_inventory__gt=0)
 
 
 class VariantSelectorTypeFilter(filters.FilterSet):
     search = filters.CharFilter(field_name='title', lookup_expr='icontains')
 
     class Meta:
-        model = VariantSelectorType
+        model = SelectorType
         fields = ['search']
 
-
-class ProductVariantFilter(filters.FilterSet):
-    search = filters.CharFilter(method='search_in_fields')
-    is_active = filters.BooleanFilter(field_name='is_active')
-
-    o = OrderingFilter(fields=['price', 'is_active'])
-
-    class Meta:
-        model = ProductVariant
-        fields = ['search', 'is_active']
-
-    def search_in_fields(self, qs, name, value):
-        return qs.filter(Q(product__title__icontains=value) | Q(selector_value__title=value))

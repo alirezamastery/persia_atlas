@@ -9,7 +9,7 @@ __all__ = [
 
 
 class _OrderItemWriteSerializer(serializers.Serializer):
-    variant = serializers.PrimaryKeyRelatedField(queryset=ProductVariant.objects.all())
+    variant = serializers.PrimaryKeyRelatedField(queryset=Variant.objects.all())
     quantity = serializers.IntegerField()
 
     class Meta:

@@ -2,20 +2,20 @@ from django.db import models
 
 
 __all__ = [
-    'ProductVariant',
-    'VariantSelectorType',
-    'VariantSelectorValue',
+    'Variant',
+    'SelectorType',
+    'SelectorValue',
 ]
 
 
-class ProductVariant(models.Model):
+class Variant(models.Model):
     product = models.ForeignKey(
         'shop.Product',
         on_delete=models.CASCADE,
         related_name='variants'
     )
     selector_value = models.ForeignKey(
-        'shop.VariantSelectorValue',
+        'shop.SelectorValue',
         on_delete=models.PROTECT,
         related_name='product_variants'
     )
@@ -40,7 +40,7 @@ class ProductVariant(models.Model):
         return f'{self.product} - {self.selector_value.value}'
 
 
-class VariantSelectorType(models.Model):
+class SelectorType(models.Model):
     class CodeChoices(models.TextChoices):
         SIZE = 'SIZE'
         COLOR = 'COLOR'
@@ -52,9 +52,9 @@ class VariantSelectorType(models.Model):
         return f'{self.title}'
 
 
-class VariantSelectorValue(models.Model):
+class SelectorValue(models.Model):
     type = models.ForeignKey(
-        'shop.VariantSelectorType',
+        'shop.SelectorType',
         on_delete=models.PROTECT,
         related_name='values'
     )

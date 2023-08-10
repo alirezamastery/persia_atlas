@@ -2,20 +2,20 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from shop.models import *
-from .read import ProductVariantReadSerializer
+from .read import VariantReadSerializer
 
 
 __all__ = [
-    'ProductVariantCreateSerializer',
-    'ProductVariantUpdateSerializer',
+    'VariantCreateSerializer',
+    'VariantUpdateSerializer',
 ]
 
 
-class ProductVariantCreateSerializer(serializers.ModelSerializer):
+class VariantCreateSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.select_related('category').all())
 
     class Meta:
-        model = ProductVariant
+        model = Variant
         fields = [
             'product',
             'selector_value',
@@ -26,7 +26,7 @@ class ProductVariantCreateSerializer(serializers.ModelSerializer):
         ]
         validators = [
             UniqueTogetherValidator(
-                queryset=ProductVariant.objects.all(),
+                queryset=Variant.objects.all(),
                 fields=['product', 'selector_value']
             )
         ]
@@ -42,10 +42,10 @@ class ProductVariantCreateSerializer(serializers.ModelSerializer):
         return attrs
 
     def to_representation(self, instance):
-        return ProductVariantReadSerializer(instance).data
+        return VariantReadSerializer(instance).data
 
 
-class ProductVariantUpdateSerializer(serializers.ModelSerializer):
+class VariantUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductVariant
+        model = Variant
         fields = ['is_active', 'price', 'inventory', 'max_in_order']

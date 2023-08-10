@@ -26,7 +26,7 @@ class _ProductSerializer(serializers.ModelSerializer):
 
 class _VariantSelectorTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = VariantSelectorType
+        model = SelectorType
         fields = ['id', 'title', 'code']
 
 
@@ -34,5 +34,5 @@ class _VariantSelectorValueReadSerializer(serializers.ModelSerializer):
     type = _VariantSelectorTypeSerializer(read_only=True)
 
     class Meta:
-        model = VariantSelectorValue
+        model = SelectorValue
         fields = ['id', 'type', 'title', 'value', 'extra_info']

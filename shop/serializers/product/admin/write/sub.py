@@ -10,7 +10,7 @@ __all__ = [
 
 
 class _ProductAttributeValueWriteSerializer(serializers.Serializer):
-    attribute = serializers.PrimaryKeyRelatedField(queryset=ProductAttribute.objects.all())
+    attribute = serializers.PrimaryKeyRelatedField(queryset=Attribute.objects.all())
     value = serializers.CharField()
 
     class Meta:

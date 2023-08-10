@@ -20,7 +20,7 @@ class TestOrder(APITestCase):
         self.user = User.objects.create_superuser(mobile='09125544666', password='123456')
         self.client.force_login(self.user)
 
-        self.category = ProductCategory.objects.first()
+        self.category = Category.objects.first()
 
     def test_1_create_order(self):
         payload = {

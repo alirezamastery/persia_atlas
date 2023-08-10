@@ -1,17 +1,17 @@
 from rest_framework import serializers
 
 from shop.models import *
-from shop.serializers.product import ProductDetailSerializer
 from shop.queries import get_product_with_attrs
+from shop.serializers.product.admin.read import ProductDetailSerializerAdmin
 from .sub import *
 
 
 __all__ = [
-    'ProductWriteSerializer',
+    'ProductWriteSerializerAdmin',
 ]
 
 
-class ProductWriteSerializer(serializers.ModelSerializer):
+class ProductWriteSerializerAdmin(serializers.ModelSerializer):
     attribute_values = serializers.ListSerializer(child=_ProductAttributeValueWriteSerializer(), allow_empty=True)
     new_images = serializers.ListSerializer(child=_NewProductImageWriteSerializer(), allow_empty=True)
     main_img = serializers.PrimaryKeyRelatedField(queryset=ProductImage.objects.all(), required=False, allow_null=True)
@@ -32,7 +32,7 @@ class ProductWriteSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         category = attrs.get('category')
         if category is not None:
-            category_attrs = ProductCategoryAttribute.objects \
+            category_attrs = CategoryAttribute.objects \
                 .filter(category=category) \
                 .values_list('attribute_id', flat=True)
             category_attrs = set(category_attrs)
@@ -105,8 +105,9 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         product = super().save(**kwargs)
 
         main_img = self.validated_data.get('main_img', None)
-        print(f'{main_img = } - file: {main_img.file}')
+        print(f'{main_img = }')
         if main_img is not None:
+            print(f'file: {main_img.file}')
             main_img.is_main = True
             main_img.save()
             product.thumbnail = main_img.file
@@ -128,4 +129,4 @@ class ProductWriteSerializer(serializers.ModelSerializer):
         return product
 
     def to_representation(self, instance):
-        return ProductDetailSerializer(instance).data
+        return ProductDetailSerializerAdmin(instance).data

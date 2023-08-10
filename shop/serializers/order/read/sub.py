@@ -10,7 +10,7 @@ __all__ = [
 
 class _OrderItemVariantSerializer(serializers.ModelSerializer):
     class Meta:
-        model = ProductVariant
+        model = Variant
         fields = ['id', 'product_id', 'selector_value_id', 'is_active']
 
 

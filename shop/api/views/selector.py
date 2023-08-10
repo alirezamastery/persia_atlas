@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from shop.models import VariantSelectorType
+from shop.models import SelectorType
 from shop.serializers import VariantSelectorTypeReadSerializer
 
 
@@ -10,5 +10,5 @@ __all__ = [
 
 
 class VariantSelectorTypeViewSet(ReadOnlyModelViewSet):
-    queryset = VariantSelectorType.objects.all().order_by('id')
+    queryset = SelectorType.objects.all().order_by('id')
     serializer_class = VariantSelectorTypeReadSerializer

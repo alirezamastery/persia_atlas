@@ -6,15 +6,16 @@ from .sub import *
 
 
 __all__ = [
-    'ProductListSerializer',
-    'ProductDetailSerializer',
+    'ProductListSerializerPublic',
+    'ProductDetailSerializerPublic',
 ]
 
 
-class ProductListSerializer(serializers.ModelSerializer):
+class ProductListSerializerPublic(serializers.ModelSerializer):
     brand = _BrandReadSerializer(read_only=True)
     category = _CategoryReadSerializer(read_only=True)
     variants = _VariantSerializer(read_only=True, many=True)
+    price_min = serializers.IntegerField()
 
     class Meta:
         model = Product
@@ -28,10 +29,11 @@ class ProductListSerializer(serializers.ModelSerializer):
             'thumbnail',
             'category',
             'variants',
+            'price_min',
         ]
 
 
-class ProductDetailSerializer(serializers.ModelSerializer):
+class ProductDetailSerializerPublic(serializers.ModelSerializer):
     brand = _BrandReadSerializer(read_only=True)
     category = _CategoryReadSerializer(read_only=True)
     attribute_values = _AttributeValueReadSerializer(read_only=True, many=True)
@@ -45,7 +47,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'brand',
             'title',
             'description',
-            'is_active',
             'slug',
             'thumbnail',
             'category',
@@ -53,11 +54,6 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'variants',
             'images',
         ]
-
-    # @extend_schema_field(_VariantSerializer)
-    # def get_variants(self, obj: Product):
-    #     variants = ProductVariant.objects.select_related('selector_value__type').filter(product=obj)
-    #     return _VariantSerializer(variants, many=True).data
 
     @extend_schema_field(_ImageReadSerializer)
     def get_images(self, obj: Product):

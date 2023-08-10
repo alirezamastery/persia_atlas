@@ -5,21 +5,21 @@ from treebeard.mp_tree import get_result_class
 
 
 __all__ = [
-    'ProductCategory',
-    'ProductCategoryAttribute',
+    'Category',
+    'CategoryAttribute',
 ]
 
 
-class ProductCategory(MP_Node):
+class Category(MP_Node):
     title = models.CharField(max_length=255)
 
     selector_type = models.ForeignKey(
-        'shop.VariantSelectorType',
+        'shop.SelectorType',
         on_delete=models.PROTECT
     )
     attributes = models.ManyToManyField(
-        'shop.ProductAttribute',
-        through='shop.ProductCategoryAttribute',
+        'shop.Attribute',
+        through='shop.CategoryAttribute',
         related_name='product_categories'
     )
 
@@ -78,9 +78,9 @@ class ProductCategory(MP_Node):
         return ret
 
 
-class ProductCategoryAttribute(models.Model):
-    category = models.ForeignKey('shop.ProductCategory', on_delete=models.CASCADE)
-    attribute = models.ForeignKey('shop.ProductAttribute', on_delete=models.CASCADE)
+class CategoryAttribute(models.Model):
+    category = models.ForeignKey('shop.Category', on_delete=models.CASCADE)
+    attribute = models.ForeignKey('shop.Attribute', on_delete=models.CASCADE)
 
     class Meta:
         constraints = [

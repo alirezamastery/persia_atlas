@@ -5,16 +5,16 @@ from .sub import *
 
 
 __all__ = [
-    'ProductVariantReadSerializer',
+    'VariantReadSerializer',
 ]
 
 
-class ProductVariantReadSerializer(serializers.ModelSerializer):
+class VariantReadSerializer(serializers.ModelSerializer):
     product = _ProductSerializer(read_only=True)
     selector_value = _VariantSelectorValueReadSerializer(read_only=True)
 
     class Meta:
-        model = ProductVariant
+        model = Variant
         fields = [
             'id',
             'product',

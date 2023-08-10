@@ -17,18 +17,18 @@ class TestProduct(APITransactionTestCase):
         self.client.force_login(self.user)
 
         self.brand = Brand.objects.create(title='brand 1')
-        self.selector_type = VariantSelectorType.objects.create(title='selector type 1')
-        self.attribute_1 = ProductAttribute.objects.create(title='تعداد طبقه')
-        self.attribute_2 = ProductAttribute.objects.create(title='ارتفاع')
-        self.category = ProductCategory.objects.create(
+        self.selector_type = SelectorType.objects.create(title='selector type 1')
+        self.attribute_1 = Attribute.objects.create(title='تعداد طبقه')
+        self.attribute_2 = Attribute.objects.create(title='ارتفاع')
+        self.category = Category.objects.create(
             title='category 1',
             selector_type=self.selector_type,
             depth=0,
         )
-        ProductCategoryAttribute.objects.create(category=self.category, attribute=self.attribute_1)
-        ProductCategoryAttribute.objects.create(category=self.category, attribute=self.attribute_2)
-        self.selector_1 = VariantSelectorValue.objects.create(type=self.selector_type, title='مشکلی', value='#000')
-        self.selector_2 = VariantSelectorValue.objects.create(type=self.selector_type, title='سفید', value='#fff')
+        CategoryAttribute.objects.create(category=self.category, attribute=self.attribute_1)
+        CategoryAttribute.objects.create(category=self.category, attribute=self.attribute_2)
+        self.selector_1 = SelectorValue.objects.create(type=self.selector_type, title='مشکلی', value='#000')
+        self.selector_2 = SelectorValue.objects.create(type=self.selector_type, title='سفید', value='#fff')
 
     def test_1_create_product(self):
         payload = {

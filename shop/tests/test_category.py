@@ -19,7 +19,7 @@ class TestCategory(APITransactionTestCase):
         self.user = User.objects.create_superuser(mobile='09125544666', password='123456')
         self.client.force_login(self.user)
 
-        self.category = ProductCategory.objects.first()
+        self.category = Category.objects.first()
 
     def test_1_get_category(self):
         response = self.client.get(f'{self.url_base}{self.category.id}/')
@@ -46,7 +46,7 @@ class TestCategory(APITransactionTestCase):
 
         category_id = response.data['id']
         correct_attr_ids = {1, 2, 3, 4}
-        category_attrs = ProductCategoryAttribute.objects.filter(category_id=category_id)
+        category_attrs = CategoryAttribute.objects.filter(category_id=category_id)
         self.assertEqual(category_attrs.count(), 4)
         category_attr_ids = set([attr.attribute_id for attr in category_attrs])
         self.assertEqual(category_attr_ids, correct_attr_ids)
