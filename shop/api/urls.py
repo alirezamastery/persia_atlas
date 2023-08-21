@@ -12,16 +12,16 @@ urlpatterns = [
 ]
 
 
-router.register('categories-admin', CategoryViewsetAdmin, basename='categories-admin')
+router.register('categories-admin', CategoryViewSetAdmin, basename='categories-admin')
 router.register('categories', CategoryViewSetPublic, basename='categories')
 
 router.register('products-admin', ProductViewSetAdmin, basename='products-admin')
 router.register('products', ProductViewSetPublic, basename='products')
 
 router.register('brands', BrandViewSet, basename='brands')
-router.register('product-attrs', ProductAttributeViewSet, basename='product-attrs')
+router.register('attributes', AttributeViewSet, basename='attributes')
 router.register('selector-types', VariantSelectorTypeViewSet, basename='selector_types')
-router.register('variants', ProductVariantViewSet, basename='variants')
+router.register('variants', VariantViewSet, basename='variants')
 router.register('images', ImageViewSet, basename='images')
 router.register('orders', OrderViewSet, basename='orders')
 

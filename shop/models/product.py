@@ -26,7 +26,7 @@ class Product(models.Model):
     description = models.TextField(default='')
     is_active = models.BooleanField(default=True, blank=True)
     slug = models.SlugField(unique=True, editable=False, blank=True)
-    thumbnail = models.ImageField(upload_to='product/main_img')
+    thumbnail = models.ImageField(upload_to='product/thumbnail')
 
     category = models.ForeignKey(
         'shop.Category',

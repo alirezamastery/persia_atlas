@@ -9,16 +9,16 @@ from utils.drf.permissions import IsAdmin
 
 
 __all__ = [
-    'ProductAttributeViewSet',
+    'AttributeViewSet',
 ]
 
 
-class ProductAttributeViewSet(mixins.CreateModelMixin,
-                              mixins.RetrieveModelMixin,
-                              mixins.UpdateModelMixin,
-                              mixins.ListModelMixin,
-                              GenericViewSet,
-                              GetByIdList):
+class AttributeViewSet(mixins.CreateModelMixin,
+                       mixins.RetrieveModelMixin,
+                       mixins.UpdateModelMixin,
+                       mixins.ListModelMixin,
+                       GenericViewSet,
+                       GetByIdList):
     queryset = Attribute.objects.all().order_by('id')
     serializer_class = AttributeReadWriteSerializer
     filterset_class = AttributeFilter

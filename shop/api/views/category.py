@@ -11,7 +11,7 @@ from utils.drf.permissions import IsAdmin, ReadOnly
 
 __all__ = [
     'CategoryViewSetPublic',
-    'CategoryViewsetAdmin',
+    'CategoryViewSetAdmin',
 ]
 
 
@@ -33,7 +33,7 @@ class CategoryViewSetPublic(ReadOnlyModelViewSet):
         return Response({'tree': tree_structure})
 
 
-class CategoryViewsetAdmin(ModelViewSet):
+class CategoryViewSetAdmin(ModelViewSet):
     queryset = Category.objects \
         .select_related('selector_type') \
         .all() \

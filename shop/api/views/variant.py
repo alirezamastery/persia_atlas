@@ -9,15 +9,15 @@ from utils.drf.permissions import IsAdmin, ReadOnly
 
 
 __all__ = [
-    'ProductVariantViewSet',
+    'VariantViewSet',
 ]
 
 
-class ProductVariantViewSet(mixins.RetrieveModelMixin,
-                            mixins.UpdateModelMixin,
-                            mixins.DestroyModelMixin,
-                            mixins.ListModelMixin,
-                            GenericViewSet):
+class VariantViewSet(mixins.RetrieveModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin,
+                     mixins.ListModelMixin,
+                     GenericViewSet):
     queryset = Variant.objects \
         .select_related('product') \
         .select_related('selector_value__type') \

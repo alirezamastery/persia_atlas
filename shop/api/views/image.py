@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.files.storage import default_storage
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
@@ -21,6 +23,8 @@ class ImageViewSet(ModelViewSet):
     @action(methods=['POST'], detail=False, url_path='upload')
     def upload(self, request, *args, **kwargs):
         file = request.FILES.get('image')
+        if not file:
+            return Response({'error': 'no file'}, status=400)
         parts = file.name.split('.')
         if len(parts) == 0:
             return Response({'error': 'no file extension'}, status=400)

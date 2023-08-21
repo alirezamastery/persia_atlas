@@ -9,6 +9,7 @@ __all__ = [
 
 
 class AttributeReadWriteSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Attribute
         fields = ['id', 'title', 'description']
