@@ -1,6 +1,17 @@
 from django.db import models
 
 
+__all__ = [
+    'CostType',
+    'Cost',
+    'Income',
+    'ProductCost',
+    'Invoice',
+    'InvoiceItem',
+    'InvoiceActualItem',
+]
+
+
 class TimestampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
@@ -79,11 +90,16 @@ class InvoiceItem(models.Model):
     calculated = models.BooleanField(default=False)
 
 
-__all__ = [
-    'CostType',
-    'Cost',
-    'Income',
-    'ProductCost',
-    'Invoice',
-    'InvoiceItem'
-]
+class InvoiceActualItem(models.Model):
+    invoice = models.ForeignKey(
+        Invoice,
+        on_delete=models.PROTECT,
+        related_name='actual_product_items'
+    )
+    actual_product = models.ForeignKey(
+        'products.ActualProduct',
+        on_delete=models.PROTECT,
+        related_name='actual_product_items'
+    )
+    quantity = models.PositiveIntegerField()
+    price = models.PositiveBigIntegerField()

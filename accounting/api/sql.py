@@ -2,9 +2,9 @@ SQL_INVOICE_ACTUAL_PRODUCT_COUNT = """
 WITH
     serial_count AS (
         SELECT
-            ap.id
-          , ap.title
-          , COUNT(DISTINCT ii.serial) AS "cnt"
+            ap.id                     AS actual_product_id
+          , ap.title                  AS title
+          , COUNT(DISTINCT ii.serial) AS count
         FROM
             accounting_invoice                 AS i
             INNER JOIN accounting_invoiceitem  AS ii
@@ -13,24 +13,35 @@ WITH
                        ON v.dkpc = ii.dkpc
             INNER JOIN products_actualproduct  AS ap
                        ON v.actual_product_id = ap.id
+
         WHERE
             i.id = %(invoice_id)s
         GROUP BY
             ap.id, ap.title
         ORDER BY
-            cnt DESC
+            count DESC
+    ),
+    with_quantity AS (
+        SELECT
+            sc.*
+          , iap.price
+        FROM
+            serial_count                           AS sc
+            LEFT JOIN accounting_invoiceactualitem AS iap
+                      ON iap.invoice_id = %(invoice_id)s AND iap.actual_product_id = sc.actual_product_id
     ),
     result AS (
         SELECT
-            ROW_NUMBER() OVER (ORDER BY serial_count.cnt DESC) AS rnum
-          , serial_count.*
+            ROW_NUMBER() OVER (ORDER BY with_quantity.count DESC) AS row_number
+          , with_quantity.*
         FROM
-            serial_count
+            with_quantity
+
     )
 SELECT *
 FROM
         (TABLE result)                           AS res
-        RIGHT JOIN (SELECT SUM(cnt) FROM result) AS c(total)
+        RIGHT JOIN (SELECT SUM(count) FROM result) AS c(total)
                    ON TRUE;
 """
 

@@ -18,5 +18,6 @@ router.register('incomes', IncomeViewSet)
 router.register('product-costs', ProductCostViewSet)
 router.register('invoices', InvoiceViewSet)
 router.register('invoice-items', InvoiceItemViewSet)
+router.register('invoice-actual-items', InvoiceActualItemViewSet)
 
 urlpatterns += router.urls

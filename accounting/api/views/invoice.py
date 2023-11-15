@@ -5,10 +5,17 @@ from rest_framework import mixins
 from rest_framework import status
 
 from ...models import *
-from accounting.api.serializers.accounting import *
+from accounting.api.serializers.invoice import *
 from ..filters import *
 from ..sql import *
 from utils.query import execute_raw_query
+
+
+__all__ = [
+    'InvoiceViewSet',
+    'InvoiceItemViewSet',
+    'InvoiceActualItemViewSet',
+]
 
 
 class InvoiceViewSet(mixins.CreateModelMixin,
@@ -30,6 +37,7 @@ class InvoiceViewSet(mixins.CreateModelMixin,
             'actual_product_id': row[1],
             'title':             row[2],
             'count':             row[3],
+            'price':             row[4],
         } for row in result]
 
         response = {
@@ -57,7 +65,37 @@ class InvoiceItemViewSet(mixins.CreateModelMixin,
         return Response(serializer.data, status.HTTP_201_CREATED)
 
 
-__all__ = [
-    'InvoiceViewSet',
-    'InvoiceItemViewSet'
-]
+class InvoiceActualItemViewSet(mixins.CreateModelMixin,
+                               mixins.UpdateModelMixin,
+                               GenericViewSet):
+    queryset = InvoiceActualItem.objects.all().order_by('id')
+    serializer_class = InvoiceActualItemWriteSerializer
+    http_method_names = ['post', 'patch']
+
+    @action(detail=False, methods=['POST'], url_path='bulk-insert')
+    def bulk_insert(self, request):
+        serializer = InvoiceActualItemWriteSerializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+
+        for item in serializer.validated_data:
+            invoice = item['invoice']
+            actual_product = item['actual_product']
+            quantity = item['quantity']
+            price = item['price']
+            try:
+                actual_item = InvoiceActualItem.objects.get(
+                    invoice=invoice,
+                    actual_product=actual_product,
+                )
+                actual_item.quantity = quantity
+                actual_item.price = price
+                actual_item.save()
+            except InvoiceActualItem.DoesNotExist:
+                InvoiceActualItem.objects.create(
+                    invoice=invoice,
+                    actual_product=actual_product,
+                    quantity=quantity,
+                    price=price,
+                )
+
+        return Response(serializer.data, status.HTTP_201_CREATED)

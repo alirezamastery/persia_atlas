@@ -3,6 +3,16 @@ from rest_framework import serializers
 from accounting.models import *
 
 
+__all__ = [
+    'CostTypeSerializer',
+    'CostReadSerializer',
+    'CostWriteSerializer',
+    'IncomeSerializer',
+    'ProductCostSerializer',
+    'JalaliDateSerializer',
+]
+
+
 class CostTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = CostType
@@ -38,27 +48,3 @@ class ProductCostSerializer(serializers.ModelSerializer):
 class JalaliDateSerializer(serializers.Serializer):
     j_month = serializers.IntegerField(min_value=1, max_value=12)
     j_year = serializers.IntegerField()
-
-
-class InvoiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Invoice
-        fields = '__all__'
-
-
-class InvoiceItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = InvoiceItem
-        fields = '__all__'
-
-
-__all__ = [
-    'CostTypeSerializer',
-    'CostReadSerializer',
-    'CostWriteSerializer',
-    'IncomeSerializer',
-    'ProductCostSerializer',
-    'JalaliDateSerializer',
-    'InvoiceSerializer',
-    'InvoiceItemSerializer'
-]
