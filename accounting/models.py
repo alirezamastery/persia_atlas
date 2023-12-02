@@ -78,7 +78,7 @@ class InvoiceItem(models.Model):
 
     dkpc = models.PositiveBigIntegerField()
     variant_title = models.CharField(max_length=255)
-    order_id = models.BigIntegerField()
+    order_id = models.BigIntegerField(blank=True, null=True)
     serial = models.CharField(max_length=255)
     credit = models.BigIntegerField()
     debit = models.BigIntegerField()
