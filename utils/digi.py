@@ -1,4 +1,5 @@
 import json
+import datetime as dt
 
 import requests
 from django.conf import settings
@@ -30,7 +31,10 @@ def send_digikala_api_request(url: str, *, method: str = 'GET', payload: dict = 
     try:
         res_json = res.json()
     except json.decoder.JSONDecodeError:
-        plogger(res.content)
+        plogger(res.text)
+        with open('err.html', 'w', encoding='utf-8') as f:
+            f.write(f'--- {dt.datetime.now()} ---')
+            f.write(res.text)
         raise APIException('پاسخ غیر عادی از دیجیکالا دریافت شد')
     if res_json['status'] == 'ok':
         return res_json['data']
