@@ -17,6 +17,7 @@ urlpatterns_main = [
     path('api/products/', include('products.api.urls')),
     path('api/users/', include('users.api.urls')),
     path('api/accounting/', include('accounting.api.urls')),
+    path('api/car-robot/', include('car_robot.api.urls')),
 ]
 
 schema_view = get_schema_view(

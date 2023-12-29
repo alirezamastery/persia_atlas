@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'products.apps.ProductsConfig',
     'accounting.apps.AccountingConfig',
+    'car_robot.apps.CarRobotConfig',
 
     'channels',
     'rest_framework',
