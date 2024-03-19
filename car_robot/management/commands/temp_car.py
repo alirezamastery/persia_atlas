@@ -9,6 +9,7 @@ from django.conf import settings
 
 from car_robot.scrapers import *
 from utils.logging import logger
+from car_robot.scrapers.laptop_detail import LaptopDetailScraper
 from car_robot.models import *
 
 
@@ -37,6 +38,9 @@ def extract_date(time: str):
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        cars = Car.objects.all()
-        for car in cars:
-            extract_date(car.time)
+        urls = [
+            '/v/%D9%84%D9%BE-%D8%AA%D8%A7%D9%BE-%D8%A7%DB%8C%D8%B3%D9%88%D8%B3-rog-g533zm/AZZ_N-30'
+        ]
+
+        robot = LaptopDetailScraper(urls)
+        robot.run()

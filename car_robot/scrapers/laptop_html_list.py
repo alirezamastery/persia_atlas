@@ -1,19 +1,29 @@
 import time
+import re
+import random
+from typing import Optional
+from zoneinfo import ZoneInfo
+from pprint import pprint
 
 from bs4 import BeautifulSoup
-from django.conf import settings
 from selenium.webdriver import Firefox, FirefoxOptions
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
+from django.core.management import BaseCommand
+from django.conf import settings
 
 from utils.logging import logger
 
 
 __all__ = [
-    'CarListScraper',
+    'LaptopFirstPageListScraper',
 ]
 
 
-class CarListScraper:
+class LaptopFirstPageListScraper:
 
     def __init__(self, url: str):
         self.url = url
@@ -33,13 +43,11 @@ class CarListScraper:
         with open('temp.html', 'w', encoding='utf-8') as f:
             f.write(source)
         soup = BeautifulSoup(source, 'html.parser')
-        container = soup.find('div', {'class': 'virtual-infinite-scroll__viewport'})
-        wrapper = container.find('div', recursive=False)
-        children = wrapper.find_all('div', recursive=False)
+        container = soup.find_all('div', attrs={'class': re.compile('^post-list__widget-col*')})
 
         links = []
-        for child in children:
-            link = child.find('a')
+        for el in container:
+            link = el.find('a')
             href = link['href']
             print(href)
             links.append(href)
