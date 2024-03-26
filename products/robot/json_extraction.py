@@ -6,7 +6,7 @@ from utils.logging import logger, plogger
 
 
 class JSONExtractor:
-    base_url = 'https://api.digikala.com/v1/product/'
+    base_url = 'https://api.digikala.com/v2/product/'
 
     def __init__(self, product: Product):
         self.product = product

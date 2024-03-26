@@ -25,6 +25,7 @@ def send_digikala_api_request(url: str, *, method: str = 'GET', payload: dict = 
             method=method,
             json=payload,
             timeout=5,
+            verify=False,
         )
     except requests.exceptions.RequestException:
         raise APIException('خطا در برقرار ارتباط با دیجیکالا')
@@ -68,6 +69,7 @@ def variant_detail_request_from_robot(
             method=method,
             json=payload,
             timeout=5,
+            verify=False,
         )
     except requests.exceptions.RequestException:
         raise Exception('خطا در برقرار ارتباط با دیجیکالا')
